@@ -37,7 +37,10 @@
   var cores = navigator.hardwareConcurrency || 4;
   var POOL = Math.max(1, Math.min(3, cores - 1));
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var SMOOTH = reduceMotion ? 30 : 8;           // rattrapage (s⁻¹) : ~0,12 s, réactif sans à-coup
+  var SMOOTH = reduceMotion ? 30 : 8;           // mobile (doigt, défilement continu) : rattrapage ~0,12 s
+  // ordinateur (molette qui avance par crans) : « ressort » amorti — la vitesse varie en douceur,
+  // la caméra glisse d'un cran à l'autre au lieu de démarrer et s'arrêter à chaque cran
+  var OMEGA = reduceMotion ? 30 : (parseFloat(root.getAttribute("data-omega")) || 7.5);
   var PACKS_EN_COURS = 2;                       // paquets haute qualité téléchargés en même temps
 
   var canvas = root.querySelector("canvas");
@@ -60,6 +63,7 @@
   var hiMap = new Map(), loMap = new Map(), inflight = new Set();
   var packCache = {}, hiOpts = null, hiOptsKey = "";
   var target = 0, pos = 0, prevPos = 0, vel = 0, lastT = 0, running = false, last = "", lastScroll = 0;
+  var spd = 0, rawPrev = 0, travel = 1, hold = null;   // vitesse du ressort, sens du défilement, image d'arrêt
   var hiPacksBusy = 0;
   var cw = 0, ch = 0, dpr = 1, rootTop = 0, rootH = 0, stickyH = 0;
   var hiTimer = 0, loReady = false;
@@ -371,19 +375,32 @@
     var dt = lastT ? Math.min(0.05, (now - lastT) / 1000) : 1 / 60;
     lastT = now;
     prevPos = pos;
-    var diff = target - pos;
-    pos = Math.abs(diff) < 0.003 ? target : pos + diff * (1 - Math.exp(-SMOOTH * dt));
+    // à l'arrêt : on se pose sur l'image d'origine suivante, dans le sens du mouvement (jamais de recul)
+    if (KEY > 1 && now - lastScroll > REST_MS) { var k = snap(target); if (k !== target) { target = k; hold = k; } }
+    if (mode === "mobile") {
+      var diff = target - pos;
+      pos = Math.abs(diff) < 0.003 ? target : pos + diff * (1 - Math.exp(-SMOOTH * dt));
+    } else {
+      // ressort critiquement amorti (calcul exact, stable quel que soit l'intervalle entre deux images)
+      var x = pos - target, e = Math.exp(-OMEGA * dt), c = spd + OMEGA * x;
+      var nx = (x + c * dt) * e;
+      spd = (spd - OMEGA * c * dt) * e;
+      // on ne dépasse jamais la cible (sinon la caméra reculerait) ; arrivée = arrêt net mais à vitesse quasi nulle
+      if (nx * x < 0 || (Math.abs(nx) < 0.003 && Math.abs(spd) < 0.05)) { nx = 0; spd = 0; }
+      pos = target + nx;
+    }
     var sp = Math.abs(pos - prevPos);
     vel = vel * 0.7 + sp * 0.3;
-    // à l'arrêt : on se pose en douceur sur l'image d'origine la plus proche (la plus nette)
-    if (KEY > 1 && now - lastScroll > REST_MS) target = snap(target);
     render();
     overlays();
     pump();
     if (pos !== target || (KEY > 1 && snap(target) !== target)) requestAnimationFrame(loop);
-    else { running = false; lastT = 0; vel = 0; }
+    else { running = false; lastT = 0; vel = 0; spd = 0; }
   }
-  function snap(t) { return Math.min(N - 1, Math.round(t / KEY) * KEY); }
+  function snap(t) {                              // image d'origine (multiple de KEY) suivante dans le sens du défilement
+    var k = travel >= 0 ? Math.ceil(t / KEY - 1e-6) * KEY : Math.floor(t / KEY + 1e-6) * KEY;
+    return Math.max(0, Math.min(N - 1, k));
+  }
   function kick() {
     if (running) return;
     running = true; lastT = 0;
@@ -401,7 +418,12 @@
     // course = hauteur de la section − hauteur de l'écran collant (fixe : ne bouge pas avec la barre d'adresse)
     var y = window.pageYOffset, total = rootH - stickyH;
     var p = total > 0 ? Math.min(1, Math.max(0, (y - rootTop) / total)) : 0;
-    target = p * (N - 1);
+    var raw = p * (N - 1);
+    if (raw !== rawPrev) travel = raw > rawPrev ? 1 : -1;
+    // posée un peu plus loin (image d'origine suivante) : quand on reprend dans le même sens, on ne recule pas
+    if (hold !== null && (raw === rawPrev || (travel > 0 && raw > rawPrev && raw < hold) || (travel < 0 && raw < rawPrev && raw > hold))) target = hold;
+    else { hold = null; target = raw; }
+    rawPrev = raw;
     // en-tête transparent seulement tant que l'écran de la visite est fixé ; dès qu'il s'en va, en-tête plein
     // (sinon les textes de fin passeraient sous le logo)
     if (siteTop) siteTop.classList.toggle("in-hero", y < rootTop + rootH - stickyH - 1);
@@ -470,7 +492,7 @@
   resize();
   measure();
   readTarget();
-  pos = prevPos = target;
+  pos = prevPos = rawPrev = target;
   startMode();
   updateHiOpts();
   overlays();

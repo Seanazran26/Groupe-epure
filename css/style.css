@@ -482,6 +482,7 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .totals span { font-size: 10.5px; letter-spacing: .26em; text-transform: uppercase; }
 .totals strong { font-family: var(--serif); font-size: 1.9rem; font-weight: 500; }
 .drawer-foot .note { font-size: .78rem; color: var(--muted); margin: 0 0 18px; }
+.drawer-foot .age-note { margin-top: -10px; font-size: .72rem; }
 .free-ship { font-size: .82rem; color: var(--ink-soft); margin-bottom: 18px; }
 .free-ship .bar { height: 3px; background: var(--sand-deep); margin-top: 8px; overflow: hidden; }
 .free-ship .bar i { display: block; height: 100%; background: var(--wine); transition: width .6s var(--ease); }
@@ -520,22 +521,6 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .toast .t-txt strong { font-family: var(--serif); font-weight: 500; font-size: 1.05rem; display: block; }
 .toast button { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold-soft); white-space: nowrap; padding-left: 8px; }
 
-/* ---------- Contrôle de l'âge ---------- */
-.age-gate {
-  position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px;
-  background: var(--wine-night); color: var(--paper); text-align: center;
-  transition: opacity .9s var(--ease), visibility .9s;
-}
-.age-gate.hide { opacity: 0; visibility: hidden; }
-.age-gate-box { position: relative; max-width: 560px; }
-.age-gate .brand { color: var(--paper); }
-.age-gate .brand-sub { color: rgba(250,246,240,.55); }
-.age-gate h2 { font-family: var(--serif); font-weight: 300; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; margin: 44px 0 14px; }
-.age-gate h2 em { color: var(--gold-soft); }
-.age-gate p { color: rgba(250,246,240,.7); margin: 0 auto 34px; max-width: 40ch; }
-.age-gate .actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-.age-gate small { display: block; margin-top: 40px; font-size: .7rem; letter-spacing: .16em; text-transform: uppercase; color: rgba(250,246,240,.4); }
-.age-gate .refused { display: none; margin-top: 20px; color: var(--gold-soft); font-family: var(--serif); font-style: italic; font-size: 1.2rem; }
 
 /* ---------- Page « La Cave » ---------- */
 .page-hero .container { position: relative; z-index: 2; padding-top: 190px; padding-bottom: 64px; }
@@ -884,12 +869,6 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .club .lead { color: rgba(250,246,240,.72); }
 .club .ct-small { color: var(--gold-soft); }
 
-/* ---------- Contrôle de l'âge ---------- */
-.age-gate::before {
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(45% 55% at 50% 100%, rgba(122,36,51,.6), transparent 70%), radial-gradient(40% 40% at 50% 0%, rgba(180,142,90,.12), transparent 70%);
-}
-.age-gate-box { outline: 1px solid rgba(180,142,90,.3); outline-offset: 36px; }
 
 /* ---------- En-tête de la page « La Cave » ---------- */
 .page-hero {

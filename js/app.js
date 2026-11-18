@@ -354,6 +354,8 @@
         '<div class="bar"><i style="width:' + Math.min(100, (n / seuil) * 100) + '%"></i></div></div>' +
       '<div class="totals"><span>Sous-total</span><strong>' + V.prix(cartTotal()) + "</strong></div>" +
       '<p class="note">' + (reste ? "Livraison " + esc(L.transporteur || "") + " : " + V.prix(L.prix || 0) + " (colis de 3, 6 ou 9 bouteilles). " : "") + "Retrait possible à la cave sur rendez-vous.</p>" +
+      // contrôle de l'âge au moment de commander (et non plus en plein écran à l'arrivée sur le site)
+      '<p class="note age-note">Vente d\'alcool interdite aux mineurs : en validant votre commande, vous certifiez avoir 18 ans ou plus.</p>' +
       '<button class="btn btn-wine btn-block" data-checkout>Valider ma commande ' + I.arrow + "</button>";
   }
   V.ajouter = function (id, q) {
@@ -417,31 +419,6 @@
   }
 
   /* ---------- Contrôle d'âge ---------- */
-  function ageGate() {
-    if (store.get("vdc-age-ok", false)) return;
-    var g = document.createElement("div");
-    g.className = "age-gate";
-    g.setAttribute("role", "dialog");
-    g.setAttribute("aria-modal", "true");
-    g.innerHTML = '<div class="age-gate-box"><div class="brand">' + V.brandHTML() + "</div>" +
-      "<h2>Bienvenue <em>chez les copains</em></h2>" +
-      "<p>Pour entrer sur notre site, vous devez avoir l'âge légal pour consommer de l'alcool dans votre pays de résidence.</p>" +
-      '<div class="actions"><button class="btn btn-light" data-age-yes>J\'ai plus de 18 ans</button><button class="btn btn-ghost-light" data-age-no>J\'ai moins de 18 ans</button></div>' +
-      '<div class="refused" data-age-refused>Revenez nous voir un peu plus tard… à bientôt !</div>' +
-      "<small>L'abus d'alcool est dangereux pour la santé, à consommer avec modération.</small></div>";
-    document.body.appendChild(g);
-    document.body.classList.add("no-scroll");
-    g.querySelector("[data-age-yes]").addEventListener("click", function () {
-      store.set("vdc-age-ok", true);
-      g.classList.add("hide");
-      document.body.classList.remove("no-scroll");
-      setTimeout(function () { g.remove(); }, 1000);
-    });
-    g.querySelector("[data-age-no]").addEventListener("click", function () {
-      g.querySelector("[data-age-refused]").style.display = "block";
-    });
-  }
-
   /* ---------- Animations ---------- */
   V.observe = function (root) {
     var els = (root || document).querySelectorAll(".reveal:not(.in), .img-reveal:not(.in)");
@@ -503,7 +480,6 @@
     document.querySelectorAll("#mobile-menu a").forEach(function (a) { a.addEventListener("click", closePanels); });
 
     renderCart();
-    ageGate();
     V.observe();
   }
 
