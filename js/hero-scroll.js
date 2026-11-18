@@ -11,8 +11,11 @@
    2. Décodage en parallèle dans plusieurs travailleurs (js/hero-worker.js),
       anticipé dans le sens et à la vitesse du défilement ; le fil principal
       ne fait que dessiner.
-   3. Mouvement lissé (amortissement exponentiel) + fondu entre deux images
-      voisines quand on défile lentement.
+   3. Mouvement lissé (amortissement exponentiel), sans aucun fondu (pas de
+      double image) ; à l'arrêt, la caméra se pose toujours sur une image
+      d'origine de la vidéo (1 image sur 3), la plus nette.
+      Pendant le mouvement, si l'image exacte n'est pas encore en haute qualité,
+      on montre la voisine en haute qualité plutôt que la version légère.
    4. Plein écran partout, caméra fixe et centrée :
       - ordinateur : images 16:9 (1920 px) ;
       - mobile portrait : images verticales préparées pour le téléphone
@@ -25,7 +28,9 @@
   var root = document.querySelector("[data-hero-scroll]");
   if (!root) return;
 
-  var N = parseInt(root.getAttribute("data-frames"), 10) || 439;
+  var N = parseInt(root.getAttribute("data-frames"), 10) || 427;
+  var KEY = parseInt(root.getAttribute("data-key-step"), 10) || 1;   // 1 image sur KEY = image d'origine (nette)
+  var REST_MS = 140;                            // sans défilement depuis 140 ms = arrêt
   var BATCH = 24, BATCH_DELAY = 120;            // haute qualité : lots de 24 toutes les 120 ms
   var MOBILE_MAX = 1024;
   var HI_WIN = 14, LO_WIN = 48, AHEAD = 14;     // fenêtres de décodage (images)
@@ -33,7 +38,7 @@
   var POOL = Math.max(1, Math.min(3, cores - 1));
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var SMOOTH = reduceMotion ? 30 : 8;           // rattrapage (s⁻¹) : ~0,12 s, réactif sans à-coup
-  var FAST = 1.2;                               // au-delà (images par rafraîchissement) : pas de fondu
+  var PACKS_EN_COURS = 2;                       // paquets haute qualité téléchargés en même temps
 
   var canvas = root.querySelector("canvas");
   var ctx = canvas.getContext("2d", { alpha: false });
@@ -54,7 +59,8 @@
   var blobs = { lo: [], hi: [] }, fetching = { lo: [], hi: [] }, imgs = { lo: [], hi: [] };
   var hiMap = new Map(), loMap = new Map(), inflight = new Set();
   var packCache = {}, hiOpts = null, hiOptsKey = "";
-  var target = 0, pos = 0, prevPos = 0, vel = 0, lastT = 0, running = false, last = "";
+  var target = 0, pos = 0, prevPos = 0, vel = 0, lastT = 0, running = false, last = "", lastScroll = 0;
+  var hiPacksBusy = 0;
   var cw = 0, ch = 0, dpr = 1, rootTop = 0, rootH = 0, stickyH = 0, headerH = 80;
   var hiTimer = 0, loReady = false;
 
@@ -235,8 +241,52 @@
       }, next);
     })();
   }
+  function hiPackDone(n) {                       // toutes les images du paquet n sont-elles là ?
+    var fr = packs(mode).frames;
+    for (var j = 0; j < fr.length; j++) if (fr[j][0] === n && !blobs.hi[j]) return false;
+    return true;
+  }
+  function nextHiPack() {
+    // le paquet de la position actuelle d'abord, puis vers l'avant (2 pour 1 vers l'arrière)
+    var pk = packs(mode), np = pk.packs.length, c = pk.frames[Math.min(N - 1, Math.round(target))][0];
+    var dir = target >= pos ? 1 : -1, order = [c], f = 1, b = 1;
+    while (order.length < np) {
+      for (var r = 0; r < 2; r++) { var a = c + dir * f++; if (a >= 0 && a < np) order.push(a); }
+      var z = c - dir * b++; if (z >= 0 && z < np) order.push(z);
+      if (f > np && b > np) break;
+    }
+    for (var k = 0; k < order.length; k++) {
+      var n = order[k];
+      if (!hiPackBusy[n] && !hiPackDone(n)) return n;
+    }
+    return -1;
+  }
+  var hiPackBusy = {};
+  function packLoop() {
+    var g = modeGen, name = mode;
+    // pendant le chargement de la version légère : 1 paquet net à la fois (le début de la visite), ensuite 2
+    while (hiPacksBusy < (loReady || !hasLo ? PACKS_EN_COURS : 1)) {
+      var n = nextHiPack();
+      if (n < 0) return;
+      hiPackBusy[n] = true; hiPacksBusy++;
+      (function (n) {
+        fetchPack(name, n).then(function (buf) {
+          if (g !== modeGen) return;
+          unpack("hi", name, n, buf);
+          hiPackBusy[n] = false; hiPacksBusy--;
+          pump(); kick(); packLoop();
+        }, function () {
+          if (g !== modeGen) return;
+          hiPackBusy[n] = false; hiPacksBusy--;
+          hiTimer = setTimeout(packLoop, 800);     // nouvel essai un peu plus tard
+        });
+      })(n);
+    }
+  }
   function scheduleHi() {
     clearTimeout(hiTimer);
+    if (canFetch && packs(mode)) { packLoop(); return; }
+    if (hasLo && !loReady) return;                // (sans paquets) la version légère d'abord
     (function step() {
       // les 24 images haute qualité manquantes les plus proches (surtout vers l'avant)
       var c = Math.round(target), n = 0, f = 0, b = 1;
@@ -269,26 +319,29 @@
     var s = Math.max(cw / iw, ch / ih), dw = iw * s, dh = ih * s;
     return [(cw - dw) / 2, (ch - dh) / 2, dw, dh];
   }
-  function draw(img, alpha, lo) {
+  function draw(img, lo) {
     var r = rect(img);
-    // version légère (déjà floue) : filtre simple, bien moins coûteux ; haute qualité : filtre fin
+    // version légère (déjà floue) : filtre simple ; haute qualité : filtre fin
     ctx.imageSmoothingQuality = lo ? "low" : "high";
-    ctx.globalAlpha = alpha;
     ctx.drawImage(img, r[0], r[1], r[2], r[3]);
   }
-  function render(speed) {
-    var i0 = Math.floor(pos), t = pos - i0;
-    if (speed > FAST) { i0 = Math.round(pos); t = 0; }
-    var i1 = Math.min(N - 1, i0 + 1), a = frameAt(i0), aHi = hiMap.has(i0);
-    // fondu seulement entre deux images haute qualité (sur la version légère, il ne se verrait pas)
-    var b = t > 0.004 && aHi && hiMap.has(i1) ? hiMap.get(i1) : null, key;
-    if (a) key = i0 + ":" + (b ? Math.round(t * 128) : 0) + (aHi ? "h" : "l");
-    else { a = nearest(i0); b = null; key = a ? "n" + i0 : ""; }
-    if (!a || key === last) return;
-    last = key;
-    draw(a, 1, !aHi && a !== hiMap.get(i0));
-    if (b) draw(b, t, false);
-    ctx.globalAlpha = 1;
+  function pick(i) {
+    // haute qualité exacte, sinon voisine en haute qualité (nette), sinon version légère
+    if (hiMap.has(i)) return [hiMap.get(i), "h" + i];
+    var dir = target >= pos ? 1 : -1;
+    for (var d = 1; d <= 2; d++) {
+      if (hiMap.has(i + dir * d)) return [hiMap.get(i + dir * d), "h" + (i + dir * d)];
+      if (hiMap.has(i - dir * d)) return [hiMap.get(i - dir * d), "h" + (i - dir * d)];
+    }
+    if (loMap.has(i)) return [loMap.get(i), "l" + i];
+    var n = nearest(i);
+    return n ? [n, "n" + i] : null;
+  }
+  function render() {
+    var p = pick(Math.round(pos));
+    if (!p || p[1] === last) return;
+    last = p[1];
+    draw(p[0], p[1].charAt(0) !== "h");
   }
   function overlays() {
     var p = pos / (N - 1);
@@ -305,12 +358,15 @@
     pos = Math.abs(diff) < 0.003 ? target : pos + diff * (1 - Math.exp(-SMOOTH * dt));
     var sp = Math.abs(pos - prevPos);
     vel = vel * 0.7 + sp * 0.3;
-    render(sp);
+    // à l'arrêt : on se pose en douceur sur l'image d'origine la plus proche (la plus nette)
+    if (KEY > 1 && now - lastScroll > REST_MS) target = snap(target);
+    render();
     overlays();
     pump();
-    if (pos !== target) requestAnimationFrame(loop);
+    if (pos !== target || (KEY > 1 && snap(target) !== target)) requestAnimationFrame(loop);
     else { running = false; lastT = 0; vel = 0; }
   }
+  function snap(t) { return Math.min(N - 1, Math.round(t / KEY) * KEY); }
   function kick() {
     if (running) return;
     running = true; lastT = 0;
@@ -332,7 +388,7 @@
     target = p * (N - 1);
     if (siteTop) siteTop.classList.toggle("in-hero", rootTop + rootH - y > headerH);
   }
-  function onScroll() { readTarget(); kick(); }
+  function onScroll() { lastScroll = performance.now(); readTarget(); kick(); }
 
   /* ---------- Taille du canvas, mode ordinateur / mobile ---------- */
   function resize() {
@@ -371,12 +427,12 @@
     clearTimeout(hiTimer);
     hiMap.forEach(release); hiMap.clear(); loMap.forEach(release); loMap.clear(); inflight.clear();
     blobs = { lo: [], hi: [] }; fetching = { lo: [], hi: [] }; imgs = { lo: [], hi: [] };
-    hiOptsKey = ""; last = ""; loReady = false;
+    hiOptsKey = ""; last = ""; loReady = false; hiPackBusy = {}; hiPacksBusy = 0;
     hasLo = canFetch && !!packs(loName());
     fetchBlob("hi", 0, true);                     // image 1 en priorité absolue
     fetchBlob("hi", Math.round(target), true);
-    if (hasLo) loadLo();                          // la version légère d'abord (toute la séquence)…
-    else scheduleHi();                            // …puis la haute qualité
+    if (hasLo) loadLo();                          // la version légère (toute la séquence, pour bouger tout de suite)…
+    scheduleHi();                                 // …et, en parallèle, la haute qualité autour de la position
   }
 
   // lecture seule, pour les mesures

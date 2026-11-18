@@ -12,12 +12,34 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="has-hero" data-page="accueil">
+  <script>
+    /* Ouverture du site : toujours au tout début du héros.
+       Seule exception : un lien interne vers une section (ex. « La Maison » depuis une autre page). */
+    (function () {
+      try {
+        if ("scrollRestoration" in history) history.scrollRestoration = "manual";   // pas de retour à l'ancienne position
+        var nav = performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
+        var interne = false;
+        try { interne = !!document.referrer && new URL(document.referrer).origin === location.origin && (!nav || nav.type === "navigate"); } catch (e) {}
+        if (location.hash && interne) return;
+        if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+        var touche = false;
+        ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (t) {
+          window.addEventListener(t, function () { touche = true; }, { once: true, passive: true });
+        });
+        var haut = function () { if (!touche) window.scrollTo(0, 0); };   // jamais contre un geste du visiteur
+        haut();
+        document.addEventListener("DOMContentLoaded", haut);
+        window.addEventListener("load", haut);
+      } catch (e) {}
+    })();
+  </script>
 
   <div class="site-top" id="site-top"></div>
 
   <main>
-    <!-- ============ HÉROS SCROLL VIDÉO (297 images pilotées par le défilement) ============ -->
-    <section class="hero-scroll" data-hero-scroll data-frames="439"
+    <!-- ============ HÉROS SCROLL VIDÉO (427 images pilotées par le défilement) ============ -->
+    <section class="hero-scroll" data-hero-scroll data-frames="427" data-key-step="3"
       data-src-lo="assets/hero-frames-lo/" data-size-lo="512x288" data-size-lo-mobile="288x432"
       data-src-desktop="assets/hero-frames/" data-size-desktop="1920x1080"
       data-src-mobile="assets/hero-frames-m/" data-size-mobile="720x1080" aria-label="Visite de la cave">
