@@ -81,7 +81,9 @@
   function release(bm) { if (bm && bm.close) bm.close(); }
   function categorie() {
     // mobile = petit écran tenu en portrait ; à l'horizontale, l'image plein écran convient
-    return window.innerWidth < MOBILE_MAX && window.innerHeight >= window.innerWidth ? "mobile" : "desktop";
+    var portrait = window.innerHeight >= window.innerWidth ||
+      !!(window.matchMedia && window.matchMedia("(orientation: portrait)").matches);
+    return window.innerWidth < MOBILE_MAX && portrait ? "mobile" : "desktop";
   }
   function srcName(tier) { return tier === "lo" ? "lo" : mode; }
 
