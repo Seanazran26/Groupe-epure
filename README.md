@@ -23,10 +23,12 @@ les couleurs et des filets dorés. Les emplacements « Cuvée à venir » montre
 
 Le héros de l'accueil fait défiler la vidéo de la cave image par image au scroll (`js/hero-scroll.js`) :
 
-- 297 images interpolées (compensation de mouvement) à partir de la vidéo 1080p de 143 images
-- `assets/hero-frames/` : 297 WebP 1920 px, qualité 85 (ordinateur, ~27 Mo)
-- `assets/hero-frames-sm/` : 297 WebP 1080 px, qualité 80 (mobile < 1024 px, ~11 Mo)
-- sur mobile, le cadrage suit les bouteilles (`data-focus-mobile` dans `index.html`)
+- 439 images interpolées (compensation de mouvement) à partir de la vidéo 1080p de 143 images
+- `assets/hero-frames/` : 439 WebP 1920 px, qualité 88 (ordinateur, ~48 Mo)
+- `assets/hero-frames-sm/` : 439 WebP 608 × 1080 (recadrage central 9:16 en résolution native, mobile portrait, ~17 Mo)
+- fluidité : lissage du mouvement, fondu entre images voisines, téléchargement et décodage
+  dans un travailleur en arrière-plan (`js/hero-worker.js`) ; caméra toujours centrée
+- ouvert directement depuis le dossier (file://), un mode de secours prend le relais
 
 ## Où modifier quoi ?
 
@@ -73,6 +75,7 @@ js/carte-france.js     fond de carte de France (Natural Earth, domaine public)
 js/app.js              en-tête, pied de page, panier, recherche, contrôle d'âge
 js/home.js | nos-vins.js | produit.js | vignerons.js   scripts propres à chaque page
 js/hero-scroll.js      héros vidéo piloté par le défilement
+js/hero-worker.js      téléchargement + décodage des images du héros en arrière-plan
 assets/hero-frames/    images du héros (ordinateur) — assets/hero-frames-sm/ (mobile)
 donnees/               catalogue du site actuel (JSON + CSV)
 assets/bouteilles/     photos des bouteilles (reprises du site actuel, recadrées, pas encore affichées)
