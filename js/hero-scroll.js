@@ -28,8 +28,18 @@
   var root = document.querySelector("[data-hero-scroll]");
   if (!root) return;
 
-  var N = parseInt(root.getAttribute("data-frames"), 10) || 424;
-  var KEY = parseInt(root.getAttribute("data-key-step"), 10) || 1;   // 1 image sur KEY = image d'origine (nette)
+  var N = parseInt(root.getAttribute("data-frames"), 10) || 297;
+  // Images d'origine de la vidéo (les plus nettes) : liste fournie par js/hero-time.js (window.HERO_KEYS),
+  // sinon 1 image sur data-key-step. Entre deux images d'origine, les images calculées sont réparties
+  // régulièrement : le défilement avance donc la vidéo à vitesse constante, quel que soit leur nombre.
+  var KEYS = (function () {
+    var k = window.HERO_KEYS, step = parseInt(root.getAttribute("data-key-step"), 10) || 1, a = [];
+    if (k && k.length > 1 && k[0] === 0 && k[k.length - 1] === N - 1) return k;
+    for (var i = 0; i < N; i += step) a.push(i);
+    if (a[a.length - 1] !== N - 1) a.push(N - 1);
+    return a;
+  })();
+  var SNAP = KEYS.length < N;                   // se poser sur une image d'origine à l'arrêt
   var REST_MS = 140;                            // sans défilement depuis 140 ms = arrêt
   var BATCH = 24, BATCH_DELAY = 120;            // haute qualité : lots de 24 toutes les 120 ms
   var MOBILE_MAX = 1024;
@@ -376,7 +386,7 @@
     lastT = now;
     prevPos = pos;
     // à l'arrêt : on se pose sur l'image d'origine suivante, dans le sens du mouvement (jamais de recul)
-    if (KEY > 1 && now - lastScroll > REST_MS) { var k = snap(target); if (k !== target) { target = k; hold = k; } }
+    if (SNAP && now - lastScroll > REST_MS) { var k = snap(target); if (k !== target) { target = k; hold = k; } }
     if (mode === "mobile") {
       var diff = target - pos;
       pos = Math.abs(diff) < 0.003 ? target : pos + diff * (1 - Math.exp(-SMOOTH * dt));
@@ -394,12 +404,24 @@
     render();
     overlays();
     pump();
-    if (pos !== target || (KEY > 1 && snap(target) !== target)) requestAnimationFrame(loop);
+    if (pos !== target || (SNAP && snap(target) !== target)) requestAnimationFrame(loop);
     else { running = false; lastT = 0; vel = 0; spd = 0; }
   }
-  function snap(t) {                              // image d'origine (multiple de KEY) suivante dans le sens du défilement
-    var k = travel >= 0 ? Math.ceil(t / KEY - 1e-6) * KEY : Math.floor(t / KEY + 1e-6) * KEY;
-    return Math.max(0, Math.min(N - 1, k));
+  function seg(t) {                               // indice k tel que KEYS[k] <= t <= KEYS[k+1]
+    var lo = 0, hi = KEYS.length - 2;
+    while (lo < hi) { var m = (lo + hi + 1) >> 1; if (KEYS[m] <= t) lo = m; else hi = m - 1; }
+    return lo;
+  }
+  function snap(t) {                              // image d'origine suivante dans le sens du défilement
+    t = Math.max(0, Math.min(N - 1, t));
+    var k = seg(t), a = KEYS[k], b = KEYS[k + 1];
+    if (t <= a + 1e-6) return a;
+    if (t >= b - 1e-6) return b;
+    return travel >= 0 ? b : a;
+  }
+  function frameOf(tau) {                         // temps de la vidéo (en images d'origine) -> indice d'image
+    var k = Math.min(KEYS.length - 2, Math.floor(tau)), f = tau - k;
+    return KEYS[k] + f * (KEYS[k + 1] - KEYS[k]);
   }
   function kick() {
     if (running) return;
@@ -418,7 +440,7 @@
     // course = hauteur de la section − hauteur de l'écran collant (fixe : ne bouge pas avec la barre d'adresse)
     var y = window.pageYOffset, total = rootH - stickyH;
     var p = total > 0 ? Math.min(1, Math.max(0, (y - rootTop) / total)) : 0;
-    var raw = p * (N - 1);
+    var raw = frameOf(p * (KEYS.length - 1));     // vitesse constante de la vidéo, quel que soit le nombre d'images
     if (raw !== rawPrev) travel = raw > rawPrev ? 1 : -1;
     // posée un peu plus loin (image d'origine suivante) : quand on reprend dans le même sens, on ne recule pas
     if (hold !== null && (raw === rawPrev || (travel > 0 && raw > rawPrev && raw < hold) || (travel < 0 && raw < rawPrev && raw > hold))) target = hold;
