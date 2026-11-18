@@ -6,6 +6,9 @@ Site vitrine et boutique de la cave **Vin des Copains** (Vieux-Lille), refait à
 Site 100 % statique (HTML / CSS / JavaScript, sans installation) : il suffit d'ouvrir `index.html`
 ou de déposer le dossier chez n'importe quel hébergeur.
 
+**Étape actuelle : châssis du site, sans aucune image.** Le design repose uniquement sur la typographie,
+les couleurs et des filets dorés. Les emplacements « Cuvée à venir » montrent où les bouteilles prendront place.
+
 ## Pages
 
 | Page | Contenu |
@@ -23,7 +26,15 @@ Tout le contenu se pilote depuis **`js/data.js`** :
 - `VDC.REGIONS` : les régions (nom + petite phrase de présentation)
 - `VDC.CATEGORIES` : Fines bulles, Vins bio, Vins blancs, Vins rosés, Vins rouges
 - `VDC.CONSOMMATIONS` : Plaisir immédiat, Attendre 2 à 3 ans, Belle garde, À mettre en cave
-- `VDC.PRODUITS` : les 173 vins (titre, prix, photo, région, catégories, consommation, description)
+- `VDC.PRODUITS` : les bouteilles affichées (vide pour l'instant)
+
+## Catalogue du site actuel (mis de côté)
+
+Chaque bouteille du site actuel a été enregistrée avec sa **photo**, son **titre** et son **prix** :
+
+- `donnees/catalogue-vinsdecopains.json` : 173 vins + 4 accessoires (avec, pour mémoire, le classement de l'ancien site)
+- `donnees/catalogue-vinsdecopains.csv` : la même liste, lisible dans Excel
+- `assets/bouteilles/` : les 177 photos, recadrées au même format
 
 Exemple de bouteille :
 
@@ -49,8 +60,8 @@ css/style.css          styles du site
 js/data.js             données (catalogue + coordonnées)
 js/app.js              en-tête, pied de page, panier, recherche, contrôle d'âge
 js/home.js | cave.js | produit.js   scripts propres à chaque page
-assets/bouteilles/     photos des bouteilles (reprises du site actuel, recadrées)
-assets/img/            photos d'ambiance (Unsplash, libres de droits)
+donnees/               catalogue du site actuel (JSON + CSV)
+assets/bouteilles/     photos des bouteilles (reprises du site actuel, recadrées, pas encore affichées)
 ```
 
 ## À noter

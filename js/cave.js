@@ -6,7 +6,7 @@
   var V = window.VDC, esc = V.esc;
   var $ = function (s) { return document.querySelector(s); };
 
-  var prixMax = Math.ceil(Math.max.apply(null, V.PRODUITS.map(function (p) { return p.prix; }).concat([10])) / 5) * 5;
+  var prixMax = V.PRODUITS.length ? Math.ceil(Math.max.apply(null, V.PRODUITS.map(function (p) { return p.prix; })) / 5) * 5 : 100;
   var params = new URLSearchParams(location.search);
   var list = function (k) { var v = params.get(k); return v ? v.split(",").filter(Boolean) : []; };
 
@@ -58,19 +58,20 @@
       var box = document.querySelector('[data-f="' + k + '"]');
       box.innerHTML = FACETS[k].items.map(function (it) {
         var n = V.PRODUITS.filter(function (p) { return match(p, k) && FACETS[k].test(p, it.slug); }).length;
-        var on = state[k].indexOf(it.slug) > -1;
-        return '<label class="check' + (!n && !on ? " disabled" : "") + '"><input type="checkbox" data-k="' + k + '" value="' + it.slug + '"' + (on ? " checked" : "") + '><span class="box"></span><span class="lbl">' + esc(it.nom) + '</span><span class="n">' + n + "</span></label>";
+        var on = state[k].indexOf(it.slug) > -1, vide = !V.PRODUITS.length;
+        return '<label class="check' + (!n && !on && !vide ? " disabled" : "") + '"><input type="checkbox" data-k="' + k + '" value="' + it.slug + '"' + (on ? " checked" : "") + '><span class="box"></span><span class="lbl">' + esc(it.nom) + '</span><span class="n">' + (vide ? "" : n) + "</span></label>";
       }).join("");
     });
   }
 
   function renderPills() {
     var total = V.PRODUITS.length;
-    var h = '<button class="cat-pill' + (!state.categorie.length ? " active" : "") + '" data-pill="">Tous les vins<sup>' + total + "</sup></button>";
+    var sup = function (n) { return total ? "<sup>" + n + "</sup>" : ""; };
+    var h = '<button class="cat-pill' + (!state.categorie.length ? " active" : "") + '" data-pill="">Tous les vins' + sup(total) + "</button>";
     h += V.CATEGORIES.map(function (c) {
       var n = V.PRODUITS.filter(function (p) { return (p.categories || []).indexOf(c.slug) > -1; }).length;
       var on = state.categorie.length === 1 && state.categorie[0] === c.slug;
-      return '<button class="cat-pill' + (on ? " active" : "") + '" data-pill="' + c.slug + '">' + esc(c.nom) + "<sup>" + n + "</sup></button>";
+      return '<button class="cat-pill' + (on ? " active" : "") + '" data-pill="' + c.slug + '">' + esc(c.nom) + sup(n) + "</button>";
     }).join("");
     $("[data-cat-pills]").innerHTML = h;
   }
@@ -89,28 +90,35 @@
   }
 
   function renderHero() {
-    var title = "La <em>Cave</em>", lead = "Toute notre sélection, à explorer par région, par couleur ou selon le moment où vous souhaitez la déguster.", img = "assets/img/cave-murale.jpg", extra = "";
+    var title = "La <em>Cave</em>", lead = "Toute notre sélection, à explorer par région, par couleur ou selon le moment où vous souhaitez la déguster.", tint = "#4a1220", giant = "Cave", extra = "";
     var only = function (k) { return state[k].length === 1 && Object.keys(FACETS).every(function (o) { return o === k || !state[o].length; }); };
     if (only("categorie")) {
       var c = V.categorie(state.categorie[0]);
-      if (c) { title = esc(c.nom).replace(/^(\S+)\s(.+)$/, "$1 <em>$2</em>"); lead = esc(c.note); img = c.image; extra = c.nom; }
+      if (c) { title = esc(c.nom).replace(/^(\S+)\s(.+)$/, "$1 <em>$2</em>"); lead = esc(c.note); tint = (c.teinte || [])[1] || tint; giant = c.nom.replace(/^Vins?\s/, ""); extra = c.nom; }
     } else if (only("region")) {
       var r = V.region(state.region[0]);
-      if (r) { title = esc(r.nom); lead = esc(r.note); img = "assets/img/vignoble.jpg"; extra = r.nom; }
+      if (r) { title = esc(r.nom); lead = esc(r.note); giant = r.nom.split(/[\s/]/)[0]; extra = r.nom; }
     } else if (only("conso")) {
       var co = V.conso(state.conso[0]);
-      if (co) { title = esc(co.nom); lead = esc(co.note); img = "assets/img/chai.jpg"; extra = co.nom; }
+      if (co) { title = esc(co.nom); lead = esc(co.note); tint = "#3a2a14"; giant = co.horizon; extra = co.nom; }
     }
     $("[data-hero-title]").innerHTML = title;
     $("[data-hero-lead]").innerHTML = lead;
     $("[data-crumb-extra]").innerHTML = extra ? "/ " + esc(extra) : "";
-    var hi = $("[data-hero-img]");
-    if (hi.getAttribute("src") !== img) hi.src = img;
+    document.querySelector(".page-hero").style.setProperty("--ph1", tint);
+    $("[data-hero-giant]").textContent = giant;
     document.title = (extra ? extra + " — " : "La Cave — ") + "Vin des Copains";
   }
 
   function renderGrid() {
     var res = results(), grid = $("[data-grid]");
+    if (!V.PRODUITS.length) {
+      var lab = state.categorie.length === 1 ? (V.categorie(state.categorie[0]) || {}).nom : (state.region.length === 1 ? (V.region(state.region[0]) || {}).nom : "");
+      $("[data-count]").innerHTML = "<em>Bientôt</em> en cave";
+      grid.innerHTML = '<p class="slots-note">Les bouteilles prendront place ici</p>' + V.emplacements(9, lab || "Région");
+      $("[data-more]").innerHTML = "";
+      return;
+    }
     $("[data-count]").innerHTML = "<em>" + res.length + "</em> " + (res.length > 1 ? "vins" : "vin");
     if (!res.length) {
       grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">' + V.icons.glass +

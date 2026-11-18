@@ -50,10 +50,7 @@
     mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3.5 6 8.5 7 8.5-7"/></svg>'
   };
 
-  V.mark = '<svg class="brand-mark" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true">' +
-    '<g transform="translate(14 9) rotate(-17)"><path d="M-6 0C-6 8-3.4 12 0 12S6 8 6 0Z"/><path d="M-5.6 4h11.2" opacity=".6"/><path d="M0 12v10M-4.5 22h9"/></g>' +
-    '<g transform="translate(26 9) rotate(17)"><path d="M-6 0C-6 8-3.4 12 0 12S6 8 6 0Z"/><path d="M-5.6 4h11.2" opacity=".6"/><path d="M0 12v10M-4.5 22h9"/></g>' +
-    '<path d="M20 1.5v3M17.2 3l1.2 1.6M22.8 3l-1.2 1.6" stroke-width=".9"/></svg>';
+  V.mark = '<span class="brand-mark" aria-hidden="true"><i></i>✦<i></i></span>';
 
   V.brandHTML = function (sub) {
     return V.mark + '<span class="brand-name">Vin <em>des</em> Copains</span>' +
@@ -180,6 +177,26 @@
     "</article>";
   };
 
+  /* ---------- Emplacements réservés (tant que la cave est vide) ---------- */
+  V.emplacements = function (n, label) {
+    var h = "";
+    for (var i = 1; i <= n; i++) {
+      h += '<article class="product-card is-slot" aria-hidden="true">' +
+        '<div class="product-visual"><div class="product-media slot-media">' +
+          '<span class="slot-frame"></span>' +
+          '<span class="slot-num">N° ' + (i < 10 ? "0" : "") + i + "</span>" +
+          '<span class="slot-label">Cuvée<br><em>à venir</em></span>' +
+        "</div></div>" +
+        '<div class="product-info">' +
+          '<span class="product-region">' + esc(label || "Région") + "</span>" +
+          '<h3 class="product-name"><span class="slot-line"></span><span class="slot-line short"></span></h3>' +
+          '<span class="product-conso">' + V.consoDots("") + "Consommation</span>" +
+          '<div class="product-bottom"><span class="product-price">— €</span><span class="product-add">' + I.plus + "</span></div>" +
+        "</div></article>";
+    }
+    return h;
+  };
+
   /* ---------- En-tête ---------- */
   function megaHTML() {
     var cats = V.CATEGORIES.map(function (c) { return '<li><a href="cave.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a></li>"; }).join("");
@@ -189,7 +206,7 @@
       "<div><h4>Catégories</h4><ul>" + cats + '<li><a href="cave.html">Toute la cave</a></li></ul></div>' +
       "<div><h4>Consommation</h4><ul>" + cons + "</ul></div>" +
       '<div><h4>Régions</h4><ul class="cols-2">' + regs + "</ul></div>" +
-      '<a class="mega-feature" href="cave.html"><img src="assets/img/cave-murale.jpg" alt="" loading="lazy"><div><span class="s">Découvrir</span><span class="t">Toute la cave</span></div></a>' +
+      '<a class="mega-feature" href="cave.html"><span class="mf-orn" aria-hidden="true">✦</span><div><span class="s">Découvrir</span><span class="t">Toute <em>la cave</em></span></div></a>' +
     "</div></div>";
   }
 
@@ -394,7 +411,8 @@
     });
     box.innerHTML = res.length
       ? res.slice(0, 8).map(V.carte).join("")
-      : '<p style="grid-column:1/-1;font-family:var(--serif);font-size:1.4rem;color:var(--muted)">Aucun vin ne correspond à « ' + esc(q) + " ».</p>";
+      : '<p style="grid-column:1/-1;font-family:var(--serif);font-size:1.4rem;color:var(--muted)">' +
+        (V.PRODUITS.length ? "Aucun vin ne correspond à « " + esc(q) + " »." : "Notre cave se remplit : les bouteilles arrivent très bientôt.") + "</p>";
   }
 
   /* ---------- Contrôle d'âge ---------- */

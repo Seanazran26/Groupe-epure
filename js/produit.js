@@ -11,7 +11,7 @@
 
   if (!p) {
     box.innerHTML = '<div class="empty-state" style="margin-top:40px">' + I.glass +
-      "<h3>Ce vin n'est plus disponible</h3><p>Il a peut-être trouvé preneur… Découvrez le reste de notre cave.</p>" +
+      (V.PRODUITS.length ? "<h3>Ce vin n'est plus disponible</h3><p>Il a peut-être trouvé preneur… Découvrez le reste de notre cave.</p>" : "<h3>Les fiches arrivent bientôt</h3><p>Notre cave se remplit : chaque bouteille aura bientôt sa fiche.</p>") +
       '<a class="btn btn-dark" href="cave.html">Retour à la cave ' + I.arrow + "</a></div>";
     $("[data-related-wrap]").style.display = "none";
     return;
