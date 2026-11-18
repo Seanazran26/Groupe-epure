@@ -13,30 +13,53 @@
 </head>
 <body class="has-hero" data-page="accueil">
   <script>
-    /* Ouverture du site : toujours au tout début du héros.
+    /* Arrivée sur le site = toujours au tout début du héros, l'animation prête à défiler.
+       Couvre : premier chargement, rechargement, page réaffichée depuis la mémoire du navigateur
+       (bouton retour, onglet rouvert), aperçu masqué puis réaffiché sans rechargement (application claude.ai),
+       retour après une absence de plus de 30 s.
        Seule exception : un lien interne vers une section (ex. « La Maison » depuis une autre page). */
     (function () {
       try {
-        if ("scrollRestoration" in history) history.scrollRestoration = "manual";   // pas de retour à l'ancienne position
+        if ("scrollRestoration" in history) history.scrollRestoration = "manual";   // jamais l'ancienne position
         var nav = performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
         var interne = false;
         try { interne = !!document.referrer && new URL(document.referrer).origin === location.origin && (!nav || nav.type === "navigate"); } catch (e) {}
-        if (location.hash && interne) return;
-        if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+        var ancre = !!location.hash && interne;
+        if (location.hash && !ancre) history.replaceState(null, "", location.pathname + location.search);
         var touche = false;
         ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (t) {
-          window.addEventListener(t, function () { touche = true; }, { once: true, passive: true });
+          window.addEventListener(t, function () { touche = true; }, { passive: true });
         });
-        var haut = function () {                                         // jamais contre un geste du visiteur
-          if (touche || window.pageYOffset === 0) return;
+        var debut = function (force) {
+          if (!force && (ancre || touche)) return;                      // jamais contre un geste du visiteur
           var r = document.documentElement, b = r.style.scrollBehavior;
-          r.style.scrollBehavior = "auto";                               // instantané (la page défile en douceur par défaut)
-          window.scrollTo(0, 0);
+          r.style.scrollBehavior = "auto";                              // instantané (la page défile en douceur par défaut)
+          if (window.pageYOffset !== 0) window.scrollTo(0, 0);
           r.style.scrollBehavior = b;
+          try { window.dispatchEvent(new CustomEvent("vdc:debut")); } catch (e) {}   // la caméra revient à la 1re image
         };
-        haut();
-        document.addEventListener("DOMContentLoaded", haut);
-        window.addEventListener("load", haut);
+        var arrivee = function () { ancre = false; touche = false; debut(true); };
+        debut();
+        document.addEventListener("DOMContentLoaded", function () { debut(); });
+        window.addEventListener("load", function () { debut(); });
+        window.addEventListener("pageshow", function (e) { if (e.persisted) arrivee(); });   // page gardée en mémoire
+        // aperçu masqué puis réaffiché sans rechargement (ex. page affichée dans une application) :
+        // la page entière cesse d'être visible à l'écran, puis le redevient
+        if ("IntersectionObserver" in window) {
+          var vu = null;
+          document.addEventListener("DOMContentLoaded", function () {
+            new IntersectionObserver(function (es) {
+              var v = es[es.length - 1].isIntersecting;
+              if (v && vu === false) arrivee();
+              vu = v;
+            }).observe(document.body);
+          });
+        }
+        var parti = 0;
+        document.addEventListener("visibilitychange", function () {     // retour après une absence
+          if (document.visibilityState === "hidden") parti = Date.now();
+          else if (parti && Date.now() - parti > 30000) arrivee();
+        });
       } catch (e) {}
     })();
   </script>

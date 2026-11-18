@@ -335,7 +335,7 @@
     return null;
   }
   function rect(img) {
-    // plein écran (cover), centré : la caméra ne se décale jamais
+    // plein écran (cover), centré : le cadre ne bouge jamais
     var iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
     var s = Math.max(cw / iw, ch / ih), dw = iw * s, dh = ih * s;
     return [(cw - dw) / 2, (ch - dh) / 2, dw, dh];
@@ -488,6 +488,12 @@
     last = ""; pump(); kick();
   });
   window.addEventListener("load", function () { measure(); readTarget(); kick(); });
+  // nouvelle arrivée sur la page (voir le script en tête de page) : la caméra revient d'un coup à la 1re image
+  window.addEventListener("vdc:debut", function () {
+    measure(); hold = null; readTarget();
+    pos = prevPos = target; spd = 0; vel = 0; last = "";
+    overlays(); pump(); kick();
+  });
 
   resize();
   measure();
