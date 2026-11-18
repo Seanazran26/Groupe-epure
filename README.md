@@ -23,10 +23,10 @@ les couleurs et des filets dorés. Les emplacements « Cuvée à venir » montre
 
 Le héros de l'accueil fait défiler la vidéo de la cave image par image au scroll (`js/hero-scroll.js`) :
 
-- 427 images : les 143 images d'origine de la vidéo 1080p (1 sur 3, intactes) + 2 images interpolées
+- 424 images : 142 images d'origine de la vidéo 1080p (1 sur 3, non recalculées) + 2 images interpolées
   (compensation de mouvement) entre chacune ; netteté renforcée, plus fort là où la vidéo est douce
-- `assets/hero-frames/` : 427 WebP 1920 px, qualité 84 (ordinateur)
-- `assets/hero-frames-m/` : 427 WebP verticaux 720 × 1080, qualité 80 (mobile portrait) :
+- `assets/hero-frames/` : 424 WebP 1920 px, qualité 84 (ordinateur)
+- `assets/hero-frames-m/` : 424 WebP verticaux 720 × 1080, qualité 80 (mobile portrait) :
   recadrage centré de la vidéo, sur toute sa hauteur
 - `assets/hero-frames-lo/` + `js/hero-lo.js` : version légère 512 px (~3,7 Mo) en 4 paquets entrelacés,
   chargée en premier pour que la caméra ne se fige jamais pendant le chargement
@@ -36,8 +36,8 @@ Le héros de l'accueil fait défiler la vidéo de la cave image par image au scr
 - netteté : jamais de fondu entre deux images (pas de double image) ; à l'arrêt, la caméra se pose
   sur une image d'origine ; la haute qualité est téléchargée en priorité autour de la position
 - à l'ouverture, la page démarre toujours au début du héros (sauf lien interne vers une section)
-- mobile portrait : plein écran vertical, caméra fixe et centrée (les bords gauche et droit de la vidéo,
-  tournée à l'horizontale, sortent de l'écran)
+- mobile portrait : plein écran vertical ; au tout début, le cadre est décalé pour montrer la bouteille
+  de vin rouge en entier, puis il se recentre très progressivement (un seul sens, jamais de va-et-vient)
 - ouvert directement depuis le dossier (file://), un mode de secours prend le relais
 
 ## Où modifier quoi ?

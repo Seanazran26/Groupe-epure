@@ -28,7 +28,7 @@
   var root = document.querySelector("[data-hero-scroll]");
   if (!root) return;
 
-  var N = parseInt(root.getAttribute("data-frames"), 10) || 427;
+  var N = parseInt(root.getAttribute("data-frames"), 10) || 424;
   var KEY = parseInt(root.getAttribute("data-key-step"), 10) || 1;   // 1 image sur KEY = image d'origine (nette)
   var REST_MS = 140;                            // sans défilement depuis 140 ms = arrêt
   var BATCH = 24, BATCH_DELAY = 120;            // haute qualité : lots de 24 toutes les 120 ms
