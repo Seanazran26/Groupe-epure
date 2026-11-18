@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mentions légales — Vin des Copains</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="mentions">
+
+  <div class="site-top" id="site-top"></div>
+
+  <main class="section">
+    <div class="container">
+      <nav class="crumbs dark" aria-label="Fil d'Ariane"><a href="index.html">Accueil</a><span>/</span><span>Mentions légales</span></nav>
+      <h1 class="display h-lg" style="margin:22px 0 64px">Mentions <em>légales</em></h1>
+      <div class="prose" data-legal></div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    (function () {
+      var V = window.VDC, C = V.CONTACT || {}, L = C.livraison || {}, e = V.esc;
+      var row = function (k, v) { return v ? "<dt>" + k + "</dt><dd>" + v + "</dd>" : ""; };
+      document.querySelector("[data-legal]").innerHTML =
+        "<h2>Éditeur du site</h2><dl>" +
+          row("Société", e(C.societe)) +
+          row("RCS", e(C.rcs)) +
+          row("TVA intracom.", e(C.tva)) +
+          row("Siret", e(C.siret)) +
+          row("N° d'accise", e(C.accise)) +
+          row("Directeur de la publication", e(C.directeur)) +
+        "</dl>" +
+        "<h2>Contact</h2><dl>" +
+          row("Adresse", e(C.adresse) + "<br>" + e([C.codePostal, C.ville].filter(Boolean).join(" "))) +
+          row("Téléphone", [C.telephone, C.mobile].filter(Boolean).map(function (t) { return '<a href="' + V.telHref(t) + '">' + e(t) + "</a>"; }).join("<br>")) +
+          row("E-mail", C.email ? '<a href="mailto:' + e(C.email) + '">' + e(C.email) + "</a>" : "") +
+        "</dl>" +
+        '<h2 id="livraison">Livraison &amp; retrait</h2>' +
+        "<p>Vos bouteilles sont conditionnées dans des cartons sécurisés de 3, 6 ou 12 bouteilles grâce à un système de protection qui évite tout choc entre les bouteilles (carton recyclable et bulles de maïs compostables).</p>" +
+        "<p>Nos livraisons sont effectuées par " + e(L.transporteur) + " (sous " + e(L.delai) + ") : à domicile, au travail, dans un bureau de poste ou en point relais.</p>" +
+        "<p>Participation aux frais de livraison France métropolitaine, Corse et Benelux : <strong>" + V.prix(L.prix) + "</strong> pour un colis de 3, 6 ou 9 bouteilles. <strong>Livraison offerte dès " + L.offerteDes + " bouteilles.</strong></p>" +
+        "<p>Vous pouvez également retirer votre commande à la cave, " + e(C.adresse) + ", " + e(C.ville) + " (" + e(C.quartier) + "), uniquement sur rendez-vous, du lundi au vendredi de 9h à 13h et de 14h à 18h (horaires pouvant varier).</p>" +
+        "<h2>Propriété intellectuelle</h2>" +
+        "<p>Le présent site est la propriété de " + e(C.societe) + ". Les textes, photographies et éléments graphiques qui le composent ne peuvent être reproduits sans autorisation préalable.</p>" +
+        "<h2>Santé</h2>" +
+        "<p>L'abus d'alcool est dangereux pour la santé, à consommer avec modération. L'alcool est déconseillé pendant la grossesse. La vente d'alcool est interdite aux mineurs.</p>";
+    })();
+  </script>
+</body>
+</html>

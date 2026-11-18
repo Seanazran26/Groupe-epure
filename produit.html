@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vin des Copains</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="produit">
+
+  <div class="site-top" id="site-top"></div>
+
+  <main>
+    <section class="container pdp" data-pdp></section>
+
+    <section class="section on-ivory" data-related-wrap>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow reveal">À découvrir aussi</span>
+            <h2 class="display h-md reveal reveal-d1">Vous aimerez <em>aussi</em></h2>
+          </div>
+          <a class="link-line reveal" href="cave.html">Toute la cave <svg class="arrow" viewBox="0 0 22 8" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 4h21M17.5 .5 21 4l-3.5 3.5"/></svg></a>
+        </div>
+        <div class="products-grid" data-related></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/produit.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vin des Copains — Cave à vins</title>
+  <meta name="description" content="Vin des Copains : une cave de passionnés. Fines bulles, vins bio, blancs, rosés et rouges de toutes les régions, choisis pour être partagés.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="has-hero" data-page="accueil">
+
+  <div class="site-top" id="site-top"></div>
+
+  <main>
+    <!-- ============ HÉROS ============ -->
+    <section class="hero">
+      <div class="hero-media"><img src="assets/img/hero.jpg" alt="Bouteilles de vin couchées dans une cave" fetchpriority="high"></div>
+      <div class="container hero-content">
+        <div class="hero-in">
+          <span class="eyebrow">Cave à vins · Vieux-Lille</span>
+          <h1 class="display h-xl">Le vin,<br>ça se <em>partage.</em></h1>
+          <p class="lead">De bons vins, originaux, à déguster entre copains. Achetés en direct chez les vignerons, choisis selon un seul critère&nbsp;: «&nbsp;Ah, c'est bon ça&nbsp;!&nbsp;»</p>
+          <div class="hero-actions">
+            <a class="btn btn-light" href="cave.html">Découvrir la cave <svg class="arrow" viewBox="0 0 22 8" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 4h21M17.5 .5 21 4l-3.5 3.5"/></svg></a>
+            <a class="btn btn-ghost-light" href="#regions">Explorer les régions</a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="stat"><span data-stat="vins">173</span><small>Vins en cave</small></div>
+        <div class="stat"><span data-stat="regions">21</span><small>Régions</small></div>
+      </div>
+      <div class="scroll-cue">Défiler<i></i></div>
+    </section>
+
+    <!-- ============ DÉFILANT RÉGIONS ============ -->
+    <div class="marquee" aria-label="Nos régions"><div class="marquee-track" data-marquee></div></div>
+
+    <!-- ============ MANIFESTE ============ -->
+    <section class="section" id="maison">
+      <div class="container manifesto">
+        <div class="manifesto-media reveal">
+          <div class="img-main img-reveal"><img src="assets/img/copains.jpg" alt="Des amis trinquent avec des verres de vin rouge" loading="lazy"></div>
+          <div class="img-float img-reveal"><img src="assets/img/service.jpg" alt="Un verre de vin rouge que l'on sert" loading="lazy"></div>
+          <div class="badge" aria-hidden="true">
+            <svg viewBox="0 0 120 120"><defs><path id="circ" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0"/></defs><text font-family="Jost, sans-serif" font-size="8.6" letter-spacing="3.4" fill="currentColor"><textPath href="#circ">VIN DES COPAINS ✦ LE VIN SE PARTAGE ✦ </textPath></text></svg>
+            <span class="core" data-mark></span>
+          </div>
+        </div>
+        <div class="manifesto-text">
+          <span class="eyebrow reveal">Le concept</span>
+          <h2 class="display h-lg reveal reveal-d1">Faire rimer vins,<br><em>plaisirs et partages.</em></h2>
+          <p class="reveal reveal-d2">Tout est né lors d'une soirée entre copains, d'un constat simple&nbsp;: on n'achète plus nos vins comme nos parents. On recherche le plaisir immédiat, des conseils simples et sans fioriture, et des vins de qualité à prix abordable.</p>
+          <p class="reveal reveal-d2">Nous sillonnons les routes des vins, les salons (et quelques restaurants) à la découverte de nouveaux vignerons. Nos vins sont achetés directement au domaine et entreposés dans notre cave du Vieux-Lille&nbsp;: si le vin est dans votre panier, c'est qu'il est disponible.</p>
+          <div class="signature reveal reveal-d3">Santé&nbsp;! (et modération)</div>
+          <div class="pillars">
+            <div class="pillar reveal reveal-d1"><span class="roman">I.</span><h3>« Ah, c'est bon ça&nbsp;! »</h3><p>Notre seul critère de sélection. Des vins testés et approuvés.</p></div>
+            <div class="pillar reveal reveal-d2"><span class="roman">II.</span><h3>En direct des vignerons</h3><p>Des vignerons sincères, passionnés par leur vigne et leur terroir.</p></div>
+            <div class="pillar reveal reveal-d3"><span class="roman">III.</span><h3>Un prix raisonnable</h3><p>Totalement indépendants dans nos choix (sauf quelques exceptions en Bourgogne…).</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ UNIVERS (CATÉGORIES) ============ -->
+    <section class="section on-ivory" id="univers">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow reveal">Nos univers</span>
+            <h2 class="display h-lg reveal reveal-d1">Une couleur,<br><em>une envie.</em></h2>
+          </div>
+          <p class="lead reveal reveal-d2">Des fines bulles de l'apéritif aux rouges de garde, en passant par nos vins bio : choisissez votre univers.</p>
+        </div>
+        <div class="univers-grid" data-univers></div>
+      </div>
+    </section>
+
+    <!-- ============ SÉLECTION ============ -->
+    <section class="section" id="selection">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow reveal">Testés et approuvés</span>
+            <h2 class="display h-lg reveal reveal-d1">Nos coups <em>de cœur</em></h2>
+          </div>
+          <div class="carousel-nav reveal reveal-d2">
+            <button class="round-btn" data-car-prev aria-label="Précédent"><svg viewBox="0 0 22 8" fill="none" stroke="currentColor" stroke-width="1"><path d="M22 4H1M4.5 .5 1 4l3.5 3.5"/></svg></button>
+            <button class="round-btn" data-car-next aria-label="Suivant"><svg viewBox="0 0 22 8" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 4h21M17.5 .5 21 4l-3.5 3.5"/></svg></button>
+          </div>
+        </div>
+        <div class="carousel reveal">
+          <div class="carousel-track" data-carousel></div>
+          <div class="carousel-progress"><i data-car-progress></i></div>
+        </div>
+        <div style="text-align:center;margin-top:56px" class="reveal">
+          <a class="btn btn-dark" href="cave.html">Voir toute la cave <svg class="arrow" viewBox="0 0 22 8" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 4h21M17.5 .5 21 4l-3.5 3.5"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ QUAND DÉGUSTER (CONSOMMATION) ============ -->
+    <section class="on-dark garde" id="garde">
+      <div class="garde-media">
+        <img src="assets/img/chai.jpg" alt="Fûts de chêne alignés dans un chai voûté" loading="lazy">
+        <p class="quote">« Le temps ne respecte pas ce qui se fait sans lui. »<small>Le secret des grands vins de garde</small></p>
+      </div>
+      <div class="garde-body">
+        <span class="eyebrow reveal">Consommation</span>
+        <h2 class="display h-lg reveal reveal-d1">Maintenant,<br>ou <em>un peu plus tard ?</em></h2>
+        <p class="lead reveal reveal-d2">Et je bois ça quand&nbsp;? Pour chaque bouteille, nous vous disons quand elle s'exprimera le mieux&nbsp;: à déboucher ce soir entre copains, ou à laisser mûrir en cave.</p>
+        <ol class="timeline" data-timeline></ol>
+      </div>
+    </section>
+
+    <!-- ============ RÉGIONS ============ -->
+    <section class="section" id="regions">
+      <div class="container regions-layout">
+        <div class="regions-aside">
+          <span class="eyebrow reveal">Nos régions</span>
+          <h2 class="display h-lg reveal reveal-d1">Un tour de France<br><em>des vignobles</em></h2>
+          <p class="lead reveal reveal-d2">De l'Alsace à la Corse, de la Champagne au Maroc, sans oublier les nouveaux vignobles du Nord&nbsp;: partez à la découverte des terroirs qui font notre cave.</p>
+          <div class="regions-visual reveal reveal-d3">
+            <img src="assets/img/vignoble.jpg" alt="Rangs de vigne au soleil couchant" loading="lazy" data-rv-img>
+            <div class="rv-caption"><strong data-rv-title>Nos terroirs</strong><span data-rv-note>Survolez une région pour la découvrir.</span></div>
+          </div>
+        </div>
+        <ul class="regions-list" data-regions></ul>
+      </div>
+    </section>
+
+    <!-- ============ CITATION ============ -->
+    <section class="parallax-quote">
+      <img src="assets/img/vignoble-2.jpg" alt="" loading="lazy" data-parallax="0.12">
+      <div class="container">
+        <span class="eyebrow center reveal">L'esprit copains</span>
+        <blockquote class="reveal reveal-d1">« Le vin est la plus saine et la plus hygiénique des boissons. »</blockquote>
+        <cite class="reveal reveal-d2">Louis Pasteur</cite>
+      </div>
+    </section>
+
+    <!-- ============ SERVICES ============ -->
+    <section class="section-sm">
+      <div class="container">
+        <div class="services" data-services></div>
+      </div>
+    </section>
+
+    <!-- ============ NOUS RENDRE VISITE ============ -->
+    <section class="section on-ivory" id="visite">
+      <div class="container visit">
+        <div class="visit-text">
+          <span class="eyebrow reveal">Nous rendre visite</span>
+          <h2 class="display h-lg reveal reveal-d1">La cave du<br><em>Vieux-Lille</em></h2>
+          <p class="lead reveal reveal-d2">C'est ici que nos vins sont stockés et que nous organisons nos ateliers de dégustation. Besoin d'un conseil, envie de retirer votre commande&nbsp;? Appelez-nous, on vous attend.</p>
+          <dl class="visit-infos reveal reveal-d3" data-visit-infos></dl>
+        </div>
+        <div class="visit-map reveal reveal-d2" data-visit-map></div>
+      </div>
+    </section>
+
+    <!-- ============ LE CERCLE ============ -->
+    <section class="club" id="club">
+      <div class="club-inner">
+        <div class="club-media img-reveal"><img src="assets/img/copains-2.jpg" alt="Des amis trinquent autour d'une table" loading="lazy"></div>
+        <div class="club-body on-dark" style="background:transparent">
+          <span class="eyebrow reveal">Le Cercle des Copains</span>
+          <h2 class="display h-lg light reveal reveal-d1">Rejoignez <em>la tablée.</em></h2>
+          <p class="lead reveal reveal-d2">Soyez prévenu(e) en premier des nouveautés, des ateliers de dégustation et des offres spéciales.</p>
+          <form class="club-form reveal reveal-d3" data-club-form>
+            <input type="email" required placeholder="Votre adresse e-mail" aria-label="Votre adresse e-mail">
+            <button type="submit">S'inscrire <svg class="arrow" viewBox="0 0 22 8" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 4h21M17.5 .5 21 4l-3.5 3.5"/></svg></button>
+          </form>
+          <p class="club-note reveal reveal-d3">Pas plus d'un message par mois. Désinscription en un clic.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

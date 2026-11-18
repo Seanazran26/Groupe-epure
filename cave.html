@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>La Cave — Vin des Copains</title>
+  <meta name="description" content="Toute la cave Vin des Copains : filtrez par région, catégorie et moment de consommation.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="has-hero" data-page="cave">
+
+  <div class="site-top" id="site-top"></div>
+
+  <main>
+    <section class="page-hero">
+      <img src="assets/img/cave-murale.jpg" alt="" data-hero-img>
+      <div class="container">
+        <nav class="crumbs" aria-label="Fil d'Ariane"><a href="index.html">Accueil</a><span>/</span><a href="cave.html">La Cave</a><span data-crumb-extra></span></nav>
+        <h1 class="display h-xl" data-hero-title>La <em>Cave</em></h1>
+        <p class="lead" data-hero-lead>Toute notre sélection, à explorer par région, par couleur ou selon le moment où vous souhaitez la déguster.</p>
+      </div>
+    </section>
+
+    <div class="cat-bar"><div class="container" data-cat-pills></div></div>
+
+    <div class="container shop">
+      <aside class="filters" id="filters" aria-label="Filtres" aria-hidden="false">
+        <div class="filters-head"><h3>Filtrer</h3><button class="icon-btn" data-close-filters aria-label="Fermer les filtres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="m5 5 14 14M19 5 5 19"/></svg></button></div>
+        <details class="filter-group" open><summary>Catégorie</summary><div data-f="categorie"></div></details>
+        <details class="filter-group" open><summary>Région</summary><div data-f="region"></div></details>
+        <details class="filter-group" open><summary>Consommation</summary><div data-f="conso"></div></details>
+        <details class="filter-group" open><summary>Prix</summary>
+          <div class="price-range">
+            <input type="range" min="0" max="100" step="1" data-price aria-label="Prix maximum">
+            <div class="vals"><span data-price-min></span><span>jusqu'à <strong data-price-val></strong></span></div>
+          </div>
+        </details>
+        <button class="reset" data-reset>Effacer tous les filtres</button>
+        <div style="height:24px"></div>
+        <button class="btn btn-dark btn-block filter-toggle" data-close-filters>Voir les vins</button>
+      </aside>
+
+      <div>
+        <div class="toolbar">
+          <div class="count" data-count></div>
+          <div class="toolbar-right">
+            <button class="btn btn-ghost filter-toggle" data-open-filters style="padding:10px 18px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 6h16M7 12h10M10 18h4"/></svg> Filtrer</button>
+            <label class="mini-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><input type="search" placeholder="Rechercher un vin" data-q aria-label="Rechercher un vin"></label>
+            <div class="select"><select data-sort aria-label="Trier">
+              <option value="selection">Notre sélection</option>
+              <option value="prix-asc">Prix croissant</option>
+              <option value="prix-desc">Prix décroissant</option>
+              <option value="nom">Nom (A → Z)</option>
+            </select></div>
+          </div>
+        </div>
+        <div class="active-chips" data-chips></div>
+        <div class="products-grid" data-grid></div>
+        <div class="load-more" data-more></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/cave.js"></script>
+</body>
+</html>
