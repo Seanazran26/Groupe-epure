@@ -8,7 +8,7 @@
    1. Deux qualités d'images :
       - « légère » (512 px, 4 fichiers) : toute la séquence arrive vite,
         la caméra n'est donc jamais bloquée en attendant le réseau ;
-      - « haute » (1920×1080 ordinateur / 1080×1920 mobile) : remplace la
+      - « haute » (1920×1080 ordinateur / 810×1440 mobile) : remplace la
         légère au fur et à mesure, en commençant autour de la position.
    2. Décodage en parallèle dans plusieurs travailleurs (js/hero-worker.js),
       anticipé dans le sens et à la vitesse du défilement ; le fil principal
@@ -64,9 +64,9 @@
 
   var SRC = {
     lo: { path: root.getAttribute("data-src-lo") || "assets/hero-frames-lo/", size: dims(root.getAttribute("data-size-lo"), [512, 288]) },
-    "lo-mobile": { path: "", size: dims(root.getAttribute("data-size-lo-mobile"), [288, 512]) },
+    "lo-mobile": { path: "", size: dims(root.getAttribute("data-size-lo-mobile"), [216, 384]) },
     desktop: { path: root.getAttribute("data-src-desktop") || "assets/hero-frames/", size: dims(root.getAttribute("data-size-desktop"), [1920, 1080]) },
-    mobile: { path: root.getAttribute("data-src-mobile") || "assets/hero-frames-m/", size: dims(root.getAttribute("data-size-mobile"), [1080, 1920]) }
+    mobile: { path: root.getAttribute("data-src-mobile") || "assets/hero-frames-m/", size: dims(root.getAttribute("data-size-mobile"), [810, 1440]) }
   };
 
   // --- état ---
@@ -259,11 +259,14 @@
 
   /* ---------- Préchargement ---------- */
   function loadLo() {
-    // paquets l'un après l'autre : le 1er (1 image sur 4 sur toute la vidéo) arrive donc au plus vite
+    // paquets l'un après l'autre : le 1er (1 image sur 4 sur toute la vidéo) arrive donc au plus vite.
+    // Avec la haute qualité en paquets, on s'arrête à 2 paquets (1 image sur 2, assez pour que la caméra
+    // ne se fige jamais) : chaque octet suivant sert à la version nette, qui arrive ainsi plus tôt.
     var name = loName(), pk = packs(name), n = 0, g = modeGen;
+    var stop = canFetch && packs(mode) ? Math.min(2, pk.packs.length) : pk.packs.length;
     (function next() {
       if (g !== modeGen) return;                   // le mode a changé : un autre chargement a pris le relais
-      if (n >= pk.packs.length) { loReady = true; scheduleHi(); return; }
+      if (n >= stop) { loReady = true; scheduleHi(); return; }
       var k = n++;
       fetchPack(name, k).then(function (buf) {
         if (g !== modeGen) return;
@@ -273,19 +276,28 @@
       }, next);
     })();
   }
+
   function hiPackDone(n) {                       // toutes les images du paquet n sont-elles là ?
     var fr = packs(mode).frames;
     for (var j = 0; j < fr.length; j++) if (fr[j][0] === n && !blobs.hi[j]) return false;
     return true;
   }
   function nextHiPack() {
-    // le paquet de la position actuelle d'abord, puis vers l'avant (2 pour 1 vers l'arrière)
-    var pk = packs(mode), np = pk.packs.length, c = pk.frames[Math.min(N - 1, Math.round(target))][0];
-    var dir = target >= pos ? 1 : -1, order = [c], f = 1, b = 1;
-    while (order.length < np) {
-      for (var r = 0; r < 2; r++) { var a = c + dir * f++; if (a >= 0 && a < np) order.push(a); }
-      var z = c - dir * b++; if (z >= 0 && z < np) order.push(z);
-      if (f > np && b > np) break;
+    // le paquet de la position actuelle d'abord, puis DEVANT, dans le sens du défilement.
+    // Pendant le mouvement : tout ce qui est devant passe avant ce qui est derrière (une image déjà dépassée
+    // ne sert à rien, et chaque octet compte pour que l'image nette arrive avant le visiteur).
+    // À l'arrêt : autour de la position (2 paquets devant pour 1 derrière).
+    var pk = packs(mode), np = pk.packs.length, c = pk.frames[Math.min(N - 1, Math.max(0, Math.round(target)))][0];
+    var dir = travel >= 0 ? 1 : -1, order = [c], i, a, z;
+    if (performance.now() - lastScroll < 1000) {
+      for (i = 1; i < np; i++) { a = c + dir * i; if (a >= 0 && a < np) order.push(a); }
+      for (i = 1; i < np; i++) { z = c - dir * i; if (z >= 0 && z < np) order.push(z); }
+    } else {
+      var f = 1, b = 1;
+      while (f < np || b < np) {
+        for (var r = 0; r < 2; r++) { a = c + dir * f++; if (a >= 0 && a < np) order.push(a); }
+        z = c - dir * b++; if (z >= 0 && z < np) order.push(z);
+      }
     }
     for (var k = 0; k < order.length; k++) {
       var n = order[k];
@@ -293,6 +305,7 @@
     }
     return -1;
   }
+
   var hiPackBusy = {};
   function packLoop() {
     var g = modeGen, name = mode;
@@ -489,7 +502,7 @@
     if (cat === mode) return false;
     mode = cat; gen++; modeGen++;
     setKeys(mode);
-    HI_WIN = mode === "mobile" ? 10 : 14;         // images verticales 1080 px : moins d'images en mémoire
+    HI_WIN = mode === "mobile" ? 10 : 14;         // images verticales : moins d'images en mémoire
     clearTimeout(hiTimer);
     hiMap.forEach(release); hiMap.clear(); loMap.forEach(release); loMap.clear(); inflight.clear();
     blobs = { lo: [], hi: [] }; fetching = { lo: [], hi: [] }; imgs = { lo: [], hi: [] };

@@ -926,6 +926,12 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .hero-contact { margin: 26px 0 0; font-size: .85rem; letter-spacing: .06em; color: rgba(250,246,240,.78); text-shadow: 0 2px 12px rgba(0,0,0,.6); user-select: text; }
 .hero-contact .sep { color: var(--gold-soft); margin: 0 .8em; font-size: .7em; }
 /* l'en-tête reste transparent tant que l'on « visite » la vidéo */
+/* Ordinateur : le titre se pose en bas, sur la table, pour laisser les bouteilles entièrement visibles */
+.hero-scroll:not(.is-mobile) .hero-intro { justify-content: flex-end; padding-bottom: calc(var(--ui) + clamp(120px, 17vh, 190px)); }
+.hero-scroll:not(.is-mobile) .hero-intro::before {
+  background: linear-gradient(to bottom, rgba(0,0,0,.45) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 50%, rgba(0,0,0,.82) 100%);
+}
+.hero-scroll:not(.is-mobile) .hero-title { margin-top: 14px; font-size: clamp(3.4rem, 8.2vw, 9.5rem); }
 /* Mobile : le titre se pose en bas, sur la table, pour laisser la bouteille de vin rouge entièrement visible */
 .hero-scroll.is-mobile .hero-topveil { height: 150px; background: linear-gradient(to bottom, rgba(0,0,0,.42), rgba(0,0,0,0)); }
 .hero-scroll.is-mobile .hero-intro { justify-content: flex-end; padding-bottom: calc(var(--ui) + 112px + env(safe-area-inset-bottom, 0px)); }

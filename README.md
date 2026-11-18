@@ -21,25 +21,27 @@ les couleurs et des filets dorés. Les emplacements « Cuvée à venir » montre
 
 ## Héros « scroll vidéo » (accueil)
 
-Le héros de l'accueil fait défiler la vidéo de la cave image par image au scroll (`js/hero-scroll.js`) :
+Le héros de l'accueil fait défiler la vidéo de la cave image par image au scroll (`js/hero-scroll.js`).
+Deux vidéos générées sur Google Flow : **ordinateur** (16:9, 1920 × 1080) et **mobile** (9:16, 1080 × 1920),
+7 s à 24 images/s chacune (168 images d'origine), sans filigrane visible (vérifié).
 
-- 297 images : les 143 images d'origine de la vidéo 1080p (toutes conservées, non recalculées) + 1 image
-  interpolée (compensation de mouvement) entre chaque paire, 2 dans les 12 passages les plus rapides ;
-  `js/hero-time.js` donne la place des images d'origine (la vidéo avance à vitesse constante au défilement) ;
-  netteté renforcée, plus fort là où la vidéo est douce
-- `assets/hero-frames/` : 297 WebP 1920 px, qualité 76 (ordinateur, ~25 Mo)
-- `assets/hero-frames-m/` : 297 WebP verticaux 720 × 1080, qualité 78 (mobile portrait, ~14 Mo) :
-  recadrage centré de la vidéo, sur toute sa hauteur
-- `assets/hero-frames-lo/` + `js/hero-lo.js` : version légère 512 px (~3,2 Mo) en 4 paquets entrelacés,
-  chargée en premier pour que la caméra ne se fige jamais pendant le chargement
-- `assets/hero-frames-lo-m/` + `js/hero-lo-m.js` : même chose en vertical pour le mobile (288 × 432, ~2,8 Mo)
-- fluidité : lissage du mouvement, décodage en parallèle dans plusieurs travailleurs
-  (`js/hero-worker.js`) ; caméra toujours centrée
+- 297 images par vidéo : les 168 images d'origine (toutes conservées, non recalculées) + 129 images
+  interpolées (compensation de mouvement), placées dans les passages où la caméra bouge le plus ;
+  `js/hero-time.js` donne la place des images d'origine pour chaque vidéo (la vidéo avance à vitesse
+  constante au défilement) ; netteté renforcée seulement là où la vidéo d'origine est douce
+- `assets/hero-frames/` : 297 WebP 1920 × 1080, qualité 74 (ordinateur, ~29 Mo)
+- `assets/hero-frames-m/` : 297 WebP 810 × 1440, qualité 72 (mobile tenu en portrait, ~22 Mo ; l'écran
+  est rendu au plus à 2× sa taille CSS)
+- `assets/hero-frames-lo/` + `js/hero-lo.js` : version légère 512 × 288 (~3,5 Mo) en 4 paquets entrelacés
+  (1 image sur 4 puis 1 sur 2 chargées en premier : la caméra ne se fige jamais pendant le chargement ;
+  le reste de la bande passante va à la version nette, téléchargée d'abord devant le visiteur)
+- `assets/hero-frames-lo-m/` + `js/hero-lo-m.js` : même chose pour le mobile (216 × 384, ~2,4 Mo)
+- conteneur 320vh, écran collant plein écran ; mobile = largeur < 1024 px tenu en portrait
+- fluidité : lissage du mouvement (ressort amorti à la molette), décodage en parallèle dans plusieurs
+  travailleurs (`js/hero-worker.js`) ; cadre fixe et centré, la caméra avance tout droit
 - netteté : jamais de fondu entre deux images (pas de double image) ; à l'arrêt, la caméra se pose
   sur une image d'origine ; la haute qualité est téléchargée en priorité autour de la position
 - à l'ouverture, la page démarre toujours au début du héros (sauf lien interne vers une section)
-- mobile portrait : plein écran vertical, cadre fixe et centré (la caméra avance tout droit) ;
-  une vidéo tournée en vertical (9:16) remplacera ce recadrage pour tout voir en plein écran
 - ouvert directement depuis le dossier (file://), un mode de secours prend le relais
 
 ## Où modifier quoi ?
