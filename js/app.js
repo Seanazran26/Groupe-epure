@@ -272,10 +272,9 @@
 
   /* ---------- Pied de page ---------- */
   function footerHTML() {
-    var cats = V.CATEGORIES.map(function (c) { return '<li><a href="nos-vins.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a></li>"; }).join("");
     var regs = V.REGIONS.slice(0, 8).map(function (r) { return '<li><a href="nos-vins.html?region=' + r.slug + '">' + esc(r.nom) + "</a></li>"; }).join("");
     var year = new Date().getFullYear();
-    var contact = V.contactLignes() || '<li><a href="index.html#visite">Nous rendre visite</a></li>';
+    var contact = V.contactLignes() || '<li><a href="index.html#cave">Nous rendre visite</a></li>';
     return '<footer class="site-footer"><div class="container">' +
       '<div class="footer-top">' +
         '<div class="footer-brand"><a class="brand" href="index.html">' + V.brandHTML() + "</a>" +
@@ -286,7 +285,6 @@
             '<a href="' + (C.email ? "mailto:" + esc(C.email) : "#") + '" aria-label="E-mail">' + I.mail + "</a>" +
           "</div>" +
         "</div>" +
-        '<div><h4>Nos vins</h4><ul>' + cats + '<li><a href="nos-vins.html">Tous nos vins</a></li></ul></div>' +
         '<div><h4>Régions</h4><ul>' + regs + '<li><a href="nos-vins.html">Toutes les régions</a></li></ul></div>' +
         '<div><h4>La Maison</h4><ul>' +
           '<li><a href="index.html#maison">Notre histoire</a></li>' +
