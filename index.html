@@ -16,39 +16,28 @@
   <div class="site-top" id="site-top"></div>
 
   <main>
-    <!-- ============ HÉROS ============ -->
-    <section class="hero">
-      <div class="hero-bg" aria-hidden="true">
-        <span class="hero-glow"></span>
-        <span class="hero-lines"><i></i><i></i><i></i></span>
-        <span class="hero-giant">Copains</span>
-      </div>
-      <div class="container hero-content">
-        <div class="hero-in">
-          <span class="eyebrow">Cave à vins · Vieux-Lille</span>
-          <h1 class="display h-xl">Le vin,<br>ça se <em>partage.</em></h1>
-          <p class="lead">De bons vins, originaux, à déguster entre copains. Achetés en direct chez les vignerons, choisis selon un seul critère&nbsp;: «&nbsp;Ah, c'est bon ça&nbsp;!&nbsp;»</p>
-          <div class="hero-actions">
-            <a class="btn btn-light" href="nos-vins.html">Découvrir nos vins <svg class="arrow" viewBox="0 0 22 8" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 4h21M17.5 .5 21 4l-3.5 3.5"/></svg></a>
-            <a class="btn btn-ghost-light" href="vignerons.html">Nos vignerons</a>
+    <!-- ============ HÉROS SCROLL VIDÉO (297 images pilotées par le défilement) ============ -->
+    <section class="hero-scroll" data-hero-scroll data-src-desktop="assets/hero-frames/" data-src-mobile="assets/hero-frames-sm/"
+      data-focus-mobile="0:0.31, 0.1:0.17, 0.2:0.6, 0.3:0.75, 0.36:0.82, 0.45:0.35, 0.5:0.28, 0.56:0.3, 0.6:0.58, 0.7:0.62, 0.8:0.66, 1:0.68" aria-label="Visite de la cave">
+      <div class="hero-sticky">
+        <canvas class="hero-canvas" aria-hidden="true"></canvas>
+        <div class="hero-topveil" aria-hidden="true"></div>
+        <div class="hero-intro show" data-hero-intro>
+          <span class="eyebrow center">Cave à vins · Vieux-Lille</span>
+          <h1 class="hero-title">Vin <em>des</em> Copains</h1>
+          <div class="hero-cue">
+            <span>Faites défiler pour visiter</span>
+            <svg class="hero-arrow" viewBox="0 0 24 40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 2v34M3 27l9 9 9-9"/></svg>
           </div>
         </div>
-        <div class="hero-medal" aria-hidden="true">
-          <svg viewBox="0 0 300 300"><defs><path id="medal-circ" d="M150 150m-128 0a128 128 0 1 1 256 0a128 128 0 1 1-256 0"/></defs>
-            <text font-family="Jost, sans-serif" font-size="11.5" letter-spacing="7.2" fill="currentColor"><textPath href="#medal-circ" textLength="800" lengthAdjust="spacing">VIN DES COPAINS ✦ LE VIN SE PARTAGE ✦ VIEUX-LILLE ✦ </textPath></text></svg>
-          <div class="medal-core">
-            <span class="medal-small">Santé&nbsp;!</span>
-            <span class="medal-big">et<br><em>modération</em></span>
+        <div class="hero-outro" data-hero-outro>
+          <span class="eyebrow center">Bienvenue chez les copains</span>
+          <h2 class="hero-outro-title">Le vin, ça se <em>partage.</em></h2>
+          <div class="hero-ctas" data-hero-ctas>
+            <a class="btn btn-light" href="nos-vins.html">Découvrir nos vins <svg viewBox="0 0 22 8" fill="none" stroke="currentColor" stroke-width="1" class="arrow"><path d="M0 4h21M17.5 .5 21 4l-3.5 3.5"/></svg></a>
           </div>
+          <p class="hero-contact" data-hero-contact></p>
         </div>
-      </div>
-      <div class="hero-foot container">
-        <div class="hero-stats">
-          <div><strong data-stat="regions">21</strong><span>Régions</span></div>
-          <div><strong data-stat="categories">5</strong><span>Univers</span></div>
-          <div><strong>1</strong><span>Seul critère</span></div>
-        </div>
-        <div class="scroll-cue">Défiler<i></i></div>
       </div>
     </section>
 
@@ -123,5 +112,6 @@
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
   <script src="js/home.js"></script>
+  <script src="js/hero-scroll.js"></script>
 </body>
 </html>

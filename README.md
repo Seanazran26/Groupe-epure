@@ -19,6 +19,15 @@ les couleurs et des filets dorés. Les emplacements « Cuvée à venir » montre
 | `produit.html?id=…` | Fiche d'une bouteille |
 | `mentions-legales.html` | Mentions légales, livraison et retrait |
 
+## Héros « scroll vidéo » (accueil)
+
+Le héros de l'accueil fait défiler la vidéo de la cave image par image au scroll (`js/hero-scroll.js`) :
+
+- 297 images interpolées (compensation de mouvement) à partir de la vidéo 1080p de 143 images
+- `assets/hero-frames/` : 297 WebP 1920 px, qualité 85 (ordinateur, ~27 Mo)
+- `assets/hero-frames-sm/` : 297 WebP 1080 px, qualité 80 (mobile < 1024 px, ~11 Mo)
+- sur mobile, le cadrage suit les bouteilles (`data-focus-mobile` dans `index.html`)
+
 ## Où modifier quoi ?
 
 Tout le contenu se pilote depuis **`js/data.js`** :
@@ -63,6 +72,8 @@ js/data.js             données (catalogue, vignerons, coordonnées)
 js/carte-france.js     fond de carte de France (Natural Earth, domaine public)
 js/app.js              en-tête, pied de page, panier, recherche, contrôle d'âge
 js/home.js | nos-vins.js | produit.js | vignerons.js   scripts propres à chaque page
+js/hero-scroll.js      héros vidéo piloté par le défilement
+assets/hero-frames/    images du héros (ordinateur) — assets/hero-frames-sm/ (mobile)
 donnees/               catalogue du site actuel (JSON + CSV)
 assets/bouteilles/     photos des bouteilles (reprises du site actuel, recadrées, pas encore affichées)
 ```

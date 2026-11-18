@@ -8,6 +8,15 @@
   var count = function (fn) { return V.PRODUITS.filter(fn).length; };
   var deux = function (n) { return (n < 10 ? "0" : "") + n; };
 
+  // Héros scroll : boutons d'action de fin (rendez-vous, téléphone, itinéraire)
+  var HC = V.CONTACT || {}, hcta = $("[data-hero-ctas]"), hcon = $("[data-hero-contact]");
+  if (hcta) {
+    var adrH = V.adresseComplete();
+    if (HC.telephone) hcta.insertAdjacentHTML("beforeend", '<a class="btn btn-ghost-light" href="' + V.telHref() + '">Prendre rendez-vous</a>');
+    if (adrH) hcta.insertAdjacentHTML("beforeend", '<a class="btn btn-ghost-light" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(adrH) + '">Itinéraire</a>');
+  }
+  if (hcon) hcon.innerHTML = [HC.telephone, HC.email, V.adresseComplete()].filter(Boolean).map(esc).join('<span class="sep">✦</span>');
+
   // Chiffres du héros
   var sr = $('[data-stat="regions"]'), sc = $('[data-stat="categories"]');
   if (sr) sr.textContent = V.REGIONS.length;
