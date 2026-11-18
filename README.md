@@ -23,14 +23,16 @@ les couleurs et des filets dorés. Les emplacements « Cuvée à venir » montre
 
 Le héros de l'accueil fait défiler la vidéo de la cave image par image au scroll (`js/hero-scroll.js`) :
 
-- 424 images : 142 images d'origine de la vidéo 1080p (1 sur 3, non recalculées) + 2 images interpolées
-  (compensation de mouvement) entre chacune ; netteté renforcée, plus fort là où la vidéo est douce
-- `assets/hero-frames/` : 424 WebP 1920 px, qualité 76 (ordinateur, ~36 Mo)
-- `assets/hero-frames-m/` : 424 WebP verticaux 720 × 1080, qualité 78 (mobile portrait, ~19 Mo) :
+- 297 images : les 143 images d'origine de la vidéo 1080p (toutes conservées, non recalculées) + 1 image
+  interpolée (compensation de mouvement) entre chaque paire, 2 dans les 12 passages les plus rapides ;
+  `js/hero-time.js` donne la place des images d'origine (la vidéo avance à vitesse constante au défilement) ;
+  netteté renforcée, plus fort là où la vidéo est douce
+- `assets/hero-frames/` : 297 WebP 1920 px, qualité 76 (ordinateur, ~25 Mo)
+- `assets/hero-frames-m/` : 297 WebP verticaux 720 × 1080, qualité 78 (mobile portrait, ~14 Mo) :
   recadrage centré de la vidéo, sur toute sa hauteur
-- `assets/hero-frames-lo/` + `js/hero-lo.js` : version légère 512 px (~3,7 Mo) en 4 paquets entrelacés,
+- `assets/hero-frames-lo/` + `js/hero-lo.js` : version légère 512 px (~3,2 Mo) en 4 paquets entrelacés,
   chargée en premier pour que la caméra ne se fige jamais pendant le chargement
-- `assets/hero-frames-lo-m/` + `js/hero-lo-m.js` : même chose en vertical pour le mobile (288 × 432, ~3,1 Mo)
+- `assets/hero-frames-lo-m/` + `js/hero-lo-m.js` : même chose en vertical pour le mobile (288 × 432, ~2,8 Mo)
 - fluidité : lissage du mouvement, décodage en parallèle dans plusieurs travailleurs
   (`js/hero-worker.js`) ; caméra toujours centrée
 - netteté : jamais de fondu entre deux images (pas de double image) ; à l'arrêt, la caméra se pose
