@@ -27,7 +27,13 @@
         ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (t) {
           window.addEventListener(t, function () { touche = true; }, { once: true, passive: true });
         });
-        var haut = function () { if (!touche) window.scrollTo(0, 0); };   // jamais contre un geste du visiteur
+        var haut = function () {                                         // jamais contre un geste du visiteur
+          if (touche || window.pageYOffset === 0) return;
+          var r = document.documentElement, b = r.style.scrollBehavior;
+          r.style.scrollBehavior = "auto";                               // instantané (la page défile en douceur par défaut)
+          window.scrollTo(0, 0);
+          r.style.scrollBehavior = b;
+        };
         haut();
         document.addEventListener("DOMContentLoaded", haut);
         window.addEventListener("load", haut);

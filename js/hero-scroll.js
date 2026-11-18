@@ -61,7 +61,7 @@
   var packCache = {}, hiOpts = null, hiOptsKey = "";
   var target = 0, pos = 0, prevPos = 0, vel = 0, lastT = 0, running = false, last = "", lastScroll = 0;
   var hiPacksBusy = 0;
-  var cw = 0, ch = 0, dpr = 1, rootTop = 0, rootH = 0, stickyH = 0, headerH = 80;
+  var cw = 0, ch = 0, dpr = 1, rootTop = 0, rootH = 0, stickyH = 0;
   var hiTimer = 0, loReady = false;
 
   function dims(a, d) { var m = /^(\d+)x(\d+)$/.exec(a || ""); return m ? [+m[1], +m[2]] : d; }
@@ -74,6 +74,7 @@
       if (fr[j][0] !== n || blobs[tier][j]) continue;
       blobs[tier][j] = new Blob([new Uint8Array(buf, fr[j][1], fr[j][2])], { type: "image/webp" });
     }
+    delete packCache[name + n];                    // les images sont copiées : le paquet brut peut être libéré
   }
   function release(bm) { if (bm && bm.close) bm.close(); }
   function categorie() {
@@ -139,6 +140,7 @@
     } else if (pk) {
       var f = pk.frames[i];
       p = fetchPack(name, f[0]).then(function (buf) {
+        if (g !== modeGen) return null;           // le mode a changé entre-temps : on ne mélange jamais les formats
         unpack(tier, name, f[0], buf);            // un paquet contient plusieurs images : toutes rangées d'un coup
         return blobs[tier][i];
       });
@@ -149,11 +151,11 @@
       });
     }
     p.then(function (b) {
+      if (g !== modeGen) return;                    // changement ordinateur ↔ mobile entre-temps (tableaux remplacés)
       fetching[tier][i] = false;
-      if (g !== modeGen) return;                    // changement ordinateur ↔ mobile entre-temps
-      blobs[tier][i] = b;
+      if (b) blobs[tier][i] = b;
       pump();
-    }, function () { fetching[tier][i] = false; });
+    }, function () { if (g === modeGen) fetching[tier][i] = false; });
   }
   function loadImg(tier, i) {                    // mode secours (file://)
     if (imgs[tier][i]) return imgs[tier][i];
@@ -183,16 +185,28 @@
     }
     var blob = blobs[tier][i];
     if (!blob) {
+      // paquets : téléchargés seulement par loadLo() et packLoop(), dans l'ordre de priorité
+      // (sinon un défilement rapide réclamerait tous les paquets d'un coup et tout arriverait en retard)
+      if (canFetch && packs(srcName(tier))) return;
       if (tier === "lo" || loReady || !hasLo || i === Math.round(pos)) fetchBlob(tier, i, true);
       return;
     }
     inflight.add(key);
     if (pool.length) {
       pool[rr++ % pool.length].postMessage({ tier: tier, i: i, gen: g, blob: blob, opts: opts });
-    } else {
+    } else if (window.createImageBitmap) {
       (opts ? createImageBitmap(blob, opts).catch(function () { return createImageBitmap(blob); }) : createImageBitmap(blob))
         .then(function (bm) { inflight.delete(key); accept(tier, i, g, bm); pump(); },
               function () { inflight.delete(key); });
+    } else {                                       // très anciens navigateurs : image classique
+      var im = new Image(), u = URL.createObjectURL(blob);
+      im.onload = function () {
+        (im.decode ? im.decode().catch(function () {}) : Promise.resolve()).then(function () {
+          URL.revokeObjectURL(u); inflight.delete(key); accept(tier, i, g, im); pump();
+        });
+      };
+      im.onerror = function () { URL.revokeObjectURL(u); inflight.delete(key); };
+      im.src = u;
     }
   }
 
@@ -237,7 +251,9 @@
       var k = n++;
       fetchPack(name, k).then(function (buf) {
         if (g !== modeGen) return;
-        unpack("lo", name, k, buf); pump(); kick(); next();
+        unpack("lo", name, k, buf); pump(); kick();
+        if (k === 0) scheduleHi();                 // 1er paquet reçu (on peut déjà bouger) : la haute qualité démarre
+        next();
       }, next);
     })();
   }
@@ -285,6 +301,7 @@
   }
   function scheduleHi() {
     clearTimeout(hiTimer);
+    if (!canFetch) return;                        // (ouvert depuis un dossier : chargement à la demande dans decode())
     if (canFetch && packs(mode)) { packLoop(); return; }
     if (hasLo && !loReady) return;                // (sans paquets) la version légère d'abord
     (function step() {
@@ -379,14 +396,15 @@
     rootTop = r.top + window.pageYOffset;
     rootH = r.height;
     stickyH = sticky ? sticky.offsetHeight : window.innerHeight;
-    if (siteTop) headerH = siteTop.offsetHeight;   // mesuré une fois (le lire à chaque scroll forcerait un recalcul de la page)
   }
   function readTarget() {
     // course = hauteur de la section − hauteur de l'écran collant (fixe : ne bouge pas avec la barre d'adresse)
     var y = window.pageYOffset, total = rootH - stickyH;
     var p = total > 0 ? Math.min(1, Math.max(0, (y - rootTop) / total)) : 0;
     target = p * (N - 1);
-    if (siteTop) siteTop.classList.toggle("in-hero", rootTop + rootH - y > headerH);
+    // en-tête transparent seulement tant que l'écran de la visite est fixé ; dès qu'il s'en va, en-tête plein
+    // (sinon les textes de fin passeraient sous le logo)
+    if (siteTop) siteTop.classList.toggle("in-hero", y < rootTop + rootH - stickyH - 1);
   }
   function onScroll() { lastScroll = performance.now(); readTarget(); kick(); }
 
@@ -428,11 +446,12 @@
     hiMap.forEach(release); hiMap.clear(); loMap.forEach(release); loMap.clear(); inflight.clear();
     blobs = { lo: [], hi: [] }; fetching = { lo: [], hi: [] }; imgs = { lo: [], hi: [] };
     hiOptsKey = ""; last = ""; loReady = false; hiPackBusy = {}; hiPacksBusy = 0;
+    packCache = {};                               // paquets de l'autre mode : libérés
     hasLo = canFetch && !!packs(loName());
     fetchBlob("hi", 0, true);                     // image 1 en priorité absolue
     fetchBlob("hi", Math.round(target), true);
-    if (hasLo) loadLo();                          // la version légère (toute la séquence, pour bouger tout de suite)…
-    scheduleHi();                                 // …et, en parallèle, la haute qualité autour de la position
+    if (hasLo) loadLo();                          // la version légère d'abord (1er paquet = toute la séquence, 1 image sur 4)…
+    else scheduleHi();                            // …la haute qualité démarre dès ce 1er paquet reçu
   }
 
   // lecture seule, pour les mesures

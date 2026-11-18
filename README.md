@@ -25,8 +25,8 @@ Le héros de l'accueil fait défiler la vidéo de la cave image par image au scr
 
 - 424 images : 142 images d'origine de la vidéo 1080p (1 sur 3, non recalculées) + 2 images interpolées
   (compensation de mouvement) entre chacune ; netteté renforcée, plus fort là où la vidéo est douce
-- `assets/hero-frames/` : 424 WebP 1920 px, qualité 84 (ordinateur)
-- `assets/hero-frames-m/` : 424 WebP verticaux 720 × 1080, qualité 80 (mobile portrait) :
+- `assets/hero-frames/` : 424 WebP 1920 px, qualité 76 (ordinateur, ~36 Mo)
+- `assets/hero-frames-m/` : 424 WebP verticaux 720 × 1080, qualité 78 (mobile portrait, ~19 Mo) :
   recadrage centré de la vidéo, sur toute sa hauteur
 - `assets/hero-frames-lo/` + `js/hero-lo.js` : version légère 512 px (~3,7 Mo) en 4 paquets entrelacés,
   chargée en premier pour que la caméra ne se fige jamais pendant le chargement
