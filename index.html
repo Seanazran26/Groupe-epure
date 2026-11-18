@@ -18,12 +18,10 @@
   <main>
     <!-- ============ HÉROS SCROLL VIDÉO (297 images pilotées par le défilement) ============ -->
     <section class="hero-scroll" data-hero-scroll data-frames="439"
-      data-src-lo="assets/hero-frames-lo/" data-size-lo="640x360"
+      data-src-lo="assets/hero-frames-lo/" data-size-lo="512x288" data-size-lo-mobile="288x432"
       data-src-desktop="assets/hero-frames/" data-size-desktop="1920x1080"
-      data-src-mobile="assets/hero-frames-sm/" data-size-mobile="1080x608" aria-label="Visite de la cave">
+      data-src-mobile="assets/hero-frames-m/" data-size-mobile="720x1080" aria-label="Visite de la cave">
       <div class="hero-sticky">
-        <img class="hero-backdrop" alt="" aria-hidden="true">
-        <img class="hero-backdrop" alt="" aria-hidden="true">
         <canvas class="hero-canvas" aria-hidden="true"></canvas>
         <div class="hero-topveil" aria-hidden="true"></div>
         <div class="hero-intro show" data-hero-intro>
@@ -117,6 +115,7 @@
   <script src="js/app.js"></script>
   <script src="js/home.js"></script>
   <script src="js/hero-lo.js"></script>
+  <script src="js/hero-lo-m.js"></script>
   <script src="js/hero-scroll.js"></script>
 </body>
 </html>

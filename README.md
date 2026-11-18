@@ -25,12 +25,15 @@ Le héros de l'accueil fait défiler la vidéo de la cave image par image au scr
 
 - 439 images interpolées (compensation de mouvement) à partir de la vidéo 1080p de 143 images
 - `assets/hero-frames/` : 439 WebP 1920 px, qualité 84 (ordinateur, ~38 Mo)
-- `assets/hero-frames-sm/` : 439 WebP 1080 × 608, qualité 82 (mobile portrait, ~17 Mo)
+- `assets/hero-frames-m/` : 439 WebP verticaux 720 × 1080, qualité 80 (mobile portrait, ~17 Mo) :
+  recadrage centré de la vidéo, sur toute sa hauteur
 - `assets/hero-frames-lo/` + `js/hero-lo.js` : version légère 512 px (~3,7 Mo) en 4 paquets entrelacés,
   chargée en premier pour que la caméra ne se fige jamais pendant le chargement
+- `assets/hero-frames-lo-m/` + `js/hero-lo-m.js` : même chose en vertical pour le mobile (288 × 432, ~3,1 Mo)
 - fluidité : lissage du mouvement, fondu entre images voisines, décodage en parallèle
   dans plusieurs travailleurs (`js/hero-worker.js`) ; caméra toujours centrée
-- mobile portrait : la vidéo entière sur toute la largeur, sur fond flouté de la même image
+- mobile portrait : plein écran vertical, caméra fixe et centrée (les bords gauche et droit de la vidéo,
+  tournée à l'horizontale, sortent de l'écran)
 - ouvert directement depuis le dossier (file://), un mode de secours prend le relais
 
 ## Où modifier quoi ?
@@ -79,8 +82,8 @@ js/app.js              en-tête, pied de page, panier, recherche, contrôle d'â
 js/home.js | nos-vins.js | produit.js | vignerons.js   scripts propres à chaque page
 js/hero-scroll.js      héros vidéo piloté par le défilement
 js/hero-worker.js      décodage des images du héros en arrière-plan (plusieurs en parallèle)
-js/hero-lo.js          index de la version légère du héros (fichier généré)
-assets/hero-frames/    images du héros (ordinateur) — assets/hero-frames-sm/ (mobile)
+js/hero-lo.js          index de la version légère du héros (fichier généré) — js/hero-lo-m.js (mobile)
+assets/hero-frames/    images du héros (ordinateur) — assets/hero-frames-m/ (mobile, vertical)
 donnees/               catalogue du site actuel (JSON + CSV)
 assets/bouteilles/     photos des bouteilles (reprises du site actuel, recadrées, pas encore affichées)
 ```
