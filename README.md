@@ -24,10 +24,13 @@ les couleurs et des filets dorés. Les emplacements « Cuvée à venir » montre
 Le héros de l'accueil fait défiler la vidéo de la cave image par image au scroll (`js/hero-scroll.js`) :
 
 - 439 images interpolées (compensation de mouvement) à partir de la vidéo 1080p de 143 images
-- `assets/hero-frames/` : 439 WebP 1920 px, qualité 88 (ordinateur, ~48 Mo)
-- `assets/hero-frames-sm/` : 439 WebP 608 × 1080 (recadrage central 9:16 en résolution native, mobile portrait, ~17 Mo)
-- fluidité : lissage du mouvement, fondu entre images voisines, téléchargement et décodage
-  dans un travailleur en arrière-plan (`js/hero-worker.js`) ; caméra toujours centrée
+- `assets/hero-frames/` : 439 WebP 1920 px, qualité 84 (ordinateur, ~38 Mo)
+- `assets/hero-frames-sm/` : 439 WebP 1080 × 608, qualité 82 (mobile portrait, ~17 Mo)
+- `assets/hero-frames-lo/` + `js/hero-lo.js` : version légère 512 px (~3,7 Mo) en 4 paquets entrelacés,
+  chargée en premier pour que la caméra ne se fige jamais pendant le chargement
+- fluidité : lissage du mouvement, fondu entre images voisines, décodage en parallèle
+  dans plusieurs travailleurs (`js/hero-worker.js`) ; caméra toujours centrée
+- mobile portrait : la vidéo entière sur toute la largeur, sur fond flouté de la même image
 - ouvert directement depuis le dossier (file://), un mode de secours prend le relais
 
 ## Où modifier quoi ?
@@ -75,7 +78,8 @@ js/carte-france.js     fond de carte de France (Natural Earth, domaine public)
 js/app.js              en-tête, pied de page, panier, recherche, contrôle d'âge
 js/home.js | nos-vins.js | produit.js | vignerons.js   scripts propres à chaque page
 js/hero-scroll.js      héros vidéo piloté par le défilement
-js/hero-worker.js      téléchargement + décodage des images du héros en arrière-plan
+js/hero-worker.js      décodage des images du héros en arrière-plan (plusieurs en parallèle)
+js/hero-lo.js          index de la version légère du héros (fichier généré)
 assets/hero-frames/    images du héros (ordinateur) — assets/hero-frames-sm/ (mobile)
 donnees/               catalogue du site actuel (JSON + CSV)
 assets/bouteilles/     photos des bouteilles (reprises du site actuel, recadrées, pas encore affichées)
