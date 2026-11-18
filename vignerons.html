@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nos vignerons — Vin des Copains</title>
+  <meta name="description" content="La carte des vignerons de Vin des Copains : des domaines passionnés, de la Champagne à la Corse.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="has-hero" data-page="vignerons">
+
+  <div class="site-top" id="site-top"></div>
+
+  <main>
+    <section class="page-hero" style="--ph1:#4a2a16">
+      <span class="hero-lines" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="ph-giant" aria-hidden="true">Vignerons</span>
+      <div class="container">
+        <nav class="crumbs" aria-label="Fil d'Ariane"><a href="index.html">Accueil</a><span>/</span><span>Nos vignerons</span></nav>
+        <h1 class="display h-xl">Nos <em>vignerons</em></h1>
+        <p class="lead">Totalement indépendants dans nos choix, nous sélectionnons des vignerons passionnés par leur vigne et leur terroir, qui donnent le meilleur d'eux-mêmes à chaque millésime.</p>
+      </div>
+    </section>
+
+    <section class="vg">
+      <div class="container">
+        <div class="vg-head">
+          <div class="vg-stats" data-vg-stats></div>
+          <div class="vg-chips" role="tablist" aria-label="Filtrer par vignoble" data-vg-chips></div>
+        </div>
+        <div class="vg-layout">
+          <div class="vg-map-wrap" data-vg-wrap>
+            <svg class="vg-map" data-vg-map role="img" aria-label="Carte de France des vignerons"></svg>
+            <div class="vg-tip" data-vg-tip hidden></div>
+            <button class="vg-reset" data-vg-reset hidden>Voir toute la France</button>
+            <p class="vg-hint">Cliquez sur un point pour découvrir le domaine</p>
+          </div>
+          <aside class="vg-panel">
+            <div class="vg-card" data-vg-card aria-live="polite"></div>
+            <div class="vg-list" data-vg-list></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/carte-france.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/vignerons.js"></script>
+</body>
+</html>

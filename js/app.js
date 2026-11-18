@@ -220,11 +220,14 @@
           '<nav class="nav" aria-label="Navigation principale">' +
             '<a href="index.html#maison">La Maison</a>' +
             '<a href="index.html#cave">La Cave</a>' +
-            '<div class="nav-item"><a class="nav-link' + (active === "vins" ? " active" : "") + '" href="nos-vins.html" aria-haspopup="true">Nos vins</a>' + megaHTML() + "</div>" +
           "</nav>" +
         "</div>" +
         '<a class="brand" href="index.html" aria-label="Vin des Copains — Accueil">' + V.brandHTML() + "</a>" +
         '<div class="header-right">' +
+          '<nav class="nav nav-right" aria-label="Nos vins et nos vignerons">' +
+            '<div class="nav-item"><a class="nav-link' + (active === "vins" ? " active" : "") + '" href="nos-vins.html" aria-haspopup="true">Nos vins</a>' + megaHTML() + "</div>" +
+            '<a href="vignerons.html"' + (active === "vignerons" ? ' class="active"' : "") + ">Nos vignerons</a>" +
+          "</nav>" +
           (C0.instagram ? '<a class="icon-btn" href="' + esc(C0.instagram) + '" target="_blank" rel="noopener" aria-label="Instagram">' + I.instagram + "</a>" : "") +
           '<button class="icon-btn" data-open-search aria-label="Rechercher">' + I.search + "</button>" +
           '<button class="icon-btn" data-open-cart aria-label="Panier">' + I.bag + '<span class="cart-count">0</span></button>' +
@@ -242,6 +245,7 @@
         '<a href="index.html#maison">La Maison</a>' +
         '<a href="index.html#cave">La Cave</a>' +
         '<a href="nos-vins.html">Nos vins</a>' +
+        '<a href="vignerons.html">Nos vignerons</a>' +
         '<details><summary>Catégories</summary><div class="sub">' + cats + "</div></details>" +
         '<details><summary>Régions</summary><div class="sub">' + regs + "</div></details>" +
         '<details><summary>Consommation</summary><div class="sub">' + cons + "</div></details>" +
@@ -287,7 +291,8 @@
         '<div><h4>La Maison</h4><ul>' +
           '<li><a href="index.html#maison">Notre histoire</a></li>' +
           '<li><a href="index.html#cave">La cave &amp; Instagram</a></li>' +
-          '<li><a href="index.html#garde">Quand déguster ?</a></li>' +
+          '<li><a href="vignerons.html">Nos vignerons</a></li>' +
+          '<li><a href="index.html#garde">Consommation</a></li>' +
           '<li><a href="mentions-legales.html">Mentions légales</a></li>' +
           '<li><a href="mentions-legales.html#livraison">Livraison &amp; retrait</a></li>' +
         "</ul></div>" +
