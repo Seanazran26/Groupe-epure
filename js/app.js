@@ -199,36 +199,33 @@
 
   /* ---------- En-tête ---------- */
   function megaHTML() {
-    var cats = V.CATEGORIES.map(function (c) { return '<li><a href="cave.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a></li>"; }).join("");
-    var cons = V.CONSOMMATIONS.map(function (c) { return '<li><a href="cave.html?conso=' + c.slug + '">' + esc(c.nom) + "</a></li>"; }).join("");
-    var regs = V.REGIONS.map(function (r) { return '<li><a href="cave.html?region=' + r.slug + '">' + esc(r.nom) + "</a></li>"; }).join("");
+    var cats = V.CATEGORIES.map(function (c) { return '<li><a href="nos-vins.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a></li>"; }).join("");
+    var cons = V.CONSOMMATIONS.map(function (c) { return '<li><a href="nos-vins.html?conso=' + c.slug + '">' + esc(c.nom) + "</a></li>"; }).join("");
+    var regs = V.REGIONS.map(function (r) { return '<li><a href="nos-vins.html?region=' + r.slug + '">' + esc(r.nom) + "</a></li>"; }).join("");
     return '<div class="mega"><div class="container mega-inner">' +
-      "<div><h4>Catégories</h4><ul>" + cats + '<li><a href="cave.html">Toute la cave</a></li></ul></div>' +
+      "<div><h4>Catégories</h4><ul>" + cats + '<li><a href="nos-vins.html">Tous nos vins</a></li></ul></div>' +
       "<div><h4>Consommation</h4><ul>" + cons + "</ul></div>" +
       '<div><h4>Régions</h4><ul class="cols-2">' + regs + "</ul></div>" +
-      '<a class="mega-feature" href="cave.html"><span class="mf-orn" aria-hidden="true">✦</span><div><span class="s">Découvrir</span><span class="t">Toute <em>la cave</em></span></div></a>' +
+      '<a class="mega-feature" href="nos-vins.html"><span class="mf-orn" aria-hidden="true">✦</span><div><span class="s">Découvrir</span><span class="t">Tous <em>nos vins</em></span></div></a>' +
     "</div></div>";
   }
 
   function headerHTML(active) {
-    var a = function (k) { return active === k ? ' class="active"' : ""; };
+    var C0 = V.CONTACT || {};
     var L = (V.CONTACT || {}).livraison || {};
     return '<div class="announce">Livraison offerte dès ' + (L.offerteDes || 12) + ' bouteilles <span>✦</span> Retrait à la cave du Vieux-Lille<span class="hide-sm">✦</span><span class="hide-sm" style="color:inherit;margin:0">En direct des vignerons</span></div>' +
       '<header class="site-header"><div class="container header-inner">' +
         '<div class="header-left">' +
           '<button class="icon-btn burger" data-open-menu aria-label="Ouvrir le menu">' + I.menu + "</button>" +
           '<nav class="nav" aria-label="Navigation principale">' +
-            '<a href="cave.html"' + a("cave") + ">La Cave</a>" +
-            '<div class="nav-item"><button class="nav-link" type="button" aria-haspopup="true">Nos vins</button>' + megaHTML() + "</div>" +
-            '<a href="index.html#regions"' + a("regions") + ">Régions</a>" +
+            '<a href="index.html#maison">La Maison</a>' +
+            '<a href="index.html#cave">La Cave</a>' +
+            '<div class="nav-item"><a class="nav-link' + (active === "vins" ? " active" : "") + '" href="nos-vins.html" aria-haspopup="true">Nos vins</a>' + megaHTML() + "</div>" +
           "</nav>" +
         "</div>" +
         '<a class="brand" href="index.html" aria-label="Vin des Copains — Accueil">' + V.brandHTML() + "</a>" +
         '<div class="header-right">' +
-          '<nav class="nav nav-right" aria-label="Navigation secondaire">' +
-            '<a href="index.html#garde">Quand déguster</a>' +
-            '<a href="index.html#maison">La Maison</a>' +
-          "</nav>" +
+          (C0.instagram ? '<a class="icon-btn" href="' + esc(C0.instagram) + '" target="_blank" rel="noopener" aria-label="Instagram">' + I.instagram + "</a>" : "") +
           '<button class="icon-btn" data-open-search aria-label="Rechercher">' + I.search + "</button>" +
           '<button class="icon-btn" data-open-cart aria-label="Panier">' + I.bag + '<span class="cart-count">0</span></button>' +
         "</div>" +
@@ -236,17 +233,18 @@
   }
 
   function mobileMenuHTML() {
-    var cats = V.CATEGORIES.map(function (c) { return '<a href="cave.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a>"; }).join("");
-    var regs = V.REGIONS.map(function (r) { return '<a href="cave.html?region=' + r.slug + '">' + esc(r.nom) + "</a>"; }).join("");
-    var cons = V.CONSOMMATIONS.map(function (c) { return '<a href="cave.html?conso=' + c.slug + '">' + esc(c.nom) + "</a>"; }).join("");
+    var cats = V.CATEGORIES.map(function (c) { return '<a href="nos-vins.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a>"; }).join("");
+    var regs = V.REGIONS.map(function (r) { return '<a href="nos-vins.html?region=' + r.slug + '">' + esc(r.nom) + "</a>"; }).join("");
+    var cons = V.CONSOMMATIONS.map(function (c) { return '<a href="nos-vins.html?conso=' + c.slug + '">' + esc(c.nom) + "</a>"; }).join("");
     return '<div class="mobile-menu" id="mobile-menu" aria-hidden="true">' +
       '<div class="mobile-menu-top"><div class="brand" style="align-items:flex-start;text-align:left">' + V.brandHTML(false) + '</div><button class="icon-btn" data-close-menu aria-label="Fermer">' + I.close + "</button></div>" +
       "<nav>" +
-        '<a href="cave.html">La Cave</a>' +
+        '<a href="index.html#maison">La Maison</a>' +
+        '<a href="index.html#cave">La Cave</a>' +
+        '<a href="nos-vins.html">Nos vins</a>' +
         '<details><summary>Catégories</summary><div class="sub">' + cats + "</div></details>" +
         '<details><summary>Régions</summary><div class="sub">' + regs + "</div></details>" +
         '<details><summary>Consommation</summary><div class="sub">' + cons + "</div></details>" +
-        '<a href="index.html#maison">La Maison</a>' +
       "</nav>" +
       '<div class="m-foot">L\'abus d\'alcool est dangereux pour la santé.<br>À consommer avec modération.</div>' +
     "</div>";
@@ -270,8 +268,8 @@
 
   /* ---------- Pied de page ---------- */
   function footerHTML() {
-    var cats = V.CATEGORIES.map(function (c) { return '<li><a href="cave.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a></li>"; }).join("");
-    var regs = V.REGIONS.slice(0, 8).map(function (r) { return '<li><a href="cave.html?region=' + r.slug + '">' + esc(r.nom) + "</a></li>"; }).join("");
+    var cats = V.CATEGORIES.map(function (c) { return '<li><a href="nos-vins.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a></li>"; }).join("");
+    var regs = V.REGIONS.slice(0, 8).map(function (r) { return '<li><a href="nos-vins.html?region=' + r.slug + '">' + esc(r.nom) + "</a></li>"; }).join("");
     var year = new Date().getFullYear();
     var contact = V.contactLignes() || '<li><a href="index.html#visite">Nous rendre visite</a></li>';
     return '<footer class="site-footer"><div class="container">' +
@@ -284,12 +282,12 @@
             '<a href="' + (C.email ? "mailto:" + esc(C.email) : "#") + '" aria-label="E-mail">' + I.mail + "</a>" +
           "</div>" +
         "</div>" +
-        '<div><h4>La Cave</h4><ul>' + cats + '<li><a href="cave.html">Toute la cave</a></li></ul></div>' +
+        '<div><h4>Nos vins</h4><ul>' + cats + '<li><a href="nos-vins.html">Tous nos vins</a></li></ul></div>' +
         '<div><h4>Régions</h4><ul>' + regs + '<li><a href="index.html#regions">Toutes les régions</a></li></ul></div>' +
         '<div><h4>La Maison</h4><ul>' +
           '<li><a href="index.html#maison">Notre histoire</a></li>' +
+          '<li><a href="index.html#cave">La cave &amp; Instagram</a></li>' +
           '<li><a href="index.html#garde">Quand déguster ?</a></li>' +
-          '<li><a href="index.html#club">Le Cercle des Copains</a></li>' +
           '<li><a href="mentions-legales.html">Mentions légales</a></li>' +
           '<li><a href="mentions-legales.html#livraison">Livraison &amp; retrait</a></li>' +
         "</ul></div>" +
@@ -321,7 +319,7 @@
         '<div class="search-top"><span class="eyebrow">Rechercher un vin</span><button class="icon-btn" data-close-search aria-label="Fermer">' + I.close + "</button></div>" +
         '<label class="search-field">' + I.search + '<input type="search" placeholder="Un nom, une région, une couleur…" data-search-input autocomplete="off"></label>' +
         '<div class="search-suggest"><span>Suggestions</span>' +
-          V.CATEGORIES.map(function (c) { return '<a class="chip" href="cave.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a>"; }).join("") +
+          V.CATEGORIES.map(function (c) { return '<a class="chip" href="nos-vins.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a>"; }).join("") +
         "</div>" +
         '<div class="search-results" data-search-results></div>' +
       "</div></div>" +
@@ -336,7 +334,7 @@
     var ids = Object.keys(cart);
     if (!ids.length) {
       body.innerHTML = '<div class="cart-empty">' + I.glass + "<p>Votre panier est vide</p><small>Laissez-vous guider par nos sélections.</small>" +
-        '<a class="btn btn-dark" href="cave.html">Découvrir la cave ' + I.arrow + "</a></div>";
+        '<a class="btn btn-dark" href="nos-vins.html">Découvrir nos vins ' + I.arrow + "</a></div>";
       foot.style.display = "none";
       return;
     }

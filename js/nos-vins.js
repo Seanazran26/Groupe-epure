@@ -1,5 +1,5 @@
 /* ==========================================================================
-   VIN DES COPAINS — Page « La Cave » (catalogue filtrable)
+   VIN DES COPAINS — Page « Nos vins » (catalogue filtrable)
    ========================================================================== */
 (function () {
   "use strict";
@@ -90,7 +90,7 @@
   }
 
   function renderHero() {
-    var title = "La <em>Cave</em>", lead = "Toute notre sélection, à explorer par région, par couleur ou selon le moment où vous souhaitez la déguster.", tint = "#4a1220", giant = "Cave", extra = "";
+    var title = "Nos <em>vins</em>", lead = "Toute notre sélection, à explorer par région, par couleur ou selon le moment où vous souhaitez la déguster.", tint = "#4a1220", giant = "Vins", extra = "";
     var only = function (k) { return state[k].length === 1 && Object.keys(FACETS).every(function (o) { return o === k || !state[o].length; }); };
     if (only("categorie")) {
       var c = V.categorie(state.categorie[0]);
@@ -107,7 +107,7 @@
     $("[data-crumb-extra]").innerHTML = extra ? "/ " + esc(extra) : "";
     document.querySelector(".page-hero").style.setProperty("--ph1", tint);
     $("[data-hero-giant]").textContent = giant;
-    document.title = (extra ? extra + " — " : "La Cave — ") + "Vin des Copains";
+    document.title = (extra ? extra + " — " : "Nos vins — ") + "Vin des Copains";
   }
 
   function renderGrid() {
@@ -123,7 +123,7 @@
     if (!res.length) {
       grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">' + V.icons.glass +
         "<h3>Aucun vin pour le moment</h3><p>Cette sélection est en cours de préparation. Élargissez votre recherche&nbsp;!</p>" +
-        '<button class="btn btn-dark" data-reset>Voir toute la cave</button></div>';
+        '<button class="btn btn-dark" data-reset>Voir tous nos vins</button></div>';
       return;
     }
     grid.innerHTML = res.slice(0, state.limit).map(V.carte).join("");

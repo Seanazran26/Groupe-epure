@@ -12,7 +12,7 @@
   if (!p) {
     box.innerHTML = '<div class="empty-state" style="margin-top:40px">' + I.glass +
       (V.PRODUITS.length ? "<h3>Ce vin n'est plus disponible</h3><p>Il a peut-être trouvé preneur… Découvrez le reste de notre cave.</p>" : "<h3>Les fiches arrivent bientôt</h3><p>Notre cave se remplit : chaque bouteille aura bientôt sa fiche.</p>") +
-      '<a class="btn btn-dark" href="cave.html">Retour à la cave ' + I.arrow + "</a></div>";
+      '<a class="btn btn-dark" href="nos-vins.html">Voir nos vins ' + I.arrow + "</a></div>";
     $("[data-related-wrap]").style.display = "none";
     return;
   }
@@ -45,8 +45,8 @@
   var names = V.CONSOMMATIONS.map(function (c, i) { return "<span" + (i === ci ? ' class="on"' : "") + ">" + esc(c.nom) + "</span>"; }).join("");
 
   box.innerHTML =
-    '<nav class="crumbs dark" aria-label="Fil d\'Ariane"><a href="index.html">Accueil</a><span>/</span><a href="cave.html">La Cave</a>' +
-      (main ? '<span>/</span><a href="cave.html?categorie=' + main.slug + '">' + esc(main.nom) + "</a>" : "") +
+    '<nav class="crumbs dark" aria-label="Fil d\'Ariane"><a href="index.html">Accueil</a><span>/</span><a href="nos-vins.html">Nos vins</a>' +
+      (main ? '<span>/</span><a href="nos-vins.html?categorie=' + main.slug + '">' + esc(main.nom) + "</a>" : "") +
       "<span>/</span><span>" + esc(p.nom) + "</span></nav>" +
     '<div class="pdp-grid">' +
       '<div class="pdp-media"><span class="ring"></span><div class="product-tags">' + V.tagsHTML(p) + "</div>" + V.visuel(p) + "</div>" +
@@ -56,9 +56,9 @@
         '<div class="pdp-price">' + V.prix(p.prix) + "<small>la bouteille" + (p.contenance ? " · " + esc(p.contenance) : "") + "</small></div>" +
         '<p class="pdp-desc">' + esc(desc) + "</p>" +
         '<dl class="pdp-specs">' +
-          "<div><dt>Région</dt><dd>" + (reg ? '<a href="cave.html?region=' + reg.slug + '">' + esc(reg.nom) + "</a>" : "—") + "</dd></div>" +
-          "<div><dt>Catégorie</dt><dd>" + (cats.length ? cats.map(function (c) { return '<a href="cave.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a>"; }).join("<br>") : "—") + "</dd></div>" +
-          "<div><dt>Consommation</dt><dd>" + (co ? '<a href="cave.html?conso=' + co.slug + '">' + esc(co.nom) + "</a>" : "—") + "</dd></div>" +
+          "<div><dt>Région</dt><dd>" + (reg ? '<a href="nos-vins.html?region=' + reg.slug + '">' + esc(reg.nom) + "</a>" : "—") + "</dd></div>" +
+          "<div><dt>Catégorie</dt><dd>" + (cats.length ? cats.map(function (c) { return '<a href="nos-vins.html?categorie=' + c.slug + '">' + esc(c.nom) + "</a>"; }).join("<br>") : "—") + "</dd></div>" +
+          "<div><dt>Consommation</dt><dd>" + (co ? '<a href="nos-vins.html?conso=' + co.slug + '">' + esc(co.nom) + "</a>" : "—") + "</dd></div>" +
         "</dl>" +
         (co ? '<div class="garde-meter"><div class="lbl"><span>Potentiel de garde</span><span>' + esc(co.horizon) + '</span></div><div class="track">' + meter + '</div><div class="names">' + names + "</div></div>" : "") +
         '<div class="buy-row"><div class="qty"><button data-q-dec aria-label="Moins">−</button><span data-q-val>1</span><button data-q-inc aria-label="Plus">+</button></div>' +

@@ -16,7 +16,7 @@
   // Défilant des régions (doublé pour une boucle continue)
   var mq = $("[data-marquee]");
   if (mq) {
-    var line = V.REGIONS.map(function (r) { return '<a href="cave.html?region=' + r.slug + '">' + esc(r.nom) + "</a>"; }).join("");
+    var line = V.REGIONS.map(function (r) { return '<a href="nos-vins.html?region=' + r.slug + '">' + esc(r.nom) + "</a>"; }).join("");
     mq.innerHTML = line + line;
   }
 
@@ -26,7 +26,7 @@
     uv.innerHTML = V.CATEGORIES.map(function (c, i) {
       var n = count(function (p) { return (p.categories || []).indexOf(c.slug) > -1; });
       var t = c.teinte || ["#8a2a3a", "#2b0c12"];
-      return '<a class="univers-card reveal reveal-d' + (i % 4 + 1) + '" href="cave.html?categorie=' + c.slug + '" style="--t1:' + t[0] + ";--t2:" + t[1] + '">' +
+      return '<a class="univers-card reveal reveal-d' + (i % 4 + 1) + '" href="nos-vins.html?categorie=' + c.slug + '" style="--t1:' + t[0] + ";--t2:" + t[1] + '">' +
         '<span class="uc-top"><span class="num">N° ' + deux(i + 1) + '</span><span class="robe">' + esc(c.robe || "") + "</span></span>" +
         '<span class="uc-letter" aria-hidden="true">' + esc(c.nom.replace(/^Vins?\s/, "").charAt(0).toUpperCase()) + "</span>" +
         "<h3>" + esc(c.nom) + "</h3><p>" + esc(c.note) + "</p>" +
@@ -34,36 +34,12 @@
     }).join("");
   }
 
-  // Sélection du moment (bouteilles « selection: true », sinon emplacements réservés)
-  var car = $("[data-carousel]");
-  if (car) {
-    var sel = V.PRODUITS.filter(function (p) { return p.selection; });
-    if (!sel.length) sel = V.PRODUITS.slice(0, 10);
-    car.innerHTML = sel.length ? sel.map(V.carte).join("") : V.emplacements(8);
-    var prog = $("[data-car-progress]");
-    var step = function (dir) {
-      var card = car.firstElementChild;
-      if (!card) return;
-      car.scrollBy({ left: dir * (card.getBoundingClientRect().width + 24), behavior: "smooth" });
-    };
-    $("[data-car-prev]").addEventListener("click", function () { step(-1); });
-    $("[data-car-next]").addEventListener("click", function () { step(1); });
-    var upd = function () {
-      var max = car.scrollWidth - car.clientWidth, ratio = car.clientWidth / car.scrollWidth;
-      prog.style.width = Math.min(100, ratio * 100) + "%";
-      prog.style.transform = "translateX(" + (max > 0 ? (car.scrollLeft / max) * ((1 / ratio) - 1) * 100 : 0) + "%)";
-    };
-    car.addEventListener("scroll", upd, { passive: true });
-    window.addEventListener("resize", upd);
-    upd();
-  }
-
   // Frise de consommation + anneaux du temps
   var tl = $("[data-timeline]"), rings = $("[data-rings]");
   if (tl) {
     tl.innerHTML = V.CONSOMMATIONS.map(function (c, i) {
       var n = count(function (p) { return p.consommation === c.slug; });
-      return '<li class="reveal reveal-d' + (i + 1) + '"><a href="cave.html?conso=' + c.slug + '" data-ring-on="' + i + '">' +
+      return '<li class="reveal reveal-d' + (i + 1) + '"><a href="nos-vins.html?conso=' + c.slug + '" data-ring-on="' + i + '">' +
         '<span class="dot"><i></i></span>' +
         '<div><span class="when">' + esc(c.horizon) + "</span><h3>" + esc(c.nom) + "</h3><p>" + esc(c.note) + "</p></div>" +
         '<span class="count">' + (n ? V.pluriel(n, "vin") : "Voir") + " →</span></a></li>";
@@ -82,7 +58,7 @@
     var total = V.REGIONS.length;
     rl.innerHTML = V.REGIONS.map(function (r, i) {
       var n = count(function (p) { return p.region === r.slug; });
-      return '<li class="reveal"><a href="cave.html?region=' + r.slug + '" data-rv="' + i + '">' +
+      return '<li class="reveal"><a href="nos-vins.html?region=' + r.slug + '" data-rv="' + i + '">' +
         '<span class="idx">' + deux(i + 1) + "</span>" +
         '<span class="nm">' + esc(r.nom) + "</span>" +
         '<span class="ct">' + (n ? V.pluriel(n, "vin") : "") + "</span></a></li>";
@@ -102,26 +78,19 @@
       rvT.textContent = r.nom;
       rvN.textContent = r.note;
       rvI.textContent = deux(i + 1) + " / " + deux(total);
-      rvL.href = "cave.html?region=" + r.slug;
+      rvL.href = "nos-vins.html?region=" + r.slug;
     });
   }
 
-  // Services
-  var sv = $("[data-services]");
-  if (sv) {
-    var L = (V.CONTACT || {}).livraison || {};
-    var S = [
-      ["Livraison soignée", "Cartons sécurisés de 3, 6 ou 12 bouteilles, livrés par " + (L.transporteur || "Colissimo") + " sous " + (L.delai || "2 à 3 jours") + ". Offerte dès " + (L.offerteDes || 12) + " bouteilles."],
-      ["Retrait à la cave", "Venez chercher votre commande au Vieux-Lille, sur rendez-vous : on la charge directement dans votre coffre."],
-      ["Ateliers de dégustation", "Découvrez nos vignerons et nos dernières trouvailles lors de nos ateliers à la cave."],
-      ["Conseils de copains", "Un repas, un cadeau, une envie : contactez-nous, on vous aide à choisir la bonne bouteille."]
-    ];
-    sv.innerHTML = S.map(function (s, i) {
-      return '<div class="service reveal reveal-d' + (i + 1) + '"><span class="sv-num">' + deux(i + 1) + "</span><h3>" + s[0] + "</h3><p>" + s[1] + "</p></div>";
-    }).join("");
+  // La Cave : lien Instagram
+  var ig = $("[data-insta]"), C0 = V.CONTACT || {};
+  if (ig && C0.instagram) {
+    var handle = "@" + C0.instagram.replace(/\/+$/, "").split("/").pop();
+    ig.innerHTML = '<a class="btn btn-wine" href="' + esc(C0.instagram) + '" target="_blank" rel="noopener">' + I.instagram + " Suivre " + esc(handle) + "</a>" +
+      '<span class="insta-note">Nouveautés, coups de cœur et dates des ateliers</span>';
   }
 
-  // Nous rendre visite : carte de visite
+  // La Cave : carte de visite
   var C = V.CONTACT || {}, vc = $("[data-visit-card]");
   if (vc) {
     var adr = V.adresseComplete();
@@ -141,13 +110,6 @@
         (C.telephone ? '<a class="btn btn-ghost" href="' + V.telHref() + '">Appeler</a>' : "") +
       "</div>";
   }
-
-  // Inscription au Cercle
-  var cf = $("[data-club-form]");
-  if (cf) cf.addEventListener("submit", function (e) {
-    e.preventDefault();
-    cf.innerHTML = '<p style="font-family:var(--serif);font-size:1.5rem;font-style:italic;margin:14px 0;color:var(--gold-soft)">Bienvenue dans le Cercle des Copains !</p>';
-  });
 
   V.observe();
 })();

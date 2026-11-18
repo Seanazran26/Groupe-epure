@@ -13,8 +13,8 @@ les couleurs et des filets dorés. Les emplacements « Cuvée à venir » montre
 
 | Page | Contenu |
 | --- | --- |
-| `index.html` | Accueil : concept, univers (catégories), coups de cœur, « Quand déguster ? », régions, services, adresse, newsletter |
-| `cave.html` | Le catalogue, filtrable par **catégorie**, **région**, **consommation**, prix, recherche et tri |
+| `index.html` | Accueil : La Maison (concept), La Cave (Instagram + coordonnées), Nos vins (catégories, « Quand déguster ? », régions) |
+| `nos-vins.html` | « Nos vins » : le catalogue, filtrable par **catégorie**, **région**, **consommation**, prix, recherche et tri |
 | `produit.html?id=…` | Fiche d'une bouteille |
 | `mentions-legales.html` | Mentions légales, livraison et retrait |
 
@@ -59,7 +59,7 @@ index.html, cave.html, produit.html, mentions-legales.html
 css/style.css          styles du site
 js/data.js             données (catalogue + coordonnées)
 js/app.js              en-tête, pied de page, panier, recherche, contrôle d'âge
-js/home.js | cave.js | produit.js   scripts propres à chaque page
+js/home.js | nos-vins.js | produit.js   scripts propres à chaque page
 donnees/               catalogue du site actuel (JSON + CSV)
 assets/bouteilles/     photos des bouteilles (reprises du site actuel, recadrées, pas encore affichées)
 ```

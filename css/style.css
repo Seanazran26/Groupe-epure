@@ -413,6 +413,9 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 
 /* Nous rendre visite */
 .ph { color: var(--muted); font-style: italic; }
+.insta { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-top: 36px; }
+.insta .btn svg:not(.arrow) { width: 17px; height: 17px; }
+.insta-note { font-size: .82rem; color: var(--muted); }
 .contact-list li { line-height: 1.55; }
 
 /* Newsletter */
@@ -863,6 +866,9 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .vc-note { font-size: .8rem; color: var(--muted); margin: 16px 0 0; }
 .vc-actions { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
 .ph { color: var(--muted); font-style: italic; }
+.insta { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-top: 36px; }
+.insta .btn svg:not(.arrow) { width: 17px; height: 17px; }
+.insta-note { font-size: .82rem; color: var(--muted); }
 
 /* ---------- Le Cercle ---------- */
 .club {
