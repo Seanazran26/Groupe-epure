@@ -32,6 +32,8 @@ Deux vidéos générées sur Google Flow : **ordinateur** (16:9, 1920 × 1080) e
 - `assets/hero-frames/` : 297 WebP 1920 × 1080, qualité 74 (ordinateur, ~29 Mo)
 - `assets/hero-frames-m/` : 297 WebP 810 × 1440, qualité 72 (mobile tenu en portrait, ~22 Mo ; l'écran
   est rendu au plus à 2× sa taille CSS)
+- `assets/hero-frames-md/` : la vidéo ordinateur en 1600 × 900, qualité 74 (~23 Mo) : écrans jusqu'à
+  ~1680 px (MacBook 13", portables 1366 / 1440 px) et ordinateurs modestes
 - `assets/hero-frames-lo/` + `js/hero-lo.js` : version légère 512 × 288 (~3,5 Mo) en 4 paquets entrelacés
   (1 image sur 4 puis 1 sur 2 chargées en premier : la caméra ne se fige jamais pendant le chargement ;
   le reste de la bande passante va à la version nette, téléchargée d'abord devant le visiteur)
@@ -39,6 +41,13 @@ Deux vidéos générées sur Google Flow : **ordinateur** (16:9, 1920 × 1080) e
 - conteneur 320vh, écran collant plein écran ; mobile = largeur < 1024 px tenu en portrait
 - fluidité : lissage du mouvement (ressort amorti à la molette), décodage en parallèle dans plusieurs
   travailleurs (`js/hero-worker.js`) ; cadre fixe et centré, la caméra avance tout droit
+- dessin pixel pour pixel : le canvas a la résolution de l'image (partie visible), l'agrandissement
+  éventuel est fait par la carte graphique — aucun filtre recalculé à chaque image
+- Firefox : décodage par WebCodecs (`ImageDecoder`) dans les travailleurs, car son `createImageBitmap(Blob)`
+  repasse par le fil principal et fige l'animation sur un ordinateur ancien ; repli `<img>.decode()`
+- ordinateur modeste (≤ 4 cœurs ou ≤ 4 Go) : moteur allégé (2 décodeurs au plus, moins d'images en
+  mémoire) ; Firefox sur ordinateur modeste : version 1600 × 900 d'emblée. Si l'écran n'est plus
+  rafraîchi à temps pendant le mouvement, bascule automatique en 1600 × 900 (mémorisée 30 jours)
 - netteté : jamais de fondu entre deux images (pas de double image) ; à l'arrêt, la caméra se pose
   sur une image d'origine ; la haute qualité est téléchargée en priorité autour de la position
 - à l'ouverture, la page démarre toujours au début du héros (sauf lien interne vers une section)
@@ -91,7 +100,7 @@ js/home.js | nos-vins.js | produit.js | vignerons.js   scripts propres à chaque
 js/hero-scroll.js      héros vidéo piloté par le défilement
 js/hero-worker.js      décodage des images du héros en arrière-plan (plusieurs en parallèle)
 js/hero-lo.js          index de la version légère du héros (fichier généré) — js/hero-lo-m.js (mobile)
-assets/hero-frames/    images du héros (ordinateur) — assets/hero-frames-m/ (mobile, vertical)
+assets/hero-frames/    images du héros (ordinateur) — hero-frames-md/ (ordinateur 1600 px) — hero-frames-m/ (mobile)
 donnees/               catalogue du site actuel (JSON + CSV)
 assets/bouteilles/     photos des bouteilles (reprises du site actuel, recadrées, pas encore affichées)
 ```
