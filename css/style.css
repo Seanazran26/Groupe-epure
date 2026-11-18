@@ -885,7 +885,7 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .page-hero .container { position: relative; z-index: 2; padding-top: 190px; padding-bottom: 64px; }
 
 /* ---------- Héros scroll vidéo ---------- */
-.hero-scroll { position: relative; height: 420vh; background: #0b0605; }
+.hero-scroll { position: relative; height: 320vh; background: #0b0605; }
 /* hauteur « grande » (barre d'adresse repliée) : l'image remplit toujours tout l'écran du téléphone ;
    --ui = la part cachée par la barre d'adresse quand elle est visible (textes et boutons restent au-dessus) */
 .hero-sticky { --ui: 0px; position: sticky; top: 0; height: 100vh; overflow: hidden; }

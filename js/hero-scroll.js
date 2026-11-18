@@ -1,25 +1,24 @@
 /* ==========================================================================
    VIN DES COPAINS — Héros « scroll vidéo » (canvas piloté par le défilement)
    --------------------------------------------------------------------------
-   Objectif : un mouvement de caméra parfaitement fluide, sans gel ni retard.
+   Deux vidéos : une pour l'ordinateur (16:9, 1920×1080), une pour le mobile
+   tenu en portrait (9:16, 1080×1920). 297 images chacune, dont toutes les
+   images d'origine de la vidéo (js/hero-time.js donne leur place).
+   Objectif : un mouvement de caméra parfaitement fluide et net, sans gel.
    1. Deux qualités d'images :
-      - « légère » (512 px, ~8 Ko, 4 fichiers) : toute la séquence arrive vite,
-        la caméra n'est donc jamais bloquée en attendant le réseau
-        (une version horizontale pour l'ordinateur, une verticale pour le mobile) ;
-      - « haute » (1920 px ordinateur / 720×1080 mobile) : remplace la légère
-        au fur et à mesure, en commençant autour de la position du visiteur.
+      - « légère » (512 px, 4 fichiers) : toute la séquence arrive vite,
+        la caméra n'est donc jamais bloquée en attendant le réseau ;
+      - « haute » (1920×1080 ordinateur / 1080×1920 mobile) : remplace la
+        légère au fur et à mesure, en commençant autour de la position.
    2. Décodage en parallèle dans plusieurs travailleurs (js/hero-worker.js),
       anticipé dans le sens et à la vitesse du défilement ; le fil principal
       ne fait que dessiner.
-   3. Mouvement lissé (amortissement exponentiel), sans aucun fondu (pas de
-      double image) ; à l'arrêt, la caméra se pose toujours sur une image
-      d'origine de la vidéo (1 image sur 3), la plus nette.
-      Pendant le mouvement, si l'image exacte n'est pas encore en haute qualité,
-      on montre la voisine en haute qualité plutôt que la version légère.
-   4. Plein écran partout, caméra fixe et centrée :
-      - ordinateur : images 16:9 (1920 px) ;
-      - mobile portrait : images verticales préparées pour le téléphone
-        (recadrage centré 2:3, toute la hauteur de la vidéo), plein écran.
+   3. Mouvement lissé (doigt : amortissement ; molette : ressort amorti),
+      sans fondu (pas de double image), la vidéo avance à vitesse constante ;
+      à l'arrêt, la caméra se pose sur une image d'origine, la plus nette.
+      Pendant le mouvement, si l'image exacte n'est pas encore en haute
+      qualité, on montre la voisine en haute qualité plutôt que la légère.
+   4. Plein écran (cover), cadre fixe et centré : la caméra avance tout droit.
    Secours : ouvert depuis un dossier (file://), images classiques.
    ========================================================================== */
 (function () {
@@ -32,18 +31,21 @@
   // Images d'origine de la vidéo (les plus nettes) : liste fournie par js/hero-time.js (window.HERO_KEYS),
   // sinon 1 image sur data-key-step. Entre deux images d'origine, les images calculées sont réparties
   // régulièrement : le défilement avance donc la vidéo à vitesse constante, quel que soit leur nombre.
-  var KEYS = (function () {
+  // Une liste par vidéo : { desktop: [...], mobile: [...] } (ou une seule liste commune).
+  function keysFor(cat) {
     var k = window.HERO_KEYS, step = parseInt(root.getAttribute("data-key-step"), 10) || 1, a = [];
+    if (k && !Array.isArray(k)) k = k[cat];
     if (k && k.length > 1 && k[0] === 0 && k[k.length - 1] === N - 1) return k;
     for (var i = 0; i < N; i += step) a.push(i);
     if (a[a.length - 1] !== N - 1) a.push(N - 1);
     return a;
-  })();
-  var SNAP = KEYS.length < N;                   // se poser sur une image d'origine à l'arrêt
+  }
+  var KEYS = [0, N - 1], SNAP = false;          // fixés selon le mode (ordinateur / mobile), voir setKeys()
+  function setKeys(cat) { KEYS = keysFor(cat); SNAP = KEYS.length < N; }
   var REST_MS = 140;                            // sans défilement depuis 140 ms = arrêt
   var BATCH = 24, BATCH_DELAY = 120;            // haute qualité : lots de 24 toutes les 120 ms
   var MOBILE_MAX = 1024;
-  var HI_WIN = 14, LO_WIN = 48, AHEAD = 14;     // fenêtres de décodage (images)
+  var HI_WIN = 14, LO_WIN = 48, AHEAD = 14;     // fenêtres de décodage (images) — HI_WIN réduit sur mobile
   var cores = navigator.hardwareConcurrency || 4;
   var POOL = Math.max(1, Math.min(3, cores - 1));
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -62,9 +64,9 @@
 
   var SRC = {
     lo: { path: root.getAttribute("data-src-lo") || "assets/hero-frames-lo/", size: dims(root.getAttribute("data-size-lo"), [512, 288]) },
-    "lo-mobile": { path: "", size: dims(root.getAttribute("data-size-lo-mobile"), [288, 432]) },
+    "lo-mobile": { path: "", size: dims(root.getAttribute("data-size-lo-mobile"), [288, 512]) },
     desktop: { path: root.getAttribute("data-src-desktop") || "assets/hero-frames/", size: dims(root.getAttribute("data-size-desktop"), [1920, 1080]) },
-    mobile: { path: root.getAttribute("data-src-mobile") || "assets/hero-frames-m/", size: dims(root.getAttribute("data-size-mobile"), [720, 1080]) }
+    mobile: { path: root.getAttribute("data-src-mobile") || "assets/hero-frames-m/", size: dims(root.getAttribute("data-size-mobile"), [1080, 1920]) }
   };
 
   // --- état ---
@@ -484,8 +486,10 @@
   }
   function startMode() {
     var cat = categorie();
-    if (cat === mode) return;
+    if (cat === mode) return false;
     mode = cat; gen++; modeGen++;
+    setKeys(mode);
+    HI_WIN = mode === "mobile" ? 10 : 14;         // images verticales 1080 px : moins d'images en mémoire
     clearTimeout(hiTimer);
     hiMap.forEach(release); hiMap.clear(); loMap.forEach(release); loMap.clear(); inflight.clear();
     blobs = { lo: [], hi: [] }; fetching = { lo: [], hi: [] }; imgs = { lo: [], hi: [] };
@@ -496,7 +500,9 @@
     fetchBlob("hi", Math.round(target), true);
     if (hasLo) loadLo();                          // la version légère d'abord (1er paquet = toute la séquence, 1 image sur 4)…
     else scheduleHi();                            // …la haute qualité démarre dès ce 1er paquet reçu
+    return true;
   }
+
 
   // lecture seule, pour les mesures
   root.heroState = function () {
@@ -506,7 +512,10 @@
 
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", function () {
-    resize(); measure(); startMode(); updateHiOpts(); readTarget();
+    resize(); measure();
+    var change = startMode();                     // ordinateur <-> mobile : autre vidéo, autre minutage
+    updateHiOpts(); hold = null; readTarget();
+    if (change) { pos = prevPos = target; spd = 0; }
     last = ""; pump(); kick();
   });
   window.addEventListener("load", function () { measure(); readTarget(); kick(); });
@@ -518,6 +527,7 @@
   });
 
   resize();
+  setKeys(categorie());
   measure();
   readTarget();
   pos = prevPos = rawPrev = target;
