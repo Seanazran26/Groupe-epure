@@ -36,8 +36,8 @@ Le héros de l'accueil fait défiler la vidéo de la cave image par image au scr
 - netteté : jamais de fondu entre deux images (pas de double image) ; à l'arrêt, la caméra se pose
   sur une image d'origine ; la haute qualité est téléchargée en priorité autour de la position
 - à l'ouverture, la page démarre toujours au début du héros (sauf lien interne vers une section)
-- mobile portrait : plein écran vertical ; au tout début, le cadre est décalé pour montrer la bouteille
-  de vin rouge en entier, puis il se recentre très progressivement (un seul sens, jamais de va-et-vient)
+- mobile portrait : plein écran vertical, cadre fixe et centré (la caméra avance tout droit) ;
+  une vidéo tournée en vertical (9:16) remplacera ce recadrage pour tout voir en plein écran
 - ouvert directement depuis le dossier (file://), un mode de secours prend le relais
 
 ## Où modifier quoi ?
