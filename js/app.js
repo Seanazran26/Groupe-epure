@@ -287,7 +287,7 @@
           "</div>" +
         "</div>" +
         '<div><h4>Nos vins</h4><ul>' + cats + '<li><a href="nos-vins.html">Tous nos vins</a></li></ul></div>' +
-        '<div><h4>Régions</h4><ul>' + regs + '<li><a href="index.html#regions">Toutes les régions</a></li></ul></div>' +
+        '<div><h4>Régions</h4><ul>' + regs + '<li><a href="nos-vins.html">Toutes les régions</a></li></ul></div>' +
         '<div><h4>La Maison</h4><ul>' +
           '<li><a href="index.html#maison">Notre histoire</a></li>' +
           '<li><a href="index.html#cave">La cave &amp; Instagram</a></li>' +

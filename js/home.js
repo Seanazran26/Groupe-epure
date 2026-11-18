@@ -20,20 +20,6 @@
     mq.innerHTML = line + line;
   }
 
-  // Univers / catégories : nuancier de robes
-  var uv = $("[data-univers]");
-  if (uv) {
-    uv.innerHTML = V.CATEGORIES.map(function (c, i) {
-      var n = count(function (p) { return (p.categories || []).indexOf(c.slug) > -1; });
-      var t = c.teinte || ["#8a2a3a", "#2b0c12"];
-      return '<a class="univers-card reveal reveal-d' + (i % 4 + 1) + '" href="nos-vins.html?categorie=' + c.slug + '" style="--t1:' + t[0] + ";--t2:" + t[1] + '">' +
-        '<span class="uc-top"><span class="num">N° ' + deux(i + 1) + '</span><span class="robe">' + esc(c.robe || "") + "</span></span>" +
-        '<span class="uc-letter" aria-hidden="true">' + esc(c.nom.replace(/^Vins?\s/, "").charAt(0).toUpperCase()) + "</span>" +
-        "<h3>" + esc(c.nom) + "</h3><p>" + esc(c.note) + "</p>" +
-        '<span class="meta"><span>' + (n ? V.pluriel(n, "référence") : "Découvrir") + "</span>" + I.arrow + "</span></a>";
-    }).join("");
-  }
-
   // Frise de consommation + anneaux du temps
   var tl = $("[data-timeline]"), rings = $("[data-rings]");
   if (tl) {
@@ -50,36 +36,6 @@
     };
     tl.addEventListener("mouseover", function (e) { var a = e.target.closest("[data-ring-on]"); if (a) light(+a.getAttribute("data-ring-on")); });
     tl.addEventListener("mouseleave", function () { light(-1); });
-  }
-
-  // Régions
-  var rl = $("[data-regions]");
-  if (rl) {
-    var total = V.REGIONS.length;
-    rl.innerHTML = V.REGIONS.map(function (r, i) {
-      var n = count(function (p) { return p.region === r.slug; });
-      return '<li class="reveal"><a href="nos-vins.html?region=' + r.slug + '" data-rv="' + i + '">' +
-        '<span class="idx">' + deux(i + 1) + "</span>" +
-        '<span class="nm">' + esc(r.nom) + "</span>" +
-        '<span class="ct">' + (n ? V.pluriel(n, "vin") : "") + "</span></a></li>";
-    }).join("");
-    var rvT = $("[data-rv-title]"), rvN = $("[data-rv-note]"), rvI = $("[data-rv-idx]"), rvL = $("[data-rv-link]"), last = -1;
-    rvI.textContent = "— / " + deux(total);
-    rl.addEventListener("mouseover", function (e) {
-      var a = e.target.closest("[data-rv]");
-      if (!a) return;
-      var i = +a.getAttribute("data-rv");
-      if (i === last) return;
-      last = i;
-      rl.querySelectorAll("a.active").forEach(function (x) { x.classList.remove("active"); });
-      a.classList.add("active");
-      var r = V.REGIONS[i], card = rvT.parentElement;
-      card.classList.remove("swap"); void card.offsetWidth; card.classList.add("swap");
-      rvT.textContent = r.nom;
-      rvN.textContent = r.note;
-      rvI.textContent = deux(i + 1) + " / " + deux(total);
-      rvL.href = "nos-vins.html?region=" + r.slug;
-    });
   }
 
   // La Cave : lien Instagram

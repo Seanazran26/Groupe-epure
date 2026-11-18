@@ -427,7 +427,7 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .club-note { font-size: .78rem; color: rgba(250,246,240,.5); margin-top: 14px; }
 
 /* ---------- Pied de page ---------- */
-.site-footer { background: var(--wine-night); color: rgba(250,246,240,.75); padding-top: clamp(70px, 9vw, 120px); font-size: .92rem; }
+.site-footer { border-top: 1px solid rgba(180,142,90,.2); background: var(--wine-night); color: rgba(250,246,240,.75); padding-top: clamp(70px, 9vw, 120px); font-size: .92rem; }
 .footer-top { display: grid; grid-template-columns: 1.3fr repeat(4, 1fr); gap: 40px; padding-bottom: 70px; border-bottom: 1px solid var(--line-light); }
 .footer-brand .brand { align-items: flex-start; text-align: left; color: var(--paper); }
 .footer-brand .brand-sub { color: rgba(250,246,240,.5); padding-left: 0; }
