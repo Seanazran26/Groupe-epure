@@ -183,7 +183,53 @@ body.has-hero .site-top { position: fixed; left: 0; right: 0; }
   transition: background .5s var(--ease), border-color .5s var(--ease), color .5s var(--ease);
 }
 .site-header .brand-sub { color: rgba(250, 246, 240, .7); }
-.site-header .icon-btn:hover { background: rgba(250, 246, 240, .1); }
+/* ---------- Barre du haut : touches en relief ----------
+   Un socle (doré, discret) et une face brun de cave ; à l'appui la face s'enfonce de la hauteur du socle
+   et s'incline vers le doigt (js/app.js, touches()) ; le reflet du dessus s'efface. */
+.site-header .key {
+  --depth: 4px;
+  position: relative; display: inline-flex; vertical-align: middle; flex: none;
+  margin: 0; padding: 0 0 var(--depth); border: 0; border-radius: 9px; background: none; color: inherit;
+  cursor: pointer; user-select: none; -webkit-user-select: none; outline: none;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.site-header .key::before {
+  content: ""; position: absolute; left: 0; right: 0; top: var(--depth); bottom: 0; border-radius: 9px;
+  background: rgba(211, 184, 143, .3);
+}
+.site-header .nav a.key::after { display: none; }
+.key-face {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 36px; padding: 0 15px; border-radius: 9px;
+  border: 1px solid rgba(250, 246, 240, .16); background: rgba(38, 27, 19, .82); color: var(--paper);
+  font-family: var(--sans); font-size: 10.5px; font-weight: 500; line-height: 1; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap;
+  transform: perspective(340px) translateY(0) rotateX(0deg) rotateY(0deg);
+  transition: transform .16s cubic-bezier(.2, .8, .3, 1), background-color .25s, border-color .25s, color .25s, box-shadow .25s;
+}
+.key-face::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 1.5px 0 rgba(255, 240, 214, .13), inset 0 -1px 0 rgba(0, 0, 0, .28);
+  transition: opacity .16s cubic-bezier(.2, .8, .3, 1);
+}
+.key.is-pressed .key-face {
+  transform: perspective(340px) translateY(var(--depth)) rotateX(calc(var(--py, 0) * -7deg)) rotateY(calc(var(--px, 0) * 7deg));
+}
+.key.is-pressed .key-face::after { opacity: 0; }
+@media (hover: hover) { .site-header .key:hover .key-face { background: rgba(58, 41, 28, .92); border-color: rgba(211, 184, 143, .4); } }
+.site-header .key.active .key-face { color: var(--gold-soft); border-color: rgba(211, 184, 143, .55); }
+.site-header .key:focus-visible .key-face { box-shadow: 0 0 0 2px var(--gold); }
+.key-icon .key-face { width: 36px; padding: 0; }
+.key-icon .key-face svg { width: 17px; height: 17px; }
+.key .cart-count { top: -7px; right: -7px; }
+.site-header .nav { gap: 10px; }
+.site-header .header-left { gap: 10px; }
+.site-header .header-right { gap: 8px; }
+.site-header .key.burger { display: none; }
+@media (max-width: 1024px) {
+  .site-header .key.burger { display: inline-flex; }
+  .site-header .header-left, .site-header .header-right { gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .key.is-pressed .key-face { transform: translateY(var(--depth)); } }
 body.has-hero .site-top:not(.scrolled) .site-header {
   background: transparent; border-color: rgba(250,246,240,.14); color: var(--paper);
   backdrop-filter: none; -webkit-backdrop-filter: none;

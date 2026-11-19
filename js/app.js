@@ -210,27 +210,32 @@
     "</div></div>";
   }
 
+  // touche « en relief » de la barre du haut : un socle et une face qui s'enfonce à l'appui (voir touches())
+  function key(tag, cls, attrs, inner) {
+    return "<" + tag + ' class="key' + (cls ? " " + cls : "") + '"' + attrs + '><span class="key-face">' + inner + "</span></" + tag + ">";
+  }
+
   function headerHTML(active) {
     var C0 = V.CONTACT || {};
     var L = (V.CONTACT || {}).livraison || {};
     return '<div class="announce">Livraison offerte dès ' + (L.offerteDes || 12) + ' bouteilles <span>✦</span> Retrait à la cave du Vieux-Lille<span class="hide-sm">✦</span><span class="hide-sm" style="color:inherit;margin:0">En direct des vignerons</span></div>' +
       '<header class="site-header"><div class="container header-inner">' +
         '<div class="header-left">' +
-          '<button class="icon-btn burger" data-open-menu aria-label="Ouvrir le menu">' + I.menu + "</button>" +
+          key("button", "key-icon burger", ' type="button" data-open-menu aria-label="Ouvrir le menu"', I.menu) +
           '<nav class="nav" aria-label="Navigation principale">' +
-            '<a href="index.html#maison">La Maison</a>' +
-            '<a href="index.html#cave">La Cave</a>' +
+            key("a", "", ' href="index.html#maison"', "La Maison") +
+            key("a", "", ' href="index.html#cave"', "La Cave") +
           "</nav>" +
         "</div>" +
         '<a class="brand" href="index.html" aria-label="Vin des Copains — Accueil">' + V.brandHTML() + "</a>" +
         '<div class="header-right">' +
           '<nav class="nav nav-right" aria-label="Nos vins et nos vignerons">' +
-            '<div class="nav-item"><a class="nav-link' + (active === "vins" ? " active" : "") + '" href="nos-vins.html" aria-haspopup="true">Nos vins</a>' + megaHTML() + "</div>" +
-            '<a href="vignerons.html"' + (active === "vignerons" ? ' class="active"' : "") + ">Nos vignerons</a>" +
+            '<div class="nav-item">' + key("a", "nav-link" + (active === "vins" ? " active" : ""), ' href="nos-vins.html" aria-haspopup="true"', "Nos vins") + megaHTML() + "</div>" +
+            key("a", active === "vignerons" ? "active" : "", ' href="vignerons.html"', "Nos vignerons") +
           "</nav>" +
-          (C0.instagram ? '<a class="icon-btn" href="' + esc(C0.instagram) + '" target="_blank" rel="noopener" aria-label="Instagram">' + I.instagram + "</a>" : "") +
-          '<button class="icon-btn" data-open-search aria-label="Rechercher">' + I.search + "</button>" +
-          '<button class="icon-btn" data-open-cart aria-label="Panier">' + I.bag + '<span class="cart-count">0</span></button>' +
+          (C0.instagram ? key("a", "key-icon", ' href="' + esc(C0.instagram) + '" target="_blank" rel="noopener" aria-label="Instagram"', I.instagram) : "") +
+          key("button", "key-icon", ' type="button" data-open-search aria-label="Rechercher"', I.search) +
+          key("button", "key-icon", ' type="button" data-open-cart aria-label="Panier"', I.bag + '<span class="cart-count">0</span>') +
         "</div>" +
       "</div></header>";
   }
@@ -446,6 +451,50 @@
     }
   }
 
+  /* ---------- Barre du haut : les touches s'enfoncent à l'appui ----------
+     Même comportement que le composant « PressDepth » : la face descend de toute la hauteur du socle et
+     s'incline vers l'endroit où l'on appuie ; si le doigt ou la souris sort de la touche, elle remonte ;
+     clavier : Entrée ou Espace. Un seul jeu d'écouteurs pour toutes les touches. */
+  function touches() {
+    if (!window.PointerEvent) return;
+    var cur = null, pid = null;
+    var borne = function (v) { return Math.max(-1, Math.min(1, v)); };
+    var dedans = function (el, e) {
+      var r = el.getBoundingClientRect();
+      return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    };
+    var stop = function () { if (cur) cur.classList.remove("is-pressed"); cur = null; pid = null; };
+    document.addEventListener("pointerdown", function (e) {
+      var el = e.target.closest ? e.target.closest(".key") : null;
+      if (!el || (e.pointerType === "mouse" && e.button !== 0)) return;
+      var r = el.getBoundingClientRect();
+      el.style.setProperty("--px", borne(((e.clientX - r.left) / r.width) * 2 - 1).toFixed(3));
+      el.style.setProperty("--py", borne(((e.clientY - r.top) / r.height) * 2 - 1).toFixed(3));
+      stop(); cur = el; pid = e.pointerId; el.classList.add("is-pressed");
+    }, { passive: true });
+    window.addEventListener("pointermove", function (e) {
+      if (cur && e.pointerId === pid) cur.classList.toggle("is-pressed", dedans(cur, e));
+    }, { passive: true });
+    window.addEventListener("pointerup", function (e) { if (e.pointerId === pid) stop(); });
+    window.addEventListener("pointercancel", function (e) { if (e.pointerId === pid) stop(); });
+    window.addEventListener("blur", stop);
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); });
+    var focusKey = function () { var el = document.activeElement; return el && el.classList && el.classList.contains("key") ? el : null; };
+    document.addEventListener("keydown", function (e) {
+      var el = focusKey();
+      if (!el || e.repeat || (e.key !== " " && e.key !== "Enter")) return;
+      el.style.setProperty("--px", "0"); el.style.setProperty("--py", "0");
+      el.classList.add("is-pressed");
+    });
+    document.addEventListener("keyup", function (e) {
+      var el = focusKey();
+      if (el && (e.key === " " || e.key === "Enter" || e.key === "Escape")) el.classList.remove("is-pressed");
+    });
+    document.addEventListener("focusout", function (e) {
+      if (e.target.classList && e.target.classList.contains("key")) e.target.classList.remove("is-pressed");
+    });
+  }
+
   /* ---------- Initialisation ---------- */
   function init() {
     var top = document.getElementById("site-top");
@@ -497,6 +546,7 @@
     document.querySelectorAll("#mobile-menu a").forEach(function (a) { a.addEventListener("click", closePanels); });
 
     anneaux();
+    touches();
     renderCart();
     V.observe();
   }
