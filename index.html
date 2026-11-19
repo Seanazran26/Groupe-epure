@@ -76,6 +76,7 @@
       <div class="hero-sticky">
         <canvas class="hero-canvas" aria-hidden="true"></canvas>
         <div class="hero-topveil" aria-hidden="true"></div>
+        <div class="hero-botveil" aria-hidden="true"></div>
         <div class="hero-intro show" data-hero-intro>
           <span class="eyebrow center">Cave à vins · Vieux-Lille</span>
           <h1 class="hero-title">Vin <em>des</em> Copains</h1>
@@ -99,31 +100,33 @@
     <div class="marquee" aria-label="Nos régions"><div class="marquee-track" data-marquee></div></div>
 
     <!-- ============ LE CONCEPT ============ -->
-    <section class="section" id="maison">
-      <div class="container manifesto">
-        <div class="manifesto-card reveal">
-          <div class="mc-inner">
-            <span class="eyebrow center">Notre seul critère</span>
-            <p class="mc-quote">«&nbsp;Ah, c'est<br><em>bon ça&nbsp;!</em>&nbsp;»</p>
-            <span class="mc-orn" aria-hidden="true"><i></i>✦<i></i></span>
-            <p class="mc-sign">Des vins testés et approuvés,<br>pour être partagés entre copains.</p>
-          </div>
-          <div class="badge" aria-hidden="true">
-            <svg viewBox="0 0 120 120"><defs><path id="circ" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0"/></defs><text font-family="Jost, sans-serif" font-size="8" letter-spacing="2" fill="currentColor"><textPath href="#circ" textLength="286" lengthAdjust="spacing">EN DIRECT DES VIGNERONS ✦ DEPUIS LA CAVE ✦ </textPath></text></svg>
-            <span class="core">✦</span>
-          </div>
-        </div>
-        <div class="manifesto-text">
-          <span class="eyebrow reveal">Le concept</span>
-          <h2 class="display h-lg reveal reveal-d1">Faire rimer vins,<br><em>plaisirs et partages.</em></h2>
-          <p class="reveal reveal-d2">Tout est né lors d'une soirée entre copains, d'un constat simple&nbsp;: on n'achète plus nos vins comme nos parents. On recherche le plaisir immédiat, des conseils simples et sans fioriture, et des vins de qualité à prix abordable.</p>
-          <p class="reveal reveal-d2">Nous sillonnons les routes des vins, les salons (et quelques restaurants) à la découverte de nouveaux vignerons. Nos vins sont achetés directement au domaine et entreposés dans notre cave du Vieux-Lille&nbsp;: si le vin est dans votre panier, c'est qu'il est disponible.</p>
-          <div class="signature reveal reveal-d3">Santé&nbsp;! (et modération)</div>
-          <div class="pillars">
-            <div class="pillar reveal reveal-d1"><span class="roman">I.</span><h3>Le goût d'abord</h3><p>Nos sensations, et rien d'autre, guident chaque sélection.</p></div>
-            <div class="pillar reveal reveal-d2"><span class="roman">II.</span><h3>En direct des vignerons</h3><p>Des vignerons sincères, passionnés par leur vigne et leur terroir.</p></div>
-            <div class="pillar reveal reveal-d3"><span class="roman">III.</span><h3>Un prix raisonnable</h3><p>Totalement indépendants dans nos choix (sauf quelques exceptions en Bourgogne…).</p></div>
-          </div>
+    <section class="concept" id="maison" aria-labelledby="concept-titre">
+      <h2 class="sr-only" id="concept-titre">Le concept</h2>
+      <div class="concept-media" aria-hidden="true">
+        <img class="concept-img" src="assets/concept/cave-casier.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async">
+      </div>
+      <div class="container concept-body">
+        <div class="concept-grid">
+          <article class="concept-item reveal">
+            <span class="roman" aria-hidden="true">I.</span>
+            <h3>Une histoire de partage</h3>
+            <p>Vins de Copains est né un soir entre amis, avec l’envie de partager de bons vins à des prix accessibles. Depuis, on vous fait découvrir nos coups de cœur et on vous conseille avec des mots simples.</p>
+          </article>
+          <article class="concept-item reveal reveal-d1">
+            <span class="roman" aria-hidden="true">II.</span>
+            <h3>En lien direct avec nos producteurs</h3>
+            <p>On sillonne les routes des vins pour rencontrer les vignerons et goûter leurs derniers millésimes. On achète nos cuvées directement auprès d’eux, puis on les entrepose dans notre cave du Vieux-Lille.</p>
+          </article>
+          <article class="concept-item reveal reveal-d2">
+            <span class="roman" aria-hidden="true">III.</span>
+            <h3>Des vins testés et approuvés</h3>
+            <p>On déguste chaque cuvée avant de la sélectionner. Notre critère tient en quelques mots&nbsp;: <em class="concept-quote">«&nbsp;Ah, c’est bon ça&nbsp;!&nbsp;»</em> La plupart de nos vins sont prêts à boire. On vous indique ceux qui gagnent à attendre en cave.</p>
+          </article>
+          <article class="concept-item reveal reveal-d3">
+            <span class="roman" aria-hidden="true">IV.</span>
+            <h3>À chaque instant, son vin</h3>
+            <p>Un apéro improvisé, un barbecue d’été ou un anniversaire en famille&nbsp;: à chaque occasion sa bouteille. Même une simple planche de fromages mérite un vin qu’on a envie de partager.</p>
+          </article>
         </div>
       </div>
     </section>

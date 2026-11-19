@@ -13,6 +13,7 @@
   --wine: #6a1f2c;
   --wine-deep: #2b0c12;
   --wine-night: #1d0a0e;
+  --cave: #1d150d;           /* brun de cave : fin du héros, bandeau des régions, concept */
   --gold: #b48e5a;
   --gold-soft: #d3b88f;
   --line: rgba(27, 21, 19, .12);
@@ -264,7 +265,7 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 @keyframes rise { to { opacity: 1; transform: none; } }
 
 /* ---------- Défilant régions ---------- */
-.marquee { background: var(--wine-deep); color: var(--paper); overflow: hidden; padding: 22px 0; border-top: 1px solid rgba(180,142,90,.25); }
+.marquee { background: var(--cave); color: rgba(243,232,214,.9); overflow: hidden; padding: 22px 0; }
 .marquee-track { display: flex; width: max-content; animation: marquee 60s linear infinite; }
 .marquee:hover .marquee-track { animation-play-state: paused; }
 .marquee a { font-family: var(--serif); font-style: italic; font-size: clamp(1.3rem, 2.2vw, 1.9rem); font-weight: 300; white-space: nowrap; display: inline-flex; align-items: center; transition: color .3s; }
@@ -282,15 +283,8 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .section-head.center { flex-direction: column; align-items: center; text-align: center; }
 .section-head.center .lead { margin: 22px auto 0; }
 
-/* Manifeste */
 @keyframes spin { to { transform: rotate(360deg); } }
-.manifesto-text .display { margin: 22px 0 28px; }
-.manifesto-text p { color: var(--ink-soft); max-width: 50ch; }
-.manifesto-text .signature { font-family: var(--serif); font-style: italic; font-size: 1.6rem; color: var(--wine); margin-top: 26px; }
-.pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 44px; padding-top: 34px; border-top: 1px solid var(--line); }
-.pillar .roman { display: block; margin-bottom: 6px; }
-.pillar h3 { font-family: var(--serif); font-weight: 500; font-size: 1.25rem; margin: 0 0 6px; line-height: 1.2; }
-.pillar p { font-size: .9rem; margin: 0; line-height: 1.6; }
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 
 /* Univers (catégories) */
 .univers-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
@@ -711,25 +705,21 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .hero-stats span { font-size: 9.5px; letter-spacing: .28em; text-transform: uppercase; color: rgba(250,246,240,.55); margin-top: 8px; }
 .scroll-cue { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase; color: rgba(250,246,240,.55); }
 
-/* ---------- Le concept ---------- */
-.manifesto { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(40px, 7vw, 120px); align-items: center; }
-.manifesto-card { position: relative; background: var(--wine-night); color: var(--paper); aspect-ratio: 4 / 5; padding: 20px; box-shadow: 0 50px 90px -50px rgba(43,12,18,.6); }
-.mc-inner {
-  height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 24px;
-  border: 1px solid rgba(180,142,90,.45); outline: 1px solid rgba(180,142,90,.18); outline-offset: -10px;
-  background: radial-gradient(70% 55% at 50% 42%, rgba(122,36,51,.6), transparent 75%);
-}
-.mc-quote { font-family: var(--serif); font-weight: 300; font-size: clamp(2.7rem, 5vw, 4.8rem); line-height: 1; margin: 30px 0 26px; }
-.mc-quote em { color: var(--gold-soft); }
-.mc-orn, .vc-orn { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--gold); font-size: 10px; }
-.mc-orn i, .vc-orn i { width: 52px; height: 1px; background: currentColor; opacity: .6; }
-.mc-sign { font-size: .92rem; color: rgba(250,246,240,.62); margin: 24px 0 0; line-height: 1.7; }
-.manifesto-card .badge {
-  position: absolute; right: -44px; bottom: 56px; width: 128px; height: 128px; border-radius: 50%;
-  background: var(--paper); display: grid; place-items: center; color: var(--wine); box-shadow: 0 20px 40px -20px rgba(27,21,19,.35);
-}
-.manifesto-card .badge svg { width: 112px; height: 112px; animation: spin 30s linear infinite; }
-.manifesto-card .badge .core { position: absolute; color: var(--gold); font-size: 14px; }
+/* ---------- Le concept : la cave en photo, quatre engagements ---------- */
+.concept { position: relative; isolation: isolate; overflow: hidden; background: var(--cave); color: var(--paper); }
+.concept-media { position: relative; height: clamp(440px, 56.25vw, 94vh); }
+.concept-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+.concept-media::before, .concept-media::after { content: ""; position: absolute; left: 0; right: 0; pointer-events: none; }
+/* haut : la photo naît du bandeau des régions ; bas : elle se fond sous les textes */
+.concept-media::before { top: 0; height: 24%; background: linear-gradient(to bottom, var(--cave), rgba(29,21,13,0)); }
+.concept-media::after { bottom: 0; height: 48%; background: linear-gradient(to bottom, rgba(29,21,13,0) 0%, rgba(29,21,13,.5) 42%, rgba(29,21,13,.88) 74%, var(--cave) 100%); }
+.concept-body { position: relative; z-index: 1; margin-top: calc(-1 * clamp(40px, 5vw, 96px)); padding-bottom: clamp(76px, 8.5vw, 128px); }
+.concept-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(28px, 3.2vw, 56px); }
+.concept-item { padding-top: 24px; border-top: 1px solid rgba(211,184,143,.34); }
+.concept-item .roman { display: block; margin-bottom: 12px; }
+.concept-item h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.5rem, 1.85vw, 1.95rem); line-height: 1.12; min-height: 2.24em; margin: 0 0 14px; color: var(--paper); text-wrap: balance; }
+.concept-item p { margin: 0; font-size: .97rem; line-height: 1.78; color: rgba(250,246,240,.76); text-wrap: pretty; }
+.concept-quote { font-family: var(--serif); font-style: italic; font-size: 1.16em; line-height: 1; color: var(--gold-soft); white-space: nowrap; }
 
 /* ---------- Univers : nuancier de robes ---------- */
 .univers-card {
@@ -839,6 +829,8 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
   border: 1px solid rgba(180,142,90,.4); outline: 1px solid rgba(180,142,90,.18); outline-offset: -11px;
   box-shadow: 0 50px 90px -60px rgba(43,12,18,.45);
 }
+.vc-orn { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--gold); font-size: 10px; }
+.vc-orn i { width: 52px; height: 1px; background: currentColor; opacity: .6; }
 .vc-head { text-align: center; padding-bottom: 26px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
 .vc-brand { display: block; font-family: var(--serif); font-size: 2.1rem; line-height: 1.1; margin-top: 12px; }
 .vc-brand em { font-style: italic; font-weight: 300; }
@@ -892,6 +884,8 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 @supports (height: 100lvh) { .hero-sticky { --ui: calc(100lvh - 100svh); height: 100lvh; } }
 .hero-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; image-rendering: auto; }
 .hero-topveil { position: absolute; inset: 0 0 auto; height: 220px; background: linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,0)); pointer-events: none; }
+/* bas : la fin de la visite se fond dans le bandeau des régions (même brun de cave) */
+.hero-botveil { position: absolute; inset: auto 0 0; height: calc(clamp(70px, 11vh, 130px) + var(--ui)); background: linear-gradient(to bottom, rgba(29,21,13,0), rgba(29,21,13,.94)); pointer-events: none; }
 .hero-intro, .hero-outro {
   position: absolute; inset: 0; z-index: 2; isolation: isolate; display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; color: var(--paper); padding: 0 max(16px, var(--gutter)) var(--ui);
@@ -1012,6 +1006,7 @@ body.has-hero .site-top.in-hero .brand-sub { color: rgba(250,246,240,.7); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1180px) {
+  .concept-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 54px; }
   .univers-grid { grid-template-columns: repeat(3, 1fr); }
   .univers-card:nth-child(4), .univers-card:nth-child(5) { aspect-ratio: 16 / 11; }
   .univers-grid .univers-card:nth-child(4) { grid-column: span 1; }
@@ -1038,8 +1033,6 @@ body.has-hero .site-top.in-hero .brand-sub { color: rgba(250,246,240,.7); }
   .brand-sub { display: none; }
   .hero-content { grid-template-columns: 1fr; }
   .hero-medal { display: none; }
-  .manifesto { grid-template-columns: 1fr; }
-  .manifesto-card { max-width: 520px; width: 88%; }
   .garde { grid-template-columns: 1fr; }
   .garde-visual { padding: 70px 24px; border-right: 0; }
   .regions-layout { grid-template-columns: 1fr; }
@@ -1066,6 +1059,13 @@ body.has-hero .site-top.in-hero .brand-sub { color: rgba(250,246,240,.7); }
 }
 
 @media (max-width: 720px) {
+  .concept-media { height: auto; aspect-ratio: 1 / 1; }
+  .concept-media::after { height: 36%; }
+  .concept-body { margin-top: -10px; padding-bottom: 80px; }
+  .concept-grid { grid-template-columns: 1fr; row-gap: 46px; }
+  .concept-item.reveal { transition-delay: 0s; }
+  .concept-item h3 { min-height: 0; font-size: 1.62rem; }
+  .concept-item p { font-size: 1rem; }
   body { font-size: 15px; }
   .announce { font-size: 9px; letter-spacing: .18em; }
   .announce .hide-sm { display: none; }
@@ -1084,9 +1084,6 @@ body.has-hero .site-top.in-hero .brand-sub { color: rgba(250,246,240,.7); }
   .product-quick { display: none; }
   .tag { font-size: 8.5px; padding: 4px 7px 3px; letter-spacing: .14em; }
   .product-tags { top: 10px; left: 10px; }
-  .manifesto-card .badge { right: -10px; bottom: -34px; width: 96px; height: 96px; }
-  .manifesto-card .badge svg { width: 84px; height: 84px; }
-  .pillars { grid-template-columns: 1fr; gap: 22px; }
   .vc-grid { grid-template-columns: 1fr; }
   .hero-ctas { flex-direction: column; align-items: stretch; width: 100%; max-width: 340px; }
   .hero-contact .sep { display: block; height: 0; overflow: hidden; margin: 2px 0; }
@@ -1096,7 +1093,6 @@ body.has-hero .site-top.in-hero .brand-sub { color: rgba(250,246,240,.7); }
   .vg-reset { top: 14px; left: 14px; }
   .vg-list { max-height: 360px; }
   .vg-stats strong { font-size: 2.1rem; }
-  .mc-inner .eyebrow::before, .mc-inner .eyebrow::after { width: 18px; }
   .regions-list { columns: 1; }
   .services { grid-template-columns: 1fr; }
   .service { border-right: 0; border-bottom: 1px solid var(--line); padding: 34px 6px; }
