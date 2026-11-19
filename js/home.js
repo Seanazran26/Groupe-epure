@@ -29,24 +29,6 @@
     mq.innerHTML = line + line;
   }
 
-  // Frise de consommation + anneaux du temps
-  var tl = $("[data-timeline]"), rings = $("[data-rings]");
-  if (tl) {
-    tl.innerHTML = V.CONSOMMATIONS.map(function (c, i) {
-      var n = count(function (p) { return p.consommation === c.slug; });
-      return '<li class="reveal reveal-d' + (i + 1) + '"><a href="nos-vins.html?conso=' + c.slug + '" data-ring-on="' + i + '">' +
-        '<span class="dot"><i></i></span>' +
-        '<div><span class="when">' + esc(c.horizon) + "</span><h3>" + esc(c.nom) + "</h3><p>" + esc(c.note) + "</p></div>" +
-        '<span class="count">' + (n ? V.pluriel(n, "vin") : "Voir") + " →</span></a></li>";
-    }).join("");
-    var light = function (i) {
-      if (!rings) return;
-      rings.querySelectorAll(".ring").forEach(function (r) { r.classList.toggle("on", +r.getAttribute("data-ring") === i); });
-    };
-    tl.addEventListener("mouseover", function (e) { var a = e.target.closest("[data-ring-on]"); if (a) light(+a.getAttribute("data-ring-on")); });
-    tl.addEventListener("mouseleave", function () { light(-1); });
-  }
-
   // La Cave : lien Instagram
   var ig = $("[data-insta]"), C0 = V.CONTACT || {};
   if (ig && C0.instagram) {

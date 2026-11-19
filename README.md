@@ -13,7 +13,7 @@ les couleurs et des filets dorés. Les emplacements « Cuvée à venir » montre
 
 | Page | Contenu |
 | --- | --- |
-| `index.html` | Accueil : La Maison (concept), La Cave (Instagram + coordonnées), Nos vins (catégories, « Quand déguster ? », régions) |
+| `index.html` | Accueil : visite de la cave (vidéo au défilement), régions, La Maison (concept), La Cave (Instagram + coordonnées) |
 | `nos-vins.html` | « Nos vins » : le catalogue, filtrable par **catégorie**, **région**, **consommation**, prix, recherche et tri |
 | `vignerons.html` | « Nos vignerons » : carte de France des 92 vignerons (reprise de la carte Google du site actuel), filtrable par vignoble |
 | `produit.html?id=…` | Fiche d'une bouteille |

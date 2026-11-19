@@ -290,7 +290,6 @@
           '<li><a href="index.html#maison">Notre histoire</a></li>' +
           '<li><a href="index.html#cave">La cave &amp; Instagram</a></li>' +
           '<li><a href="vignerons.html">Nos vignerons</a></li>' +
-          '<li><a href="index.html#garde">Consommation</a></li>' +
           '<li><a href="mentions-legales.html">Mentions légales</a></li>' +
           '<li><a href="mentions-legales.html#livraison">Livraison &amp; retrait</a></li>' +
         "</ul></div>" +
