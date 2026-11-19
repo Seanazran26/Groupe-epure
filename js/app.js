@@ -429,6 +429,24 @@
     els.forEach(function (e) { io.observe(e); });
   };
 
+  /* ---------- Boutons : l'anneau doré ne tourne que pour les boutons visibles à l'écran ----------
+     (un bouton hors de l'écran, ou dans un panneau fermé, ne coûte rien à l'ordinateur) */
+  function anneaux() {
+    if (!("IntersectionObserver" in window)) { document.documentElement.classList.add("anneaux-libres"); return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { e.target.classList.toggle("is-vu", e.isIntersecting); });
+    }, { rootMargin: "80px 0px" });
+    var scan = function () {                       // observer deux fois le même bouton ne fait rien
+      document.querySelectorAll(".btn, .cat-pill, .chip").forEach(function (el) { io.observe(el); });
+    };
+    scan();
+    if ("MutationObserver" in window) {            // boutons ajoutés plus tard (panier, filtres, listes)
+      var t = 0;
+      new MutationObserver(function () { if (!t) t = setTimeout(function () { t = 0; scan(); }, 120); })
+        .observe(document.body, { childList: true, subtree: true });
+    }
+  }
+
   /* ---------- Initialisation ---------- */
   function init() {
     var top = document.getElementById("site-top");
@@ -479,6 +497,7 @@
     if (si) si.addEventListener("input", function () { runSearch(si.value); });
     document.querySelectorAll("#mobile-menu a").forEach(function (a) { a.addEventListener("click", closePanels); });
 
+    anneaux();
     renderCart();
     V.observe();
   }

@@ -85,39 +85,63 @@ input, select { font: inherit; color: inherit; }
 
 .roman { font-family: var(--serif); font-style: italic; color: var(--gold); font-size: 1.1rem; letter-spacing: .04em; }
 
-/* ---------- Boutons ---------- */
+/* ---------- Boutons : un seul design pour tout le site ----------
+   Pilule entourée d'un anneau en dégradé qui tourne (or et bordeaux). L'intérieur prend la couleur du
+   fond sur lequel le bouton est posé (--surface) et le texte la couleur de lecture de ce fond
+   (--surface-ink) : chaque bouton va avec son environnement. Au survol, l'intérieur se remplit
+   (couleurs inversées). L'anneau tourne par la carte graphique (transform) : aucun recalcul de la page. */
+:root {
+  --surface: var(--paper); --surface-ink: var(--ink); --btn-hover-ink: var(--surface);
+  --btn-ring: conic-gradient(from 0deg, #5c3d1e 0%, #b48e5a 13%, #f6e7c8 23%, #c9a46c 31%, #7a2433 50%, #3d1218 60%, #9c7340 78%, #5c3d1e 100%);
+}
 .btn {
-  --bg: transparent; --fg: var(--ink); --bd: var(--ink);
-  position: relative;
+  --ring: 3px;
+  position: relative; isolation: isolate; overflow: hidden;
   display: inline-flex; align-items: center; justify-content: center; gap: 12px;
-  padding: 17px 34px;
-  font-family: var(--sans); font-size: 11.5px; font-weight: 500;
-  letter-spacing: .24em; text-transform: uppercase;
-  color: var(--fg); background: var(--bg);
-  border: 1px solid var(--bd);
-  overflow: hidden; isolation: isolate;
-  transition: color .5s var(--ease), border-color .5s var(--ease);
-  white-space: nowrap;
+  min-height: 54px; padding: 0 34px;
+  border: 0; border-radius: 999px; background: transparent;
+  font-family: var(--sans); font-size: 11.5px; font-weight: 500; line-height: 1.2;
+  letter-spacing: .24em; text-transform: uppercase; white-space: nowrap; text-align: center;
+  color: var(--surface-ink); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: color .3s linear, transform .4s var(--ease), box-shadow .4s var(--ease);
 }
-.btn::before {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: var(--hover-bg, var(--ink));
-  transform: scaleY(0); transform-origin: bottom;
-  transition: transform .55s var(--ease);
+.btn::before {                                 /* l'anneau : grand carré en dégradé conique qui tourne */
+  content: ""; position: absolute; z-index: -2; left: 50%; top: 50%;
+  width: calc(100% + 140px); aspect-ratio: 1 / 1;
+  background: var(--btn-ring);
+  transform: translate(-50%, -50%) rotate(0turn);
+  animation: btn-ring 3.6s linear infinite;
 }
-.btn:hover::before { transform: scaleY(1); }
-.btn:hover { color: var(--hover-fg, var(--paper)); }
+@supports not (aspect-ratio: 1 / 1) { .btn::before { height: 900px; } }
+.btn::after {                                  /* l'intérieur, à la couleur du fond */
+  content: ""; position: absolute; z-index: -1; inset: var(--ring); border-radius: inherit;
+  background: var(--surface); transition: background-color .3s linear;
+}
+@keyframes btn-ring { to { transform: translate(-50%, -50%) rotate(1turn); } }
+/* l'anneau tourne seulement quand le bouton est à l'écran (js/app.js) et que son panneau est ouvert */
+.btn::before, .cat-pill.active::before, .chip.active::before { animation-play-state: paused; }
+.btn.is-vu::before, .cat-pill.active.is-vu::before, .chip.active.is-vu::before,
+.anneaux-libres .btn::before, .anneaux-libres .cat-pill.active::before, .anneaux-libres .chip.active::before { animation-play-state: running; }
+.hero-outro:not(.show) .btn::before, .drawer:not(.open) .btn::before, .mobile-menu:not(.open) .btn::before,
+.search-panel:not(.open) .btn::before { animation-play-state: paused; }
+@media (hover: hover) {
+  .btn:hover { color: var(--btn-hover-ink); transform: translateY(-1px); box-shadow: 0 16px 34px -18px rgba(180,142,90,.8); }
+  .btn:hover::after { background: var(--surface-ink); }
+  .btn:hover .arrow { transform: translateX(5px); }
+}
+.btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; color: var(--btn-hover-ink); }
+.btn:focus-visible::after { background: var(--surface-ink); }
+.btn:active { transform: scale(.98); }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
 .btn .arrow { width: 22px; height: 8px; transition: transform .5s var(--ease); }
-.btn:hover .arrow { transform: translateX(5px); }
-
-.btn-dark { --bg: var(--ink); --fg: var(--paper); --bd: var(--ink); --hover-bg: var(--wine); --hover-fg: var(--paper); }
-.btn-dark:hover { border-color: var(--wine); }
-.btn-wine { --bg: var(--wine); --fg: var(--paper); --bd: var(--wine); --hover-bg: var(--wine-deep); --hover-fg: var(--paper); }
-.btn-light { --bg: var(--paper); --fg: var(--ink); --bd: var(--paper); --hover-bg: var(--gold); --hover-fg: var(--paper); }
-.btn-light:hover { border-color: var(--gold); }
-.btn-ghost-light { --fg: var(--paper); --bd: rgba(250,246,240,.55); --hover-bg: var(--paper); --hover-fg: var(--ink); }
-.btn-ghost { --fg: var(--ink); --bd: var(--ink); --hover-bg: var(--ink); --hover-fg: var(--paper); }
 .btn-block { width: 100%; }
+/* fonds sombres : intérieur sombre, texte ivoire */
+.on-dark, .site-footer, .mobile-menu, .page-hero, .toast { --surface: var(--wine-night); --surface-ink: var(--paper); }
+.on-ivory { --surface: var(--ivory); --surface-ink: var(--ink); }
+.visit-card, .drawer, .search-panel, .mega { --surface: var(--paper); --surface-ink: var(--ink); }
+/* sur la visite (vidéo) : intérieur brun fumé, laisse deviner l'image */
+.hero-scroll { --surface: rgba(20,13,8,.58); --surface-ink: var(--paper); --btn-hover-ink: var(--cave); }
+.concept { --surface: var(--cave); --surface-ink: var(--paper); }
 
 .link-line {
   font-size: 11.5px; font-weight: 500; letter-spacing: .24em; text-transform: uppercase;
@@ -135,7 +159,7 @@ input, select { font: inherit; color: inherit; }
 /* ---------- Barre d'annonce ---------- */
 .announce {
   position: relative; z-index: 60;
-  background: var(--wine-night); color: rgba(250,246,240,.82);
+  background: #1a120b; color: rgba(250,246,240,.82);
   font-size: 10.5px; letter-spacing: .26em; text-transform: uppercase; font-weight: 400;
   text-align: center; padding: 10px 16px; line-height: 1.4;
 }
@@ -151,17 +175,21 @@ body.has-hero .site-top { position: fixed; left: 0; right: 0; }
 .site-header {
   position: relative;
   height: var(--header-h);
-  background: rgba(250, 246, 240, .95);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--line);
+  /* partout la même allure que sur la visite : brun de cave fumé, textes ivoire, filet clair
+     (transparent sur la visite elle-même ; ailleurs ce voile sombre garde les textes lisibles) */
+  background: rgba(29, 21, 13, .86); color: var(--paper);
+  backdrop-filter: blur(14px) saturate(1.1); -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border-bottom: 1px solid rgba(250, 246, 240, .14);
   transition: background .5s var(--ease), border-color .5s var(--ease), color .5s var(--ease);
 }
+.site-header .brand-sub { color: rgba(250, 246, 240, .7); }
+.site-header .icon-btn:hover { background: rgba(250, 246, 240, .1); }
 body.has-hero .site-top:not(.scrolled) .site-header {
   background: transparent; border-color: rgba(250,246,240,.14); color: var(--paper);
   backdrop-filter: none; -webkit-backdrop-filter: none;
 }
 body.has-hero .site-top:not(.scrolled) .brand-sub { color: rgba(250,246,240,.7); }
-body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55); }
+body.has-hero .site-top:not(.scrolled) .announce { background: rgba(20,14,9,.5); }
 
 .header-inner {
   height: 100%;
@@ -321,7 +349,7 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
   opacity: 0; transform: translateY(12px); transition: opacity .5s var(--ease), transform .5s var(--ease);
 }
 .product-card:hover .product-quick, .product-card:focus-within .product-quick { opacity: 1; transform: none; }
-.product-quick .btn { width: 100%; padding: 14px 18px; font-size: 10.5px; }
+.product-quick .btn { width: 100%; min-height: 46px; padding: 0 18px; font-size: 10.5px; }
 .product-info { padding-top: 18px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .product-region { font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
 .product-name { font-family: var(--serif); font-size: 1.24rem; font-weight: 500; line-height: 1.2; margin: 2px 0 4px; }
@@ -497,7 +525,13 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .search-suggest span { font-size: 10.5px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); margin-right: 6px; }
 .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 40px; font-size: .85rem; transition: background .3s, border-color .3s, color .3s; background: transparent; }
 .chip:hover { border-color: var(--ink); }
-.chip.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chip.active { color: var(--ink); }
+.cat-pill.active, .chip.active { position: relative; isolation: isolate; overflow: hidden; background: transparent; border-color: transparent; }
+.cat-pill.active::before, .chip.active::before {
+  content: ""; position: absolute; z-index: -2; left: 50%; top: 50%; width: calc(100% + 140px); aspect-ratio: 1 / 1;
+  background: var(--btn-ring); transform: translate(-50%, -50%) rotate(0turn); animation: btn-ring 3.6s linear infinite;
+}
+.cat-pill.active::after, .chip.active::after { content: ""; position: absolute; z-index: -1; inset: 2px; border-radius: inherit; background: var(--paper); }
 .chip .x { font-size: 1rem; line-height: 1; opacity: .7; }
 
 /* ---------- Toast ---------- */
@@ -531,7 +565,8 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .cat-bar .container::-webkit-scrollbar { display: none; }
 .cat-pill { flex: none; padding: 10px 20px; font-size: 10.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; border: 1px solid transparent; border-radius: 40px; transition: all .35s var(--ease); white-space: nowrap; }
 .cat-pill:hover { border-color: var(--line); }
-.cat-pill.active { background: var(--wine); color: var(--paper); }
+/* onglet choisi : même anneau tournant que les boutons */
+.cat-pill.active { color: var(--ink); }
 .cat-pill sup { font-size: 8.5px; margin-left: 4px; opacity: .7; letter-spacing: 0; }
 
 .shop { display: grid; grid-template-columns: 270px 1fr; gap: clamp(32px, 4vw, 64px); padding-top: 56px; padding-bottom: 120px; align-items: start; }
