@@ -13,7 +13,8 @@
   --wine: #6a1f2c;
   --wine-deep: #2b0c12;
   --wine-night: #1d0a0e;
-  --cave: #1d150d;           /* brun de cave : fin du héros, bandeau des régions, concept */
+  --cave: #1d150d;           /* brun de cave : fin du héros, bandeau des régions */
+  --voute: #231713;          /* brun chaud très sombre : derrière la voûte et sous les textes du concept */
   --gold: #b48e5a;
   --gold-soft: #d3b88f;
   --line: rgba(27, 21, 19, .12);
@@ -706,13 +707,20 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(29,10,14,.55
 .scroll-cue { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase; color: rgba(250,246,240,.55); }
 
 /* ---------- Le concept : la cave en photo, quatre engagements ---------- */
-.concept { position: relative; isolation: isolate; overflow: hidden; background: var(--cave); color: var(--paper); }
-.concept-media { position: relative; height: clamp(440px, 56.25vw, 94vh); }
+/* une seule section : la voûte et le récit sur le même fond brun chaud (le haut naît du bandeau des régions) */
+.concept { position: relative; isolation: isolate; overflow: hidden; color: var(--paper);
+  background: linear-gradient(to bottom, var(--cave) 0, var(--voute) clamp(80px, 12vh, 140px), var(--voute) 100%); }
+.concept-media { --e: 0; position: relative; height: clamp(440px, 56.25vw, 94vh); }
+/* la photo (et ses fondus) : découpée en voûte au défilement — js/home.js écrit la forme à chaque image */
+.concept-arch { position: absolute; inset: 0; will-change: clip-path; }
 .concept-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
-.concept-media::before, .concept-media::after { content: ""; position: absolute; left: 0; right: 0; pointer-events: none; }
-/* haut : la photo naît du bandeau des régions ; bas : elle se fond sous les textes */
-.concept-media::before { top: 0; height: 24%; background: linear-gradient(to bottom, var(--cave), rgba(29,21,13,0)); }
-.concept-media::after { bottom: 0; height: 48%; background: linear-gradient(to bottom, rgba(29,21,13,0) 0%, rgba(29,21,13,.5) 42%, rgba(29,21,13,.88) 74%, var(--cave) 100%); }
+.concept-arch::before, .concept-arch::after { content: ""; position: absolute; left: 0; right: 0; pointer-events: none; }
+/* haut : la photo naît du bandeau (fondu qui s'efface à mesure que la voûte se dessine) ; bas : elle se fond sous les textes */
+.concept-arch::before { top: 0; height: 24%; background: linear-gradient(to bottom, var(--cave), rgba(29,21,13,0)); opacity: calc(1 - var(--e)); }
+.concept-arch::after { bottom: 0; height: 48%; background: linear-gradient(to bottom, rgba(35,23,19,0) 0%, rgba(35,23,19,.5) 42%, rgba(35,23,19,.88) 74%, var(--voute) 100%); }
+/* filet doré qui épouse la voûte, et s'efface vers le bas */
+.concept-arch-line { position: absolute; top: 0; bottom: 0; left: 0; right: 0; border: 1px solid rgba(211,184,143,.5); border-bottom: 0; opacity: 0; pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 88%); mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 88%); }
 .concept-body { position: relative; z-index: 1; margin-top: calc(-1 * clamp(40px, 5vw, 96px)); padding-bottom: clamp(76px, 8.5vw, 128px); }
 .concept-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(28px, 3.2vw, 56px); }
 .concept-item { padding-top: 24px; border-top: 1px solid rgba(211,184,143,.34); }
@@ -1060,7 +1068,7 @@ body.has-hero .site-top.in-hero .brand-sub { color: rgba(250,246,240,.7); }
 
 @media (max-width: 720px) {
   .concept-media { height: auto; aspect-ratio: 1 / 1; }
-  .concept-media::after { height: 36%; }
+  .concept-arch::after { height: 36%; }
   .concept-body { margin-top: -10px; padding-bottom: 80px; }
   .concept-grid { grid-template-columns: 1fr; row-gap: 46px; }
   .concept-item.reveal { transition-delay: 0s; }

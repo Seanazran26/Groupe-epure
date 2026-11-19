@@ -78,3 +78,110 @@
 
   V.observe();
 })();
+
+/* ==========================================================================
+   Le concept : la photo plein écran se resserre en voûte au défilement
+   Même principe que le composant « SVG clip mask » (forme « arch », mode « scroll »,
+   courbe de vitesse cubic-bezier(.645, .045, .355, 1)), en CSS natif, sans bibliothèque :
+   la découpe est un rectangle dont les deux coins du haut deviennent une demi-ellipse
+   (clip-path: inset(… round …)), recalculée à chaque image pendant le défilement.
+   Derrière, le fond brun de la section apparaît ; un filet doré épouse la voûte.
+   Animations réduites (réglage du système) : la voûte finale, sans mouvement.
+   ========================================================================== */
+(function () {
+  "use strict";
+  var media = document.querySelector("[data-voute]");
+  if (!media) return;
+  var arch = media.querySelector(".concept-arch"), line = media.querySelector(".concept-arch-line");
+  var test = "inset(0px 1px 0px 1px round 1px 1px 0px 0px / 1px 1px 0px 0px)";
+  var prop = window.CSS && CSS.supports
+    ? (CSS.supports("clip-path", test) ? "clipPath" : CSS.supports("-webkit-clip-path", test) ? "webkitClipPath" : "")
+    : "";
+  if (!prop || !arch) return;                    // navigateur trop ancien : la photo reste en plein cadre
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var W = 0, H = 0, last = -1, raf = 0, actif = false;
+
+  // courbe de vitesse du composant d'origine (EASE_MOVE) : cubic-bezier(.645, .045, .355, 1)
+  function bezier(x1, y1, x2, y2) {
+    function A(p1, p2) { return 1 - 3 * p2 + 3 * p1; }
+    function B(p1, p2) { return 3 * p2 - 6 * p1; }
+    function C(p1) { return 3 * p1; }
+    function at(t, p1, p2) { return ((A(p1, p2) * t + B(p1, p2)) * t + C(p1)) * t; }
+    function slope(t, p1, p2) { return 3 * A(p1, p2) * t * t + 2 * B(p1, p2) * t + C(p1); }
+    return function (x) {
+      if (x <= 0) return 0;
+      if (x >= 1) return 1;
+      var t = x, i;
+      for (i = 0; i < 6; i++) {                   // Newton
+        var s = slope(t, x1, x2);
+        if (Math.abs(s) < 1e-6) break;
+        t -= (at(t, x1, x2) - x) / s;
+      }
+      if (!(t >= 0 && t <= 1) || Math.abs(at(t, x1, x2) - x) > 1e-4) {   // secours : dichotomie
+        var lo = 0, hi = 1;
+        t = x;
+        for (i = 0; i < 30; i++) {
+          var v = at(t, x1, x2);
+          if (Math.abs(v - x) < 1e-5) break;
+          if (v < x) lo = t; else hi = t;
+          t = (lo + hi) / 2;
+        }
+      }
+      return at(t, y1, y2);
+    };
+  }
+  var ease = bezier(0.645, 0.045, 0.355, 1);
+
+  function forme() {
+    // voûte finale : un peu plus large sur mobile (les trois bouteilles restent entières)
+    var m = W < 721;
+    return { cote: m ? 0.05 : 0.1, montee: m ? 0.36 : 0.42, haut: Math.min(H * 0.05, 44) };
+  }
+  function px(n) { return (Math.round(n * 10) / 10) + "px"; }
+  function dessiner(e) {
+    var f = forme();
+    var L = e * f.cote * W, T = e * f.haut;
+    var rx = px(e * (W - 2 * L) / 2), ry = px(e * f.montee * H);
+    arch.style[prop] = "inset(" + px(T) + " " + px(L) + " 0px " + px(L) + " round " + rx + " " + rx + " 0px 0px / " + ry + " " + ry + " 0px 0px)";
+    media.style.setProperty("--e", e.toFixed(3));
+    if (line) {
+      line.style.left = line.style.right = px(L);
+      line.style.top = px(T);
+      line.style.borderRadius = rx + " " + rx + " 0 0 / " + ry + " " + ry + " 0 0";
+      line.style.opacity = (e * 0.9).toFixed(3);
+    }
+  }
+  function progres() {
+    // comme le composant (offset ["start 0.9", "end 0.6"]) : 0 quand le haut de la photo atteint 90 % de
+    // la hauteur de l'écran, 1 quand son bas atteint 60 % — la voûte est donc finie tant qu'on la voit.
+    // Mobile (photo moins haute que l'écran) : elle entre d'abord en entier, puis se resserre en montant.
+    var r = media.getBoundingClientRect(), vh = window.innerHeight || document.documentElement.clientHeight;
+    var court = r.height < vh * 0.6;
+    var debut = vh * (court ? 0.7 : 0.9), fin = Math.min(vh * 0.6 - r.height, vh * 0.1);
+    return Math.min(1, Math.max(0, (debut - r.top) / (debut - fin)));
+  }
+  function maj() {
+    raf = 0;
+    var e = reduce ? 1 : ease(progres());
+    if (Math.abs(e - last) < 0.0005) return;     // rien n'a changé : aucune écriture
+    last = e;
+    dessiner(e);
+  }
+  function demande() { if (!raf) raf = requestAnimationFrame(maj); }
+  function mesure() { W = media.clientWidth; H = media.clientHeight; last = -1; demande(); }
+
+  mesure();
+  window.addEventListener("resize", mesure);
+  if (reduce) return;
+  // le défilement n'est écouté que lorsque la section est proche de l'écran
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) {
+      var v = es[es.length - 1].isIntersecting;
+      if (v && !actif) { actif = true; window.addEventListener("scroll", demande, { passive: true }); }
+      else if (!v && actif) { actif = false; window.removeEventListener("scroll", demande); }
+      demande();
+    }, { rootMargin: "200px 0px" }).observe(media);
+  } else {
+    window.addEventListener("scroll", demande, { passive: true });
+  }
+})();
