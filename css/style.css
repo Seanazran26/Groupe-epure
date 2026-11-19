@@ -91,7 +91,7 @@ input, select { font: inherit; color: inherit; }
    (--surface-ink) : chaque bouton va avec son environnement. Au survol, l'intérieur se remplit
    (couleurs inversées). L'anneau tourne par la carte graphique (transform) : aucun recalcul de la page. */
 :root {
-  --surface: var(--paper); --surface-ink: var(--ink); --btn-hover-ink: var(--surface);
+  --surface: var(--paper); --surface-ink: var(--ink);
   --btn-ring: conic-gradient(from 0deg, #5c3d1e 0%, #b48e5a 13%, #f6e7c8 23%, #c9a46c 31%, #7a2433 50%, #3d1218 60%, #9c7340 78%, #5c3d1e 100%);
 }
 .btn {
@@ -125,12 +125,12 @@ input, select { font: inherit; color: inherit; }
 .hero-outro:not(.show) .btn::before, .drawer:not(.open) .btn::before, .mobile-menu:not(.open) .btn::before,
 .search-panel:not(.open) .btn::before { animation-play-state: paused; }
 @media (hover: hover) {
-  .btn:hover { color: var(--btn-hover-ink); transform: translateY(-1px); box-shadow: 0 16px 34px -18px rgba(180,142,90,.8); }
-  .btn:hover::after { background: var(--surface-ink); }
+  .btn:hover { color: var(--btn-hover-ink, var(--surface)); transform: translateY(-1px); box-shadow: 0 16px 34px -18px rgba(180,142,90,.8); }
+  .btn:hover::after { background: var(--btn-hover-fill, var(--surface-ink)); }
   .btn:hover .arrow { transform: translateX(5px); }
 }
-.btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; color: var(--btn-hover-ink); }
-.btn:focus-visible::after { background: var(--surface-ink); }
+.btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; color: var(--btn-hover-ink, var(--surface)); }
+.btn:focus-visible::after { background: var(--btn-hover-fill, var(--surface-ink)); }
 .btn:active { transform: scale(.98); }
 .btn[disabled], .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
 .btn .arrow { width: 22px; height: 8px; transition: transform .5s var(--ease); }
@@ -881,6 +881,34 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(20,14,9,.5);
 .insta { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-top: 36px; }
 .insta .btn svg:not(.arrow) { width: 17px; height: 17px; }
 .insta-note { font-size: .82rem; color: var(--muted); }
+
+/* ---------- La Cave : beige pierre chaud, fiche ivoire, textes brun profond ---------- */
+.cave-pierre {
+  --pierre: #E5D4BF; --pierre-ink: #30221C; --pierre-bordeaux: #6A3540; --fiche: #F5EBDD;
+  --surface: var(--pierre); --surface-ink: var(--pierre-ink);
+  /* contours des boutons : bordeaux (avec un léger reflet qui tourne) ; survol : bordeaux plein */
+  --btn-ring: conic-gradient(from 0deg, #6A3540 0%, #6A3540 28%, #9a6271 42%, #6A3540 56%, #4b232b 76%, #6A3540 100%);
+  --btn-hover-fill: var(--pierre-bordeaux); --btn-hover-ink: var(--fiche);
+  color: var(--pierre-ink);
+  /* fondu court en haut : le brun de la section précédente se fond dans la pierre */
+  background:
+    linear-gradient(to bottom, var(--cave) 0%, #292118 15%, #483e33 30%, #726659 45%, #9f9180 60%, #c6b6a3 75%, #dfcfba 90%, var(--pierre) 100%)
+      top / 100% clamp(80px, 9vw, 130px) no-repeat,
+    var(--pierre);
+}
+.cave-pierre .eyebrow, .cave-pierre .display, .cave-pierre .lead { color: var(--pierre-ink); }
+.cave-pierre .display em { color: var(--pierre-bordeaux); }
+.cave-pierre .insta-note { color: rgba(48, 34, 28, .78); }
+.cave-pierre .visit-card {
+  --surface: var(--fiche);
+  background: var(--fiche); color: var(--pierre-ink);
+  border: 1px solid rgba(48, 34, 28, .14); outline: 0;
+  box-shadow: 0 40px 80px -60px rgba(48, 34, 28, .45);
+}
+.cave-pierre .vc-head, .cave-pierre .vc-grid div { border-color: rgba(48, 34, 28, .13); }
+.cave-pierre .vc-sub, .cave-pierre .vc-grid dt { color: rgba(48, 34, 28, .72); }
+.cave-pierre .vc-note { color: rgba(48, 34, 28, .76); }
+.cave-pierre .vc-grid dd a:hover { color: var(--pierre-bordeaux); }
 
 /* ---------- Le Cercle ---------- */
 .club {
