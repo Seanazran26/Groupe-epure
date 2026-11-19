@@ -138,7 +138,8 @@ input, select { font: inherit; color: inherit; }
 /* fonds sombres : intérieur sombre, texte ivoire */
 .on-dark, .site-footer, .mobile-menu, .page-hero, .toast { --surface: var(--wine-night); --surface-ink: var(--paper); }
 .on-ivory { --surface: var(--ivory); --surface-ink: var(--ink); }
-.visit-card, .drawer, .search-panel, .mega { --surface: var(--paper); --surface-ink: var(--ink); }
+.visit-card, .drawer, .search-panel { --surface: var(--paper); --surface-ink: var(--ink); }
+.mega { --surface: var(--cave); --surface-ink: var(--paper); }
 /* sur la visite (vidéo) : intérieur brun fumé, laisse deviner l'image */
 .hero-scroll { --surface: rgba(20,13,8,.58); --surface-ink: var(--paper); --btn-hover-ink: var(--cave); }
 .concept { --surface: var(--cave); --surface-ink: var(--paper); }
@@ -277,25 +278,25 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(20,14,9,.5);
 
 .burger { display: none; }
 
-/* Méga-menu */
+/* Méga-menu : même brun de cave que la barre du haut, dont il est le prolongement */
 .mega {
   position: absolute; left: 0; right: 0; top: 100%;
-  background: var(--paper); color: var(--ink);
-  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-  box-shadow: 0 30px 60px -30px rgba(27,21,19,.25);
+  background: var(--cave); color: rgba(250, 246, 240, .88);
+  border-top: 0; border-bottom: 1px solid rgba(211, 184, 143, .16);
+  box-shadow: 0 40px 70px -30px rgba(0, 0, 0, .55);
   opacity: 0; visibility: hidden; transform: translateY(-8px);
   transition: opacity .4s var(--ease), transform .4s var(--ease), visibility .4s;
 }
 .nav-item:hover .mega, .nav-item:focus-within .mega { opacity: 1; visibility: visible; transform: none; }
 .mega-inner { display: grid; grid-template-columns: 1fr 1fr 2fr 1.3fr; gap: 48px; padding-top: 44px; padding-bottom: 48px; }
-.mega h4 { font-family: var(--sans); font-size: 10.5px; font-weight: 500; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin: 0 0 18px; }
+.mega h4 { font-family: var(--sans); font-size: 10.5px; font-weight: 500; letter-spacing: .28em; text-transform: uppercase; color: var(--gold-soft); margin: 0 0 18px; }
 .mega ul { list-style: none; margin: 0; padding: 0; }
 .mega li a {
   display: inline-block; font-family: var(--serif); font-size: 1.22rem; letter-spacing: 0; text-transform: none;
   font-weight: 400; padding: 3px 0; transition: color .3s, transform .4s var(--ease);
 }
 .mega li a::after { display: none; }
-.mega li a:hover { color: var(--wine); transform: translateX(4px); }
+.mega li a:hover { color: var(--gold-soft); transform: translateX(4px); }
 .mega .cols-2 { columns: 2; column-gap: 32px; }
 .mega .cols-2 a { font-size: 1.05rem; }
 .nav .mega-feature::after { display: none; }
@@ -722,8 +723,8 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(20,14,9,.5);
 .mega-feature {
   position: relative; overflow: hidden; min-height: 260px; color: var(--paper);
   display: flex; align-items: flex-end; padding: 24px;
-  background: radial-gradient(90% 70% at 80% 10%, rgba(180,142,90,.28), transparent 60%), linear-gradient(160deg, #6a1f2c 0%, #1d0a0e 85%);
-  outline: 1px solid rgba(180,142,90,.35); outline-offset: -10px;
+  background: radial-gradient(90% 70% at 80% 10%, rgba(180,142,90,.3), transparent 60%), linear-gradient(160deg, #3d2b1d 0%, #160f09 85%);
+  outline: 1px solid rgba(180,142,90,.38); outline-offset: -10px;
 }
 .mega-feature .mf-orn { position: absolute; top: 26px; right: 28px; color: var(--gold-soft); font-size: 12px; transition: transform .8s var(--ease); }
 .mega-feature:hover .mf-orn { transform: rotate(180deg); }
@@ -1195,3 +1196,9 @@ body.has-hero .site-top.in-hero .brand-sub { color: rgba(250,246,240,.7); }
 .prose dt { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--gold); padding-top: 5px; font-weight: 500; }
 .prose dd { margin: 0; font-family: var(--serif); font-size: 1.2rem; }
 @media (max-width: 720px) { .prose dl { grid-template-columns: 1fr; gap: 2px; } .prose dd { margin-bottom: 12px; } }
+
+/* Menu « Nos vins » ouvert : la barre du haut prend le même brun que le menu, les deux ne font qu'un
+   (même sur la visite, où la barre est transparente) */
+body .site-top .site-header:has(.nav-item:hover), body .site-top .site-header:has(.nav-item:focus-within) {
+  background: var(--cave); border-color: rgba(211, 184, 143, .12);
+}
