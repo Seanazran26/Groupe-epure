@@ -136,7 +136,8 @@ input, select { font: inherit; color: inherit; }
 .btn .arrow { width: 22px; height: 8px; transition: transform .5s var(--ease); }
 .btn-block { width: 100%; }
 /* fonds sombres : intérieur sombre, texte ivoire */
-.on-dark, .site-footer, .mobile-menu, .page-hero, .toast { --surface: var(--wine-night); --surface-ink: var(--paper); }
+.on-dark, .mobile-menu, .page-hero, .toast { --surface: var(--wine-night); --surface-ink: var(--paper); }
+.site-footer { --surface: #2a1d15; --surface-ink: var(--paper); }
 .on-ivory { --surface: var(--ivory); --surface-ink: var(--ink); }
 .drawer, .search-panel { --surface: var(--paper); --surface-ink: var(--ink); }
 .mega { --surface: var(--cave); --surface-ink: var(--paper); }
@@ -481,7 +482,28 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(20,14,9,.5);
 .club-note { font-size: .78rem; color: rgba(250,246,240,.5); margin-top: 14px; }
 
 /* ---------- Pied de page ---------- */
-.site-footer { border-top: 1px solid rgba(180,142,90,.2); background: var(--wine-night); color: rgba(250,246,240,.75); padding-top: clamp(70px, 9vw, 120px); font-size: .92rem; }
+.site-footer {
+  /* dégradé : de la couleur de la section au-dessus (raccord sans couture) au brun profond du site,
+     puis au brun de cave du tout début du site : la page commence et finit dans la même couleur */
+  --dessus: var(--paper); --fondu: clamp(140px, 15vw, 220px);
+  color: rgba(250,246,240,.75); font-size: .92rem;
+  padding-top: calc(var(--fondu) + clamp(40px, 5vw, 80px));
+  background: linear-gradient(to bottom, var(--dessus) 0, #30221C var(--fondu), #261a12 60%, var(--cave) 100%);
+}
+@supports (color: color-mix(in oklab, red, blue)) {
+  .site-footer {
+    background: linear-gradient(to bottom,
+      var(--dessus) 0,
+      color-mix(in oklab, #30221C 6%, var(--dessus)) calc(var(--fondu) * .15),
+      color-mix(in oklab, #30221C 22%, var(--dessus)) calc(var(--fondu) * .3),
+      color-mix(in oklab, #30221C 43%, var(--dessus)) calc(var(--fondu) * .45),
+      color-mix(in oklab, #30221C 65%, var(--dessus)) calc(var(--fondu) * .6),
+      color-mix(in oklab, #30221C 84%, var(--dessus)) calc(var(--fondu) * .75),
+      color-mix(in oklab, #30221C 97%, var(--dessus)) calc(var(--fondu) * .9),
+      #30221C var(--fondu), #261a12 60%, var(--cave) 100%);
+  }
+}
+body[data-page="accueil"] .site-footer { --dessus: #E5D4BF; }   /* accueil : la section La Cave, beige pierre */
 .footer-top { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 40px; padding-bottom: 70px; border-bottom: 1px solid var(--line-light); }
 .footer-brand .brand { align-items: flex-start; text-align: left; color: var(--paper); }
 .footer-brand .brand-sub { color: rgba(250,246,240,.5); padding-left: 0; }
@@ -497,6 +519,10 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(20,14,9,.5);
 .footer-bottom { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; padding: 28px 0 34px; font-size: .78rem; color: rgba(250,246,240,.48); }
 .footer-bottom .evin { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; }
 .footer-giant { font-family: var(--serif); font-weight: 300; font-size: clamp(3rem, 12.2vw, 13rem); line-height: .85; text-align: center; color: rgba(250,246,240,.05); white-space: nowrap; overflow: hidden; margin-top: 40px; user-select: none; letter-spacing: -.02em; }
+/* le grand « Vin des Copains » du bas : doré qui s'efface vers le bas, ton sur ton avec le brun */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .footer-giant { color: transparent; background: linear-gradient(to bottom, rgba(211,184,143,.3), rgba(211,184,143,.03) 92%); -webkit-background-clip: text; background-clip: text; }
+}
 .footer-giant em { font-style: italic; }
 
 /* ---------- Tiroir panier ---------- */
@@ -886,62 +912,55 @@ body.has-hero .site-top:not(.scrolled) .announce { background: rgba(20,14,9,.5);
 .cave-pierre .eyebrow, .cave-pierre .display, .cave-pierre .lead { color: var(--pierre-ink); }
 .cave-pierre .display em { color: var(--pierre-bordeaux); }
 .cave-pierre .insta-note { color: rgba(48, 34, 28, .78); }
-/* fiche de contact : carte photo (cave), en-tête en verre dépoli, informations sur un dégradé sombre ;
-   s'incline vers la souris sur ordinateur (js/home.js) */
+/* fiche de contact : carte blanche qui s'incline vers la souris (js/home.js), un reflet doré suit la souris */
 .carte-wrap { width: 100%; max-width: 470px; justify-self: center; }
 .carte {
   --mx: 0; --my: 0;
-  --surface: rgba(18, 12, 9, .45); --surface-ink: var(--paper);
-  --btn-ring: conic-gradient(from 0deg, #6A3540 0%, #6A3540 26%, #d3b88f 40%, #6A3540 54%, #4b232b 74%, #6A3540 100%);
+  --surface: #FFFDFA; --surface-ink: var(--pierre-ink);
   position: relative; isolation: isolate; overflow: hidden;
-  display: grid; width: 100%; border-radius: 24px;
-  background: #1a120c; color: var(--paper);
-  box-shadow: 0 44px 80px -40px rgba(48, 34, 28, .65), 0 0 0 1px rgba(255, 255, 255, .05);
+  display: block; width: 100%; border-radius: 24px;
+  background: #FFFDFA; color: var(--pierre-ink);
+  border: 1px solid rgba(48, 34, 28, .08);
+  box-shadow: 0 44px 80px -44px rgba(48, 34, 28, .45), 0 2px 8px rgba(48, 34, 28, .05);
   transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
   transition: transform .4s ease-in-out;
 }
-/* format 3:4 au minimum, plus haut si le contenu le demande (petits écrans) */
-.carte::before { content: ""; grid-area: 1 / 1; padding-top: 133.333%; }
+.carte::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(60% 50% at calc(50% + var(--mx) * 40%) calc(50% + var(--my) * 40%), rgba(211, 184, 143, .2), transparent 70%);
+  opacity: 0; transition: opacity .4s ease-in-out;
+}
 .carte.is-tilt { transition: transform .1s ease-out; }
-.carte-img {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 38%;
-  transform: scale(1.1) translate(calc(var(--mx) * -8px), calc(var(--my) * -8px));
-  transition: transform .4s ease-in-out;
-}
-.carte-voile {
-  position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(to top, rgba(16, 10, 7, .95) 0%, rgba(16, 10, 7, .9) 38%, rgba(16, 10, 7, .5) 60%, rgba(16, 10, 7, .12) 78%, rgba(16, 10, 7, .3) 100%);
-}
+.carte.is-tilt::after { opacity: 1; }
 .carte-contenu {
-  grid-area: 1 / 1; position: relative; z-index: 1; display: flex; flex-direction: column; padding: 20px;
+  position: relative; z-index: 1; display: flex; flex-direction: column; padding: 22px;
   transform: translate(calc(var(--mx) * 6px), calc(var(--my) * 6px));
   transition: transform .4s ease-in-out;
 }
-.carte.is-tilt .carte-img, .carte.is-tilt .carte-contenu { transition-duration: .1s; }
+.carte.is-tilt .carte-contenu { transition-duration: .1s; }
 .carte-tete {
   display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
-  padding: 16px 18px; border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, .12); background: rgba(255, 255, 255, .07);
-  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  padding: 18px 20px; border-radius: 14px;
+  background: var(--fiche); border: 1px solid rgba(48, 34, 28, .08);
 }
-.carte-nom { font-family: var(--serif); font-weight: 400; font-size: 1.8rem; line-height: 1.05; margin: 0; color: var(--paper); }
-.carte-nom em { font-style: italic; font-weight: 300; color: var(--gold-soft); }
-.carte-sous { margin: 7px 0 0; font-size: 9px; letter-spacing: .32em; text-transform: uppercase; color: rgba(250, 246, 240, .72); }
-.carte-logo { color: var(--gold-soft); font-size: 15px; line-height: 1; margin-top: 5px; }
+.carte-nom { font-family: var(--serif); font-weight: 400; font-size: 1.85rem; line-height: 1.05; margin: 0; color: var(--pierre-ink); }
+.carte-nom em { font-style: italic; font-weight: 300; color: var(--pierre-bordeaux); }
+.carte-sous { margin: 7px 0 0; font-size: 9px; letter-spacing: .32em; text-transform: uppercase; color: rgba(48, 34, 28, .62); }
+.carte-logo { color: var(--gold); font-size: 15px; line-height: 1; margin-top: 5px; }
 .carte-pastille {
-  align-self: flex-start; margin-top: 12px; padding: 8px 16px; border-radius: 999px;
-  background: rgba(0, 0, 0, .42); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-  font-size: 9.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--paper);
+  align-self: flex-start; margin-top: 14px; padding: 8px 16px; border-radius: 999px;
+  background: var(--pierre-bordeaux); color: #FFFDFA;
+  font-size: 9.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase;
 }
-.carte-bas { margin-top: auto; padding: 22px 4px 0; }
-.carte-grille { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 22px; margin: 0; }
+.carte-bas { padding: 26px 4px 2px; }
+.carte-grille { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 22px; margin: 0; }
 .carte-grille .large { grid-column: 1 / -1; }
-.carte-grille dt { font-size: 9.5px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase; color: var(--gold-soft); margin-bottom: 4px; }
-.carte-grille dd { margin: 0; font-family: var(--serif); font-size: 1.14rem; line-height: 1.32; color: var(--paper); }
+.carte-grille dt { font-size: 9.5px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase; color: rgba(48, 34, 28, .6); margin-bottom: 4px; }
+.carte-grille dd { margin: 0; font-family: var(--serif); font-size: 1.16rem; line-height: 1.32; color: var(--pierre-ink); }
 .carte-grille dd a { transition: color .3s; }
-.carte-grille dd a:hover { color: var(--gold-soft); }
-.carte-note { margin: 14px 0 0; font-size: .76rem; line-height: 1.5; color: rgba(250, 246, 240, .7); }
-.carte-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.carte-grille dd a:hover { color: var(--pierre-bordeaux); }
+.carte-note { margin: 18px 0 0; padding-top: 16px; border-top: 1px solid rgba(48, 34, 28, .1); font-size: .78rem; line-height: 1.5; color: rgba(48, 34, 28, .72); }
+.carte-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
 .carte-actions .btn { min-height: 46px; padding: 0 22px; font-size: 10.5px; }
 
 /* ---------- Le Cercle ---------- */
@@ -1179,7 +1198,7 @@ body.has-hero .site-top.in-hero .brand-sub { color: rgba(250,246,240,.7); }
   .product-quick { display: none; }
   .tag { font-size: 8.5px; padding: 4px 7px 3px; letter-spacing: .14em; }
   .product-tags { top: 10px; left: 10px; }
-  .carte-contenu { padding: 16px; }
+  .carte-contenu { padding: 18px; }
   .carte-nom { font-size: 1.6rem; }
   .hero-ctas { flex-direction: column; align-items: stretch; width: 100%; max-width: 340px; }
   .hero-contact .sep { display: block; height: 0; overflow: hidden; margin: 2px 0; }
