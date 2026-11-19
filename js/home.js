@@ -37,26 +37,67 @@
       '<span class="insta-note">Nouveautés, coups de cœur et dates des ateliers</span>';
   }
 
-  // La Cave : carte de visite
+  // La Cave : fiche de contact (carte photo) — toutes les informations viennent de js/data.js
   var C = V.CONTACT || {}, vc = $("[data-visit-card]");
   if (vc) {
     var adr = V.adresseComplete();
     var tels = [C.telephone, C.mobile].filter(Boolean).map(function (t) { return '<a href="' + V.telHref(t) + '">' + esc(t) + "</a>"; }).join("<br>");
-    var hor = (C.horaires || []).map(function (h) { return esc(h[0]) + "<br>" + esc(h[1]); }).join("<br>");
+    var hor = (C.horaires || []).map(function (h) { return esc(h[0]) + " · " + esc(h[1]); }).join("<br>");
     vc.innerHTML =
-      '<div class="vc-head"><span class="vc-orn" aria-hidden="true"><i></i>✦<i></i></span><span class="vc-brand">Vin <em>des</em> Copains</span><span class="vc-sub">Cave à vins · ' + esc(C.quartier || "") + "</span></div>" +
-      '<dl class="vc-grid">' +
-        "<div><dt>Adresse</dt><dd>" + (adr ? esc(C.adresse || "") + "<br>" + esc([C.codePostal, C.ville].filter(Boolean).join(" ")) : '<span class="ph">Adresse</span>') + "</dd></div>" +
-        "<div><dt>Téléphone</dt><dd>" + (tels || '<span class="ph">Téléphone</span>') + "</dd></div>" +
-        "<div><dt>E-mail</dt><dd>" + (C.email ? '<a href="mailto:' + esc(C.email) + '">' + esc(C.email) + "</a>" : '<span class="ph">E-mail</span>') + "</dd></div>" +
-        "<div><dt>Horaires</dt><dd>" + (hor || '<span class="ph">Horaires</span>') + "</dd></div>" +
-      "</dl>" +
-      (C.noteHoraires ? '<p class="vc-note">' + esc(C.noteHoraires) + "</p>" : "") +
-      '<div class="vc-actions">' +
-        (adr ? '<a class="btn btn-dark" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(adr) + '">Itinéraire ' + I.arrow + "</a>" : "") +
-        (C.telephone ? '<a class="btn btn-ghost" href="' + V.telHref() + '">Appeler</a>' : "") +
+      '<div class="carte-tete">' +
+        '<div><h3 class="carte-nom">Vin <em>des</em> Copains</h3><p class="carte-sous">Cave à vins · ' + esc(C.quartier || "") + "</p></div>" +
+        '<span class="carte-logo" aria-hidden="true">✦</span>' +
+      "</div>" +
+      (/rendez-vous/i.test(C.noteHoraires || "") ? '<span class="carte-pastille">Retrait sur rendez-vous</span>' : "") +
+      '<div class="carte-bas">' +
+        '<dl class="carte-grille">' +
+          "<div><dt>Adresse</dt><dd>" + (adr ? esc(C.adresse || "") + "<br>" + esc([C.codePostal, C.ville].filter(Boolean).join(" ")) : '<span class="ph">Adresse</span>') + "</dd></div>" +
+          "<div><dt>Téléphone</dt><dd>" + (tels || '<span class="ph">Téléphone</span>') + "</dd></div>" +
+          '<div class="large"><dt>E-mail</dt><dd>' + (C.email ? '<a href="mailto:' + esc(C.email) + '">' + esc(C.email) + "</a>" : '<span class="ph">E-mail</span>') + "</dd></div>" +
+          '<div class="large"><dt>Horaires</dt><dd>' + (hor || '<span class="ph">Horaires</span>') + "</dd></div>" +
+        "</dl>" +
+        (C.noteHoraires ? '<p class="carte-note">' + esc(C.noteHoraires) + "</p>" : "") +
+        '<div class="carte-actions">' +
+          (adr ? '<a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(adr) + '">Itinéraire ' + I.arrow + "</a>" : "") +
+          (C.telephone ? '<a class="btn" href="' + V.telHref() + '">Appeler</a>' : "") +
+        "</div>" +
       "</div>";
   }
 
   V.observe();
+})();
+
+/* ==========================================================================
+   La Cave : la fiche de contact s'incline vers la souris (ordinateur)
+   Même principe que le composant « InteractiveProductCard » : jusqu'à 8° d'inclinaison et
+   léger grossissement ; en plus, la photo et le texte glissent un peu en sens contraire
+   (effet de profondeur), sans sortir des bords arrondis de la carte.
+   Écran tactile ou animations réduites : carte immobile.
+   ========================================================================== */
+(function () {
+  "use strict";
+  var card = document.querySelector("[data-tilt]");
+  if (!card || !window.matchMedia) return;
+  if (!matchMedia("(hover: hover) and (pointer: fine)").matches || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var raf = 0, mx = 0, my = 0;
+  function poser() {
+    raf = 0;
+    card.style.transform = "perspective(1000px) rotateX(" + (my * -8).toFixed(2) + "deg) rotateY(" + (mx * 8).toFixed(2) + "deg) scale3d(1.05, 1.05, 1.05)";
+    card.style.setProperty("--mx", mx.toFixed(3));
+    card.style.setProperty("--my", my.toFixed(3));
+  }
+  card.addEventListener("mousemove", function (e) {
+    var r = card.getBoundingClientRect();
+    mx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
+    my = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
+    card.classList.add("is-tilt");
+    if (!raf) raf = requestAnimationFrame(poser);
+  });
+  card.addEventListener("mouseleave", function () {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    card.classList.remove("is-tilt");
+    card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
+    card.style.setProperty("--mx", "0");
+    card.style.setProperty("--my", "0");
+  });
 })();
