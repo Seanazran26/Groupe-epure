@@ -1,27 +1,32 @@
 /* ==========================================================================
    Lagrene Paysagiste 59 — héros scroll : la vidéo « Votre jardin se
-   transforme » avance image par image au rythme du défilement.
+   transforme » avance (et recule) image par image au rythme du défilement.
    --------------------------------------------------------------------------
    Architecture
    - Conteneur .heros-scroll de 320vh ; à l'intérieur, .hs-scene collante
      (top 0, 100svh) qui contient le <canvas> plein écran.
-   - 297 images. Progrès = défilement du conteneur (0 → 1), index =
-     round(progrès × 296). On ne redessine QUE si l'index change.
-   - Dessin en « cover » manuel, imageSmoothingQuality "high", DPR ≤ 2.
-   - Jeu mobile si largeur < 1024 px ; changement de catégorie au
-     redimensionnement → on vide tout et on recharge le bon jeu.
+   - 297 images. Progrès = défilement du conteneur (0 → 1), cible =
+     round(progrès × 296). On ne redessine QUE si l'image affichée change.
+   - « Cover » centré, pixel pour pixel (voir dimensionner), DPR ≤ 2.
+   - Jeu mobile si largeur < 1024 px (tenu en portrait) ; changement de
+     catégorie au redimensionnement → on vide tout et on recharge le bon jeu.
    - Chargement : image 1 en priorité absolue (dessinée dès son arrivée),
-     puis lots de 24 images toutes les 120 ms ; une image demandée par le
-     défilement et pas encore chargée passe devant tout le monde.
-   Fluidité
-   - Chargement (octets) et décodage sont séparés : les images proches de la
-     position courante sont décodées À L'AVANCE dans des workers (hors du fil
-     principal), dans le sens du défilement. Au moment de dessiner, l'image
-     est déjà prête : drawImage est instantané, aucune saccade.
-   - Une fenêtre limitée d'images décodées est gardée en mémoire (les plus
-     éloignées sont libérées) ; si l'image exacte n'est pas encore prête, on
-     affiche la plus proche, jamais un écran vide.
+     puis lots de 24 images toutes les 120 ms, dans un ordre ENTRELACÉ
+     (1 image sur 16, puis 1 sur 8…) ; à l'arrêt du défilement, l'image
+     demandée passe devant tout le monde.
+   Fluidité, en avant comme en arrière
+   - Décodage HORS du fil principal (workers : createImageBitmap, ou
+     ImageDecoder sous Firefox), à l'avance.
+   - Mémoire d'images décodées SYMÉTRIQUE : ce qui vient d'être vu reste prêt
+     pour un retour en arrière ; on libère d'abord les images les plus
+     éloignées. Priorité : le chemin que l'animation va parcourir, puis
+     au-delà dans le sens du défilement, puis derrière.
+   - Affichage MONOTONE : si l'image exacte n'est pas encore prête, on affiche
+     la meilleure image ENTRE l'image actuelle et la cible — jamais une image
+     située dans l'autre sens (aucun aller-retour visible).
+   - Lissage amorti : à la molette, toutes les images intermédiaires sont jouées.
    - Défilement : écouteur passif + requestAnimationFrame, aucun calcul lourd.
+   - Arrivée sur la page : toujours au tout début du héros (sauf lien #ancre).
    - Ouvert depuis un dossier (file://) : mode de secours <img> + decode().
    ========================================================================== */
 (function () {
@@ -30,9 +35,21 @@
   var racine = document.querySelector(".heros-scroll");
   if (!racine) return;
 
+  /* ---- Arrivée sur le site : tout en haut, au tout début de la vidéo -------- */
+  try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (e) {}
+  var aInteragi = false;
+  ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (t) {
+    window.addEventListener(t, function () { aInteragi = true; }, { passive: true, once: true });
+  });
+  function enHaut() {
+    if (location.hash || aInteragi) return;
+    try { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); } catch (e) { window.scrollTo(0, 0); }
+  }
+  enHaut();
+  window.addEventListener("load", enHaut);
+
   var FRAME_COUNT = 297;
-  var LOT = 24, DELAI_LOT = 120;              // préchargement : 24 images / 120 ms
-  var EN_VOL_MAX = 6;                          // requêtes réseau simultanées (4 sur mobile)
+  var LOT = 24, DELAI_LOT = 120;               // préchargement : 24 images / 120 ms
   var JEUX = { ordi: "images/hero-frames/", mobile: "images/hero-frames-sm/" };
 
   var scene = racine.querySelector(".hs-scene");
@@ -44,53 +61,47 @@
   var parFichier = location.protocol === "file:";
   var GECKO = /firefox/i.test(navigator.userAgent);
   var peutWorker = !parFichier && typeof Worker === "function" && typeof createImageBitmap === "function" && typeof fetch === "function";
-  // Méthode de décodage : workers (blob / ImageDecoder) ou secours <img>.decode()
-  var VIA = !peutWorker ? "img" : (GECKO ? (typeof ImageDecoder === "function" ? "idec" : "img") : "blob");
+  // Décodage : workers « blob » (Chrome, Edge, Safari) ou « idec » (ImageDecoder, Firefox) ; secours « img »
+  var VIA = window.HEROS_VIA || (!peutWorker ? "img" : (GECKO ? (typeof ImageDecoder === "function" ? "idec" : "img") : "blob"));
 
-  // Jeu « mobile » sous 1024 px de large ; un téléphone tenu à l'horizontale garde le jeu paysage
-  function categorie() {
+  function categorie() {                       // un téléphone tenu à l'horizontale garde le jeu paysage
     var w = window.innerWidth, h = window.innerHeight;
     return w < 1024 && h >= w * 0.8 ? "mobile" : "ordi";
   }
   function url(jeu, i) { return JEUX[jeu] + String(i + 1).padStart(4, "0") + ".webp"; }
 
-  // Mode « paquets » (attribut data-paquets) : images regroupées par lots de 24 dans des fichiers
-  // .bin (index dans paquets.json). Sert quand l'hébergement limite le nombre de fichiers.
+  // Mode « paquets » (attribut data-paquets) : images regroupées par lots dans quelques fichiers
+  // (index dans paquets.json). Sert quand l'hébergement limite le nombre de fichiers.
   var MODE_PAQUETS = racine.hasAttribute("data-paquets") && !parFichier;
   var manifestes = {};
 
+  var STATS = window.__herosStats = { charges: 0, decodes: 0, dessins: 0, exacts: 0, approches: 0,
+    via: VIA, paquets: MODE_PAQUETS, dessinMax: 0, affiche: -1, cible: 0, memoire: 0 };
+
   /* ---- Workers de décodage ------------------------------------------------ */
-  var workers = [], prochainWorker = 0;
+  var workers = [];
   function creerWorkers() {
     if (VIA === "img" || workers.length) return;
     var n = Math.max(1, Math.min(3, (navigator.hardwareConcurrency || 4) - 1));
     try {
       for (var k = 0; k < n; k++) {
         var w = new Worker("js/heros-scroll-worker.js");
+        w.charge = 0;
         w.onmessage = surDecode;
         w.onerror = function () { basculerSecours(); };
         workers.push(w);
       }
     } catch (e) { basculerSecours(); }
   }
-  function basculerSecours() {            // si les workers échouent : mode <img>
+  function basculerSecours() {                 // si les workers échouent : mode <img>
     if (VIA === "img") return;
-    VIA = "img";
+    VIA = "img"; STATS.via = VIA;
     workers.forEach(function (w) { w.terminate(); });
     workers = [];
     demarrer(true);
   }
 
-  /* ---- État du jeu d'images courant -------------------------------------- */
-  var E = null;
-  var gen = 0;
-  var indexCible = 0, indexDessine = -1, sens = 1;
-  var STATS = window.__herosStats = { charges: 0, decodes: 0, dessins: 0, exacts: 0, approches: 0, via: VIA, paquets: MODE_PAQUETS, dessinMax: 0 };
-
-  // Ordre de chargement ENTRELACÉ : image 1, puis 1 image sur 16 sur toute la vidéo, puis 1 sur 8,
-  // 1 sur 4, 1 sur 2, et le reste. En moins de deux secondes toute la vidéo est couverte : où que
-  // le visiteur défile, une image proche est prête — l'animation ne se fige jamais pendant le
-  // chargement, elle s'affine.
+  /* ---- Ordre de chargement entrelacé ---------------------------------------- */
   function ordreEntrelace() {
     var vu = new Uint8Array(FRAME_COUNT), o = [0]; vu[0] = 1;
     [16, 8, 4, 2, 1].forEach(function (pas) {
@@ -101,18 +112,23 @@
   }
   var ORDRE = ordreEntrelace();
 
-  // Unité de chargement : une image (mode normal) ou un paquet (mode paquets, liste d'images
-  // donnée par paquets.json — mêmes lots entrelacés de 24).
+  /* ---- État du jeu d'images courant -------------------------------------- */
+  var E = null, gen = 0;
+  var indexScroll = 0;      // image demandée par la position de défilement
+  var position = 0;         // position lissée (nombre décimal)
+  var indexCible = 0;       // image que l'on veut afficher maintenant (= position arrondie)
+  var indexDessine = -1;    // image réellement affichée
+  var sens = 1;             // sens du défilement : 1 en avant, -1 en arrière
+
   function uniteDe(i) { return E.man ? E.uniteDe[i] : i; }
   function imagesDe(u) { return E.man ? E.man.fichiers[u].i : [u]; }
 
-  // statut d'image : 0 rien, 1 en cours, 2 chargée — statut d'unité : idem
   function nouvelEtat(jeu, man) {
     var nbU = man ? man.fichiers.length : FRAME_COUNT, uDe = null;
     if (man) { uDe = new Int16Array(FRAME_COUNT); man.fichiers.forEach(function (f, u) { f.i.forEach(function (i) { uDe[i] = u; }); }); }
     return { jeu: jeu, gen: ++gen, man: man, uniteDe: uDe, donnees: new Array(FRAME_COUNT), statut: new Uint8Array(FRAME_COUNT),
-             uStatut: new Uint8Array(nbU), nbU: nbU, decodes: new Map(), enDecodage: new Set(), file: [], prio: [],
-             enVol: 0, libres: 0, minuteur: 0, fenetreAvant: 16, fenetreArriere: 8, octetsImage: 0 };
+             uStatut: new Uint8Array(nbU), nbU: nbU, file: [], prio: [], enVol: 0, libres: 0, minuteur: 0,
+             decodes: new Map(), enDecodage: new Set(), octets: 0 };
   }
 
   /* ---- Chargement des octets (réseau) ------------------------------------- */
@@ -122,8 +138,7 @@
     if (E) viderEtat(E);
     E = null;
     creerWorkers();
-    STATS.via = VIA;
-    indexDessine = -1;
+    indexDessine = -1; STATS.affiche = -1;
     if (!MODE_PAQUETS) return lancer(jeu, null);
     if (manifestes[jeu]) return lancer(jeu, manifestes[jeu]);
     var g = ++gen;
@@ -136,19 +151,17 @@
   function lancer(jeu, man) {
     E = nouvelEtat(jeu, man);
     var etat = E;
-    // image 1 en priorité absolue, puis le reste dans l'ordre entrelacé
-    etat.prio.push(uniteDe(0));
+    etat.prio.push(uniteDe(0));                  // image 1 en priorité absolue
     if (etat.man) { for (var u = 0; u < etat.nbU; u++) if (u !== uniteDe(0)) etat.file.push(u); }
     else ORDRE.forEach(function (i) { if (i !== 0) etat.file.push(i); });
     pomper();
-    // lots de 24 images toutes les 120 ms (en mode paquets : un paquet = un lot)
-    etat.minuteur = setInterval(function () {
+    etat.minuteur = setInterval(function () {     // lots de 24 images toutes les 120 ms
       if (etat !== E) return clearInterval(etat.minuteur);
       etat.libres += etat.man ? 1 : LOT;
       pomper();
       if (!etat.file.length) clearInterval(etat.minuteur);
     }, DELAI_LOT);
-    planifierDecodage();                         // le défilement a peut-être déjà demandé une image
+    planifier();
   }
 
   function viderEtat(etat) {
@@ -158,21 +171,21 @@
     etat.donnees = [];
   }
 
-  function prioriser(i) {                        // une image demandée par le défilement passe devant
+  function prioriser(i) {                        // l'image demandée passe devant
     if (!E) return;
     var u = uniteDe(i);
     if (E.uStatut[u] !== 0) return;
     var k = E.prio.indexOf(u);
     if (k > 0) E.prio.splice(k, 1);
     if (k !== 0) E.prio.unshift(u);
-    if (E.prio.length > 6) E.prio.length = 6;     // les demandes dépassées retournent dans la file normale
+    if (E.prio.length > 6) E.prio.length = 6;
     pomper();
   }
 
   function pomper() {
     var etat = E;
     if (!etat) return;
-    var max = etat.man ? 2 : (etat.jeu === "mobile" ? 4 : EN_VOL_MAX);
+    var max = etat.man ? 2 : (etat.jeu === "mobile" ? 4 : 6);
     while (etat.enVol < max && (etat.prio.length || (etat.libres > 0 && etat.file.length))) {
       var u;
       if (etat.prio.length) u = etat.prio.shift();
@@ -194,7 +207,7 @@
         etat.uStatut[u] = 2;
         images.forEach(function (i, k) { etat.donnees[i] = donnees[k]; etat.statut[i] = 2; });
         STATS.charges += images.length;
-        planifierDecodage();
+        planifier();
       } else {                                   // nouvel essai un peu plus tard
         etat.uStatut[u] = 0;
         images.forEach(function (i) { etat.statut[i] = 0; });
@@ -225,51 +238,76 @@
     }
   }
 
-  /* ---- Décodage à l'avance, dans le sens du défilement -------------------- */
-  function ajusterFenetre(largeur, hauteur) {
-    // ~250 Mo d'images décodées au maximum sur ordinateur, ~110 Mo sur mobile
-    var budget = (E.jeu === "mobile" ? 110 : 250) * 1024 * 1024;
-    var n = Math.max(8, Math.min(40, Math.floor(budget / (largeur * hauteur * 4))));
-    E.fenetreAvant = Math.round(n * 0.65);
-    E.fenetreArriere = n - E.fenetreAvant;
-    E.octetsImage = largeur * hauteur * 4;
-  }
-
-  // Pendant un défilement rapide, l'image exacte arriverait trop tard : on laisse la file entrelacée
-  // couvrir la vidéo. Dès que le visiteur ralentit ou s'arrête, l'image exacte passe en priorité.
+  /* ---- Décodage à l'avance : mémoire symétrique ------------------------------ */
   var dernierScroll = 0, minuteurCalme = 0;
   function calme() { return performance.now() - dernierScroll > 140; }
 
-  function planifierDecodage() {
+  // Nombre d'images décodées gardées en mémoire (~360 Mo sur ordinateur, ~160 Mo sur mobile)
+  function budget(etat) {
+    if (!etat.octets) return 24;
+    var mo = etat.jeu === "mobile" ? 160 : 360;
+    return Math.max(24, Math.min(110, Math.floor(mo * 1048576 / etat.octets)));
+  }
+
+  // Images voulues, par ordre d'urgence :
+  // 1) la CIBLE (là où le défilement s'est arrêté) : l'image se pose tout de suite au bon endroit ;
+  // 2) l'intervalle entre l'image affichée et la cible, rempli par subdivisions (milieu, quarts…) :
+  //    après un geste rapide, le rattrapage est immédiat au lieu d'un « ralenti » image par image ;
+  // 3) au-delà de la cible dans le sens du défilement, entrecoupé (2 pour 1) d'images derrière,
+  //    pour qu'un retour en arrière soit instantané.
+  function voulues(n) {
+    var o = [], vu = new Uint8Array(FRAME_COUNT);
+    function ajoute(i) { if (i >= 0 && i < FRAME_COUNT && !vu[i]) { vu[i] = 1; o.push(i); } }
+    var a = indexDessine < 0 ? indexScroll : indexCible, c = indexScroll;
+    ajoute(c);
+    if (a !== c) {
+      var lo = Math.min(a, c), hi = Math.max(a, c), segs = [[lo, hi]];
+      while (segs.length) {                       // subdivision en largeur : milieu, puis quarts…
+        var suivants = [];
+        for (var s2 = 0; s2 < segs.length; s2++) {
+          var x = segs[s2][0], y = segs[s2][1];
+          if (y - x < 2) continue;
+          var m = (x + y) >> 1;
+          ajoute(m); suivants.push([x, m], [m, y]);
+        }
+        segs = suivants;
+      }
+      ajoute(a);
+    }
+    var bas = Math.min(a, c), haut = Math.max(a, c), av = 1, ar = 1;
+    while (o.length < n && (haut + av < FRAME_COUNT || bas - av >= 0 || haut + ar < FRAME_COUNT || bas - ar >= 0)) {
+      if (sens > 0) { ajoute(haut + av); ajoute(haut + av + 1); av += 2; ajoute(bas - ar); ar++; }
+      else { ajoute(bas - av); ajoute(bas - av - 1); av += 2; ajoute(haut + ar); ar++; }
+    }
+    if (o.length > n) o.length = n;
+    return o;
+  }
+
+  function planifier() {
     var etat = E;
     if (!etat) return;
-    var c = indexCible;
-    var av = sens >= 0 ? etat.fenetreAvant : etat.fenetreArriere;
-    var ar = sens >= 0 ? etat.fenetreArriere : etat.fenetreAvant;
-    var lo = Math.max(0, c - ar), hi = Math.min(FRAME_COUNT - 1, c + av);
-    // 1) on libère les images décodées hors de la fenêtre (sauf la première, toujours prête)
-    etat.decodes.forEach(function (bm, i) {
-      if ((i < lo - 2 || i > hi + 2) && i !== 0) {
+    var n = budget(etat), liste = voulues(n), garde = new Uint8Array(FRAME_COUNT), k;
+    for (k = 0; k < liste.length; k++) garde[liste[k]] = 1;
+    // 1) mémoire pleine : on libère les images non voulues, les plus éloignées d'abord
+    if (etat.decodes.size > n) {
+      var hors = [];
+      etat.decodes.forEach(function (_, i) { if (!garde[i] && i !== indexDessine) hors.push(i); });
+      hors.sort(function (x, y) { return Math.abs(y - indexScroll) - Math.abs(x - indexScroll); });
+      for (k = 0; k < hors.length && etat.decodes.size > n; k++) {
+        var bm = etat.decodes.get(hors[k]);
         if (bm && bm.close) bm.close();
-        etat.decodes.delete(i);
+        etat.decodes.delete(hors[k]);
       }
-    });
-    // 2) on demande les décodages : la cible d'abord, puis vers l'avant, puis l'arrière
-    var maxDecodage = VIA === "img" ? 4 : Math.max(2, workers.length * 2);
-    var ordre = [c], d = sens >= 0 ? 1 : -1;
-    for (var k = 1; k <= Math.max(av, ar); k++) {
-      if (k <= av) ordre.push(c + k * d);
-      if (k <= ar) ordre.push(c - k * d);
     }
-    for (var n = 0; n < ordre.length; n++) {
-      var i = ordre[n];
-      if (i < 0 || i >= FRAME_COUNT) continue;
-      if (etat.statut[i] === 0) { if (n < 6 && calme()) prioriser(i); continue; }
-      if (etat.statut[i] !== 2 || etat.decodes.has(i) || etat.enDecodage.has(i)) continue;
-      if (etat.enDecodage.size >= maxDecodage) break;
+    STATS.memoire = etat.decodes.size;
+    // 2) on lance les décodages dans l'ordre d'urgence
+    var max = VIA === "img" ? 3 : Math.max(2, workers.length * 2);
+    for (k = 0; k < liste.length && etat.enDecodage.size < max; k++) {
+      var i = liste[k];
+      if (etat.decodes.has(i) || etat.enDecodage.has(i)) continue;
+      if (etat.statut[i] !== 2) { if (k < 8 && calme()) prioriser(i); continue; }
       decoder(etat, i);
     }
-    if (!etat.decodes.has(0) && etat.statut[0] === 2 && !etat.enDecodage.has(0)) decoder(etat, 0);
   }
 
   function decoder(etat, i) {
@@ -279,21 +317,25 @@
       if (!(img instanceof HTMLImageElement)) {   // octets (mode paquets) → <img> à partir du blob
         var el = new Image(); el.src = URL.createObjectURL(img); etat.donnees[i] = img = el;
       }
-      (img.decode ? img.decode() : Promise.resolve()).then(function () {
-        recu(etat, i, img);
-      }, function () { recu(etat, i, img); });
+      (img.decode ? img.decode() : Promise.resolve()).then(function () { recu(etat, i, img); },
+        function () { recu(etat, i, img); });
     } else {
-      var w = workers[prochainWorker++ % workers.length];
+      var w = workers[0];                         // le worker le moins chargé
+      for (var k = 1; k < workers.length; k++) if (workers[k].charge < w.charge) w = workers[k];
+      w.charge++;
+      etat.travail = etat.travail || {};
+      etat.travail[i] = w;
       w.postMessage({ i: i, gen: etat.gen, blob: etat.donnees[i], via: VIA });
     }
   }
 
   function surDecode(e) {
     var m = e.data;
+    this.charge = Math.max(0, this.charge - 1);
     if (!E || m.gen !== E.gen) { if (m.bm && m.bm.close) m.bm.close(); return; }
-    if (!m.ok) {                                 // échec de décodage → mode de secours
+    if (!m.ok) {                                  // échec de décodage → méthode suivante
       E.enDecodage.delete(m.i);
-      if (VIA === "idec") { VIA = "blob"; STATS.via = VIA; planifierDecodage(); }
+      if (VIA === "idec") { VIA = "blob"; STATS.via = VIA; planifier(); }
       else basculerSecours();
       return;
     }
@@ -303,70 +345,88 @@
   function recu(etat, i, image) {
     etat.enDecodage.delete(i);
     if (etat !== E) { if (image && image.close) image.close(); return; }
-    if (!etat.octetsImage) ajusterFenetre(image.width || image.naturalWidth, image.height || image.naturalHeight);
+    if (!etat.octets) etat.octets = (image.width || image.naturalWidth) * (image.height || image.naturalHeight) * 4;
+    var ancienne = etat.decodes.get(i);
+    if (ancienne && ancienne !== image && ancienne.close) ancienne.close();
     etat.decodes.set(i, image);
     STATS.decodes++;
-    // dessine si c'est l'image attendue, ou si elle est plus proche que celle affichée
-    if (i === indexCible || indexDessine < 0 || Math.abs(i - indexCible) < Math.abs(indexDessine - indexCible)) dessiner();
-    planifierDecodage();
+    dessiner(false);
+    planifier();
   }
 
   /* ---- Dessin -------------------------------------------------------------
-     « Cover » centré, pixel pour pixel : le canvas prend la taille de la PARTIE
-     VISIBLE de l'image source (jamais plus que l'écran × DPR plafonné à 2).
-     - Cas courant (l'image doit être agrandie) : copie 1:1 de la zone visible,
-       aucun rééchantillonnage par image ; l'agrandissement à l'écran est fait
-       par la carte graphique (canvas étiré en CSS, même proportion → aucune
-       déformation).
-     - Petite fenêtre (l'image doit être réduite) : canvas = écran × DPR et
+     « Cover » centré, pixel pour pixel : le canvas prend la taille ENTIÈRE de la
+     partie visible de l'image source (jamais plus que l'écran × DPR ≤ 2).
+     - Cas courant (l'image doit être agrandie) : copie 1:1, en pixels entiers,
+       sans aucun rééchantillonnage ; l'agrandissement à l'écran est fait par la
+       carte graphique (canvas étiré en CSS, même proportion).
+     - Petite fenêtre (l'image doit être réduite) : canvas = écran × DPR,
        réduction en qualité "high".                                              */
   var largeurCanvas = 0, hauteurCanvas = 0, srcW = 0, srcH = 0;
   var cadre = { sx: 0, sy: 0, sw: 0, sh: 0 };
-  function dimensionner() {
+
+  function dimensionner(forcer) {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = scene.clientWidth, h = scene.clientHeight;
     if (!w || !h) return;
     var cw, ch;
     if (srcW && srcH) {
-      var s = Math.max(w / srcW, h / srcH);           // échelle « cover » (px CSS par px source)
-      cadre.sw = Math.min(srcW, w / s); cadre.sh = Math.min(srcH, h / s);
-      cadre.sx = (srcW - cadre.sw) / 2; cadre.sy = (srcH - cadre.sh) / 2;
-      if (s * dpr >= 1) { cw = Math.round(cadre.sw); ch = Math.round(cadre.sh); }   // copie 1:1
-      else { cw = Math.round(w * dpr); ch = Math.round(h * dpr); }                 // réduction
+      var s = Math.max(w / srcW, h / srcH);
+      var sw = Math.min(srcW, Math.round(w / s)), sh = Math.min(srcH, Math.round(h / s));
+      cadre.sw = sw; cadre.sh = sh;
+      cadre.sx = Math.floor((srcW - sw) / 2); cadre.sy = Math.floor((srcH - sh) / 2);
+      if (s * dpr >= 1) { cw = sw; ch = sh; }
+      else { cw = Math.round(w * dpr); ch = Math.round(h * dpr); }
     } else { cw = Math.round(w * dpr); ch = Math.round(h * dpr); }
-    if (cw === largeurCanvas && ch === hauteurCanvas) return;
+    if (cw === largeurCanvas && ch === hauteurCanvas && !forcer) return;
     largeurCanvas = canvas.width = cw;
     hauteurCanvas = canvas.height = ch;
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-    indexDessine = -1;
-    dessiner();
+    dessiner(true);
   }
 
-  function dessiner() {
-    if (!E) return;
-    var i = indexCible, image = E.decodes.get(i);
-    if (!image) {                                // pas encore prête : la plus proche déjà décodée
+  // Image à afficher : l'exacte si elle est prête ; sinon la meilleure ENTRE l'image
+  // actuelle et la cible (jamais dans l'autre sens) ; sinon on garde l'image actuelle.
+  function choisir() {
+    var dec = E.decodes, c = indexCible;
+    if (dec.has(c)) return c;
+    if (indexDessine < 0 || !dec.has(indexDessine)) {   // rien d'affiché : la plus proche
       var meilleur = -1, ecart = 1e9;
-      E.decodes.forEach(function (_, k) { var d = Math.abs(k - indexCible); if (d < ecart) { ecart = d; meilleur = k; } });
-      if (meilleur < 0) return;
-      i = meilleur; image = E.decodes.get(i);
+      dec.forEach(function (_, k) { var d = Math.abs(k - c); if (d < ecart) { ecart = d; meilleur = k; } });
+      return meilleur;
     }
-    if (i === indexDessine) return;              // on ne redessine que si l'image change
+    if (c === indexDessine) return c;
+    var p = c > indexDessine ? 1 : -1;
+    // garde-fou : jamais à l'opposé de la position de défilement réelle
+    if (indexScroll !== indexDessine && (indexScroll > indexDessine ? 1 : -1) !== p) return indexDessine;
+    for (var i = c - p; i !== indexDessine; i -= p) if (dec.has(i)) return i;
+    return indexDessine;
+  }
+
+  function dessiner(forcer) {
+    if (!E) return;
+    var i = choisir();
+    if (i < 0) return;
+    if (i === indexDessine && !forcer) return;  // on ne redessine que si l'image change
+    var image = E.decodes.get(i);
+    if (!image) return;
     var iw = image.width || image.naturalWidth, ih = image.height || image.naturalHeight;
-    if (iw !== srcW || ih !== srcH) { srcW = iw; srcH = ih; largeurCanvas = 0; dimensionner(); return; }
+    if (iw !== srcW || ih !== srcH) { srcW = iw; srcH = ih; largeurCanvas = 0; indexDessine = -1; dimensionner(true); return; }
     var t0 = performance.now();
     ctx.drawImage(image, cadre.sx, cadre.sy, cadre.sw, cadre.sh, 0, 0, largeurCanvas, hauteurCanvas);
     var td = performance.now() - t0;
     if (td > STATS.dessinMax) STATS.dessinMax = td;
-    indexDessine = i;
-    STATS.dessins++;
-    if (i === indexCible) STATS.exacts++; else STATS.approches++;
+    if (i !== indexDessine) {
+      indexDessine = i; STATS.affiche = i;
+      STATS.dessins++;
+      if (i === indexCible) STATS.exacts++; else STATS.approches++;
+    }
     if (!racine.classList.contains("pret")) racine.classList.add("pret");
   }
 
   /* ---- Défilement --------------------------------------------------------- */
-  var debutVisible = true, finVisible = false, tickPrevu = false;
+  var debutVisible = true, finVisible = false, surHeros = null, tickPrevu = false;
 
   function progression() {
     var r = racine.getBoundingClientRect();
@@ -374,7 +434,6 @@
     return total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
   }
 
-  var surHeros = null;
   function surcouches(p) {
     var r = racine.getBoundingClientRect(), dedans = r.bottom > 0 && r.top < window.innerHeight;
     if (dedans !== surHeros) { surHeros = dedans; document.body.classList.toggle("sur-heros", dedans); }
@@ -388,58 +447,61 @@
     }
   }
 
-  // Lissage amorti : l'affichage rejoint la position du défilement en jouant TOUTES les images
+  // Lissage amorti : l'affichage rejoint la position de défilement en jouant TOUTES les images
   // intermédiaires (une molette avance par crans de ~100 px ≈ 6 images : sans lissage, ça saute).
   var LISSAGE_MS = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 85;
-  var position = 0, indexScroll = 0, tPrec = 0;
+  var tPrec = 0;
 
   function tick(t) {
     tickPrevu = false;
     var p = progression();
     surcouches(p);
-    indexScroll = Math.round(p * (FRAME_COUNT - 1));
+    var nouveau = Math.round(p * (FRAME_COUNT - 1));
+    if (nouveau !== indexScroll) {
+      sens = nouveau > indexScroll ? 1 : -1;
+      indexScroll = nouveau; STATS.cible = nouveau;
+      planifier();
+    }
     var dt = tPrec ? Math.min(100, t - tPrec) : 16.7;
     tPrec = t;
     var ecart = indexScroll - position;
-    if (!LISSAGE_MS || Math.abs(ecart) > 90) position = indexScroll;          // saut lointain : direct
+    if (!LISSAGE_MS || Math.abs(ecart) > 90) position = indexScroll;        // saut lointain : direct
     else {
       position += ecart * (1 - Math.exp(-dt / LISSAGE_MS));
       if (Math.abs(indexScroll - position) < 0.35) position = indexScroll;
     }
     var idx = Math.round(position);
-    if (idx !== indexCible) {                     // on ne redessine que si l'image change
-      sens = idx > indexCible ? 1 : -1;
-      indexCible = idx;
-      dessiner();
-      planifierDecodage();
-    }
-    if (position !== indexScroll) demanderTick(); else tPrec = 0;
+    if (idx !== indexCible) { indexCible = idx; dessiner(false); if (indexDessine !== indexCible) planifier(); }
+    else if (indexDessine !== indexCible) dessiner(false);                  // image arrivée entre-temps
+    if (position !== indexScroll || indexDessine !== indexCible) demanderTick(); else tPrec = 0;
   }
   function demanderTick() { if (!tickPrevu) { tickPrevu = true; requestAnimationFrame(tick); } }
 
   window.addEventListener("scroll", function () {
     dernierScroll = performance.now();
     clearTimeout(minuteurCalme);
-    minuteurCalme = setTimeout(planifierDecodage, 160);    // à l'arrêt : l'image exacte en priorité
+    minuteurCalme = setTimeout(planifier, 160);   // à l'arrêt : l'image exacte en priorité
     demanderTick();
   }, { passive: true });
+
   var redim = false;
   window.addEventListener("resize", function () {
     if (redim) return;
     redim = true;
     requestAnimationFrame(function () {
       redim = false;
-      dimensionner();
+      dimensionner(false);
       if (E && E.jeu !== categorie()) demarrer(true);   // changement ordinateur ↔ mobile
       demanderTick();
     });
   }, { passive: true });
-  window.addEventListener("pageshow", function () { indexDessine = -1; dessiner(); demanderTick(); });
+  window.addEventListener("pageshow", function () { dimensionner(true); demanderTick(); });
 
   /* ---- Démarrage ------------------------------------------------------------ */
   fin.querySelectorAll("a, button, input").forEach(function (el) { el.tabIndex = -1; });
-  dimensionner();
-  demarrer(false);
-  indexCible = indexScroll = position = Math.round(progression() * (FRAME_COUNT - 1));
+  indexScroll = position = indexCible = Math.round(progression() * (FRAME_COUNT - 1));
+  STATS.cible = indexScroll;
   surcouches(progression());
+  dimensionner(true);
+  demarrer(false);
 })();
