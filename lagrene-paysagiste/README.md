@@ -13,7 +13,7 @@ L'analyse complète du site actuel (erreurs, photos, arguments de vente) est dan
 
 | Page | Contenu |
 | --- | --- |
-| `index.html` | Accueil : héros (photo en arche, rappel immédiat), bandeau défilant, 8 services, élagage, **avant / après**, entretien, rapport qualité-prix, réalisations, zones + plan, devis |
+| `index.html` | Accueil : **héros scroll vidéo** (le jardin se transforme au défilement), bandeau défilant, 8 services, **avant / après**, réalisations, notre approche (rappel immédiat + textes repliés), zones, devis |
 | 7 pages services | `dessouchage-arbre-et-haie-59`, `taille-de-haie-59`, `creation-de-pelouse-59`, `abattage-arbres-et-haies-59`, `jardinier-59`, `elagueur-59`, `taille-de-haie-et-arbres-fruitiers-59` |
 | 7 pages villes | `paysagiste-a-wattignies-59139`, `-wattrelos-59150`, `-roubaix-59100`, `-leers-59115`, `-hem-59510`, `-bondues-59910`, `-villeneuve-d-ascq-59491` |
 | `realisations.html` | Avant / après, galerie avec visionneuse plein écran, « Bon à savoir » (règles de taille des haies) |
