@@ -828,3 +828,116 @@ body.menu-ouvert { overflow: hidden; }
 /* Pendant la vidéo : pas de flou derrière l'en-tête (il serait recalculé à chaque image → saccades) */
 .sur-heros .entete, .sur-heros .entete.est-defile { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--creme); }
 .sur-heros .barre-mobile { -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* 17. Nos services : grille courbe (port du composant « Tilted Grid Hero ») ------------- */
+.services-courbe { background: #fff; padding-block: clamp(48px, 6vw, 88px) clamp(28px, 4vw, 56px); }
+.tgh { position: relative; overflow: hidden; height: clamp(470px, 50vw, 640px); container-type: size; background: #fff; }
+.tgh-bande { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; }
+.tgh-bande.pret { opacity: 1; }
+.tgh-tuile { position: absolute; transform-style: preserve-3d; will-change: transform; }
+.tgh-pause .tgh-tuile { animation-play-state: paused !important; }
+.tgh-tranche { position: absolute; top: 0; overflow: hidden; background: var(--sable); -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.tgh-tranche.g { border-radius: 10px 0 0 10px; }
+.tgh-tranche.d { border-radius: 0 10px 10px 0; }
+.tgh-visuel { position: absolute; top: 0; }
+.tgh-visuel img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.tgh-legende {
+  position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: baseline; gap: 0.55em;
+  padding: 1.4em 0.9em 0.75em; color: #fff; font: 700 1em/1.1 var(--f-texte); letter-spacing: 0.01em;
+  background: linear-gradient(0deg, rgba(10, 26, 19, 0.78) 0%, rgba(10, 26, 19, 0.35) 60%, rgba(10, 26, 19, 0) 100%);
+}
+.tgh-legende b { font: 800 0.72em/1 var(--f-texte); letter-spacing: 0.14em; color: var(--pousse); }
+.tgh-contenu {
+  position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; align-items: center;
+  justify-content: space-between; text-align: center; padding: 0 var(--gouttiere); pointer-events: none;
+}
+.tgh-contenu > * { pointer-events: auto; }
+.tgh-contenu .etiquette { justify-content: center; margin-bottom: 14px; }
+.tgh-contenu h2 { margin: 0; font-size: clamp(30px, 3.8vw, 52px); }
+.tgh-contenu .tgh-texte { max-width: 34em; margin: 0; color: var(--gris); font-size: clamp(14.5px, 1.2vw, 16.5px); text-wrap: balance; }
+.services-liens { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: clamp(20px, 3vw, 36px); }
+.services-liens a {
+  display: inline-flex; align-items: center; gap: 10px; padding: 11px 16px 11px 12px; border-radius: 999px;
+  background: #fff; border: 1px solid var(--ligne); color: var(--foret); font-weight: 650; font-size: 15px; text-decoration: none;
+  transition: background-color 0.25s, color 0.25s, border-color 0.25s, transform 0.35s var(--ease);
+}
+.services-liens a b { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--pousse-2); font-size: 11.5px; font-weight: 800; letter-spacing: 0.02em; }
+.services-liens a .icon { width: 16px; height: 16px; opacity: 0.55; transition: transform 0.35s var(--ease), opacity 0.25s; }
+.services-liens a:hover { background: var(--foret); color: #fff; border-color: var(--foret); transform: translateY(-2px); }
+.services-liens a:hover b { background: var(--pousse); color: var(--foret); }
+.services-liens a:hover .icon { transform: translateX(3px); opacity: 1; }
+@media (max-width: 720px) {
+  .tgh { height: clamp(430px, 118vw, 520px); }
+  /* téléphone : les 8 services sur une ligne qui défile au doigt */
+  .services-liens { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scroll-snap-type: x mandatory;
+    margin-inline: calc(-1 * var(--gouttiere)); padding: 4px var(--gouttiere) 10px; scrollbar-width: none; }
+  .services-liens::-webkit-scrollbar { display: none; }
+  .services-liens a { flex: none; scroll-snap-align: start; font-size: 14px; padding: 9px 13px 9px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .tgh-tuile { animation-play-state: paused !important; } }
+
+/* 18. Dégradés doux : blanc → vert (avant / après) → blanc ---------------------------------- */
+:root {
+  --fondu: clamp(150px, 17vw, 260px);
+}
+.section--foret.fondus {
+  --f: var(--fondu);
+  padding-block: calc(var(--f) + clamp(8px, 2vw, 24px)) calc(var(--f) + clamp(8px, 2vw, 24px));
+  /* un seul dégradé continu (aucune jointure, donc aucun trait) : blanc → vert → blanc,
+     transitions adoucies en passant par des verts sauge */
+  background: linear-gradient(180deg,
+    #ffffff 0, #f6f8f2 calc(var(--f) * 0.12), #e8eedf calc(var(--f) * 0.24), #cbd9bd calc(var(--f) * 0.38),
+    #9db592 calc(var(--f) * 0.52), #6a8d6c calc(var(--f) * 0.66), #3f6650 calc(var(--f) * 0.8), #25493a calc(var(--f) * 0.91),
+    #16352a var(--f), #16352a calc(100% - var(--f)),
+    #25493a calc(100% - var(--f) * 0.91), #3f6650 calc(100% - var(--f) * 0.8), #6a8d6c calc(100% - var(--f) * 0.66),
+    #9db592 calc(100% - var(--f) * 0.52), #cbd9bd calc(100% - var(--f) * 0.38), #e8eedf calc(100% - var(--f) * 0.24),
+    #f6f8f2 calc(100% - var(--f) * 0.12), #ffffff 100%);
+}
+.section--blanc { background: #fff; }
+
+/* 19. Réalisations : le livre à feuilleter (page-flip, le moteur de react-pageflip) ------- */
+.livre-section .entete-section { grid-template-columns: 1fr; justify-items: center; text-align: center; margin-bottom: clamp(28px, 4vw, 48px); }
+.livre-section .entete-section .etiquette { justify-content: center; }
+.livre-section .entete-section p { max-width: 36em; }
+.livre-scene { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: clamp(8px, 2vw, 28px); max-width: 1020px; margin: 0 auto; }
+.livre { margin: 0 auto; width: 100%; max-width: 880px; filter: drop-shadow(0 30px 40px rgba(22, 53, 42, 0.22)); }
+.livre-page { background: #fbf8f0; color: var(--encre); overflow: hidden; }
+.livre-page.--left { background: linear-gradient(270deg, #e9e3d4 0%, #f6f2e7 5%, #fbf8f0 14%); }
+.livre-page.--right { background: linear-gradient(90deg, #e9e3d4 0%, #f6f2e7 5%, #fbf8f0 14%); }
+.livre-feuille { height: 100%; display: flex; flex-direction: column; padding: 7% 8% 6%; gap: 3.4%; }
+.livre-haut { display: flex; justify-content: space-between; align-items: center; gap: 10px; font: 800 clamp(9.5px, 1.05vw, 11.5px)/1 var(--f-texte); letter-spacing: 0.16em; text-transform: uppercase; color: var(--mousse); }
+.livre-haut span:last-child { color: var(--feuille); background: var(--pousse-2); padding: 6px 9px; border-radius: 999px; letter-spacing: 0.08em; }
+.livre-photo { flex: 1 1 auto; min-height: 0; background: #fff; padding: 3.2%; box-shadow: 0 10px 24px -14px rgba(22, 53, 42, 0.55), 0 1px 0 rgba(22, 53, 42, 0.06); transform: rotate(-0.6deg); }
+.livre-page:nth-child(odd) .livre-photo { transform: rotate(0.6deg); }
+.livre-photo img { width: 100%; height: 100%; object-fit: cover; background: var(--sable); }
+.livre-texte h3 { font: 420 clamp(17px, 1.9vw, 22px)/1.2 var(--f-titre); font-variation-settings: "SOFT" 100, "opsz" 36; margin: 0 0 6px; color: var(--foret); }
+.livre-texte p { margin: 0; font-size: clamp(12.5px, 1.25vw, 14px); line-height: 1.5; color: var(--gris); }
+.livre-pied { display: flex; justify-content: space-between; font: 600 11px/1 var(--f-texte); color: var(--mousse); letter-spacing: 0.06em; }
+.livre-couverture { background: var(--foret); color: var(--creme); }
+.livre-couverture .livre-feuille { justify-content: center; align-items: center; text-align: center; gap: 18px; padding: 10%;
+  background: radial-gradient(120% 80% at 50% 0%, rgba(181, 221, 115, 0.18), transparent 60%), linear-gradient(160deg, #1f4636 0%, #16352a 55%, #0f2a20 100%);
+  box-shadow: inset 0 0 0 10px #16352a, inset 0 0 0 11px rgba(181, 221, 115, 0.45); }
+.livre-couverture svg.logo-livre { width: 74px; height: 74px; color: var(--creme); }
+.livre-couverture .sur { font: 800 11px/1 var(--f-texte); letter-spacing: 0.24em; text-transform: uppercase; color: var(--pousse); }
+.livre-couverture h3 { font: 380 clamp(34px, 4.2vw, 48px)/1 var(--f-titre); font-variation-settings: "SOFT" 100, "opsz" 144; letter-spacing: -0.03em; margin: 0; color: #fff; }
+.livre-couverture h3 em { color: var(--pousse); font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144; }
+.livre-couverture p { margin: 0; opacity: 0.8; font-size: 14px; }
+.livre-couverture .btn { margin-top: 6px; }
+.livre-nav {
+  width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--ligne); background: #fff; color: var(--foret);
+  display: grid; place-items: center; cursor: pointer; box-shadow: var(--ombre-s); transition: background-color 0.25s, color 0.25s, transform 0.3s var(--ease), opacity 0.25s;
+}
+.livre-nav:hover { background: var(--foret); color: #fff; transform: scale(1.06); }
+.livre-nav:disabled { opacity: 0.35; cursor: default; transform: none; background: #fff; color: var(--foret); }
+.livre-nav .icon { width: 22px; height: 22px; }
+.livre-nav.prec .icon { transform: rotate(180deg); }
+.livre-bas { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: clamp(22px, 3vw, 34px); }
+.livre-compteur { margin: 0; font-weight: 700; color: var(--foret); font-variant-numeric: tabular-nums; }
+.livre-aide { margin: 0; font-size: 13.5px; color: var(--gris); }
+@media (max-width: 720px) {
+  .livre-scene { grid-template-columns: minmax(0, 1fr); }
+  .livre-nav { display: none; }
+  .livre-mobile-nav { display: flex; gap: 12px; }
+  .livre-mobile-nav .livre-nav { display: grid; }
+}
+@media (min-width: 721px) { .livre-mobile-nav { display: none; } }
