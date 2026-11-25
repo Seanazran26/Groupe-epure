@@ -71,6 +71,7 @@ Observations :
 ### Erreurs graves, visibles par les clients
 
 1. **Page « Devis gratuit » : l'adresse d'une autre entreprise.** On y lit « Adresse : 1767 Chemin Pablo Picasso, **06250 Mougins** », avec une carte de Mougins (Alpes-Maritimes) et une publicité : « Développez votre activité de **couvreur 78** … professionnel de la toiture en Aquitaine ou dans le PACA ». C'est le modèle de l'agence, jamais personnalisé.
+   ⚠️ Cette page n'est reliée à **aucun bouton du site** : le bouton noir « Votre devis ici » fait seulement descendre au formulaire en bas de la page en cours (qui, lui, est correct, avec l'adresse de Lille). On l'atteint en tapant l'adresse `www.lagrene-paysagiste.fr/devis-gratuit`, ou depuis Google : elle figure dans le plan du site (`sitemap.xml`) que le site déclare à Google.
 2. Sur cette même page, le **bouton d'envoi du formulaire est vide** (rectangle noir sans texte), il y a **deux formulaires de devis** l'un sous l'autre, et le bandeau photo est absent.
 3. **« Couverture toiture 06 »** apparaît à la place de « Élagage 59 » dans les vignettes des **7 pages de services** : c'est un reste d'un site de couvreur.
 4. **Textes en double** :
@@ -121,7 +122,7 @@ Observations :
 
 ## 6. Pistes de discours pour le rendez-vous
 
-- Commencer par **la page Devis** de son site actuel : l'adresse de Mougins et la publicité pour couvreurs. C'est l'argument le plus fort, car un client qui veut un devis tombe dessus.
+- Montrer **la page Devis** de son site actuel en tapant l'adresse `www.lagrene-paysagiste.fr/devis-gratuit` : l'adresse de Mougins et la publicité pour couvreurs. Présenter les choses honnêtement : aucun bouton n'y mène, mais la page est en ligne, déclarée à Google, et n'a jamais été vérifiée par l'agence.
 - Montrer ensuite **le nouveau site sur votre téléphone** : la barre « Appeler », le curseur avant / après, la galerie.
 - Insister : **mêmes textes, mêmes photos, mêmes adresses de pages**. Il ne perd rien de ce qu'il a, mais tout est propre, moderne et sans erreur.
 - Ouvrir sur la suite après l'acompte : **ses propres photos de chantiers en HD**, de vrais avant / après pris sous le même angle, ses avis Google.
