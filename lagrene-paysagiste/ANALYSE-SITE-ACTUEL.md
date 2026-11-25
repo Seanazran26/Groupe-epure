@@ -85,21 +85,20 @@ Observations :
 7. Le **formulaire de devis apparaît avant le titre principal** : le visiteur ne sait pas où il est.
 8. Photo d'en-tête écrasée, avec les boutons « Réalisations / Contact » posés dessus.
 9. Des **murs de texte** de 800 à 1 000 caractères par bloc, en petite police.
-10. Le bloc carte s'affiche comme un rectangle gris en bas de page *(sur notre poste de test ; à vérifier sur son téléphone)*.
 
 ### Image et confiance
 
-11. **Design daté et générique** (gabarit partagé avec d'autres métiers), sans identité propre : vert olive, gris, polices standard.
-12. **Aucun élément de confiance** : ni avis clients, ni photos de l'équipe, ni réseaux sociaux, ni vrais avant / après mis en valeur.
-13. Les textes, écrits pour Google, sont **répétitifs** (« méticuleux », « minutie », « expertise » à chaque phrase) et passent sans arrêt du « nous » au « ils / leur ».
-14. Le lien « Élagage 59 » renvoie vers l'accueil : il n'existe pas de page dédiée à l'élagage.
+10. **Design daté et générique** (gabarit partagé avec d'autres métiers), sans identité propre : vert olive, gris, polices standard.
+11. **Aucun élément de confiance** : ni avis clients, ni photos de l'équipe, ni réseaux sociaux, ni vrais avant / après mis en valeur.
+12. Les textes, écrits pour Google, sont **répétitifs** (« méticuleux », « minutie », « expertise » à chaque phrase) et passent sans arrêt du « nous » au « ils / leur ».
+13. Le lien « Élagage 59 » renvoie vers l'accueil : il n'existe pas de page dédiée à l'élagage.
 
 ### Référencement (Google) et technique
 
-15. Pas de **H1** sur Réalisations, Devis gratuit et Mentions légales.
-16. Pas de **données structurées** « entreprise locale » (adresse, horaires, téléphone lisibles par Google).
-17. Pas de balises **Open Graph** : un lien partagé sur WhatsApp ou Facebook s'affiche sans photo ni description.
-18. Textes alternatifs des images absents ou identiques sur toutes les photos.
+14. Pas de **H1** sur Réalisations, Devis gratuit et Mentions légales.
+15. Pas de **données structurées** « entreprise locale » (adresse, horaires, téléphone lisibles par Google).
+16. Pas de balises **Open Graph** : un lien partagé sur WhatsApp ou Facebook s'affiche sans photo ni description.
+17. Textes alternatifs des images absents ou identiques sur toutes les photos.
 
 ---
 
