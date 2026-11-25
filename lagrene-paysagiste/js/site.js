@@ -329,6 +329,13 @@
     });
   });
 
+  /* Ouvre le texte replié visé par un lien (ex. index.html#elagage) */
+  function ouvrirCible() {
+    var id = location.hash.slice(1), el = id && doc.getElementById(id);
+    if (el && el.tagName === "DETAILS") { el.open = true; setTimeout(function () { el.scrollIntoView({ block: "center" }); }, 60); }
+  }
+  window.addEventListener("hashchange", ouvrirCible); ouvrirCible();
+
   /* Barre d'appel mobile : se cache quand le formulaire de devis est à l'écran */
   var barre = doc.querySelector(".barre-mobile"), devis = doc.getElementById("devis");
   /* …et n'apparaît qu'après le début du défilement (pour ne pas cacher le haut de page) */
