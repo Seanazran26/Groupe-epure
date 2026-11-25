@@ -63,6 +63,16 @@
     // Flèches du clavier : actives dès que le livre est à l'écran (hors saisie dans un formulaire)
     var visible = false;
     new IntersectionObserver(function (en) { visible = en[0].isIntersecting; }, { threshold: 0.35 }).observe(el);
+    // Hors de l'écran, le livre n'écoute plus les mouvements du doigt sur toute la page
+    // (page-flip les écoute sur window) : le défilement du reste du site reste parfaitement libre.
+    var ui = pf.getUI && pf.getUI(), branche = true;
+    if (ui && ui.removeHandlers && ui.setHandlers) {
+      new IntersectionObserver(function (en) {
+        var dedans = en[0].isIntersecting;
+        if (dedans && !branche) { ui.setHandlers(); branche = true; try { pf.update(); } catch (e) {} }
+        else if (!dedans && branche) { ui.removeHandlers(); branche = false; }
+      }, { rootMargin: "200px 0px" }).observe(racine);
+    }
     document.addEventListener("keydown", function (e) {
       if (!visible || e.altKey || e.ctrlKey || e.metaKey) return;
       var t = e.target && e.target.tagName;

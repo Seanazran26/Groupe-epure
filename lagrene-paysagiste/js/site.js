@@ -352,6 +352,14 @@
     new IntersectionObserver(function (en) { barre.classList.toggle("cachee", en[0].isIntersecting); }, { threshold: 0.15 }).observe(devis);
   }
 
+  /* Animations permanentes en pause hors de l'écran (batterie, fluidité du défilement) */
+  if ("IntersectionObserver" in window) {
+    var ioPause = new IntersectionObserver(function (en) {
+      en.forEach(function (x) { x.target.classList.toggle("hors-ecran", !x.isIntersecting); });
+    }, { rootMargin: "80px 0px" });
+    doc.querySelectorAll(".defilant, .page-heros").forEach(function (el) { ioPause.observe(el); });
+  }
+
   /* Effet de profondeur sur les bandeaux photo */
   var parallaxes = doc.querySelectorAll("[data-profondeur]");
   if (parallaxes.length && !mouvementReduit) {

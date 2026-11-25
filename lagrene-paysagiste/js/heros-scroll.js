@@ -428,9 +428,13 @@
   /* ---- Défilement --------------------------------------------------------- */
   var debutVisible = true, finVisible = false, surHeros = null, tickPrevu = false;
 
+  // Progrès calculé sur la hauteur FIXE de la scène (100svh) et non sur window.innerHeight : sur
+  // téléphone, la barre d'adresse qui se replie change innerHeight et ferait « sauter » la vidéo.
+  var hauteurScene = 0;
   function progression() {
     var r = racine.getBoundingClientRect();
-    var total = r.height - window.innerHeight;
+    if (!hauteurScene) hauteurScene = scene.offsetHeight || window.innerHeight;
+    var total = r.height - hauteurScene;
     return total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
   }
 
@@ -490,6 +494,7 @@
     redim = true;
     requestAnimationFrame(function () {
       redim = false;
+      hauteurScene = scene.offsetHeight || window.innerHeight;
       dimensionner(false);
       if (E && E.jeu !== categorie()) demarrer(true);   // changement ordinateur ↔ mobile
       demanderTick();
