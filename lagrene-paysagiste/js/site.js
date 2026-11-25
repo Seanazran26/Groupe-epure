@@ -340,7 +340,12 @@
   var barre = doc.querySelector(".barre-mobile"), devis = doc.getElementById("devis");
   /* …et n'apparaît qu'après le début du défilement (pour ne pas cacher le haut de page) */
   if (barre) {
-    var majBarre = function () { barre.classList.toggle("au-depart", window.scrollY < 420); };
+    var herosScroll = doc.querySelector(".heros-scroll");
+    var majBarre = function () {
+      // sur l'accueil : la barre n'apparaît qu'une fois la vidéo du héros terminée
+      var cache = herosScroll ? herosScroll.getBoundingClientRect().bottom > window.innerHeight * 0.6 : window.scrollY < 420;
+      barre.classList.toggle("au-depart", cache);
+    };
     window.addEventListener("scroll", majBarre, { passive: true }); majBarre();
   }
   if (barre && devis && "IntersectionObserver" in window) {

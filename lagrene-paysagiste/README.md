@@ -20,6 +20,24 @@ L'analyse complète du site actuel (erreurs, photos, arguments de vente) est dan
 | `contact.html`, `devis-gratuit.html` | Formulaire + coordonnées (+ plan sur Contact) |
 | `mentions-legales.html` | Mentions légales du site actuel, remises en forme |
 
+## Héros « scroll vidéo » (accueil)
+
+La vidéo Google Flow « Votre jardin se transforme » avance image par image au défilement (`js/heros-scroll.js`).
+
+- Source : 1920 × 1080, 24 i/s, 7,9 s (190 images), **aucun filigrane** (vérifié sur la 1re et la dernière image + analyse des 25 images)
+- **297 images** : interpolation à compensation de mouvement (ffmpeg `minterpolate`, mode `mci`) → 294 images, complétées à 297
+- `images/hero-frames/` : ordinateur, 1440 × 810, WebP qualité 70 (~45 Mo)
+- `images/hero-frames-sm/` : téléphone, recadrage portrait 608 × 1080 (taille native), WebP qualité 70 (~22 Mo)
+- Conteneur 320vh, scène collante 100svh, canvas « cover » centré, DPR plafonné à 2
+- Fluidité :
+  - décodage des images **hors du fil principal** (workers ; `ImageDecoder` sous Firefox), à l'avance, dans le sens du défilement ;
+  - dessin **pixel pour pixel** (aucun rééchantillonnage à chaque image, l'agrandissement est fait par la carte graphique) ;
+  - **lissage amorti** : à la molette, toutes les images intermédiaires sont jouées ;
+  - chargement **entrelacé** (1 image sur 16, puis 1 sur 8…) par lots de 24 toutes les 120 ms : l'animation ne se fige jamais pendant le chargement ;
+  - pas de flou derrière l'en-tête pendant la vidéo (il serait recalculé à chaque image)
+- Téléphone (< 1024 px de large, tenu en portrait) : jeu portrait ; un changement de catégorie recharge le bon jeu
+- Ouvert directement depuis le dossier (file://) : mode de secours, moins fluide — pour une démonstration, passer par un serveur ou le lien en ligne
+
 ## Où modifier quoi ?
 
 - **Coordonnées, services, villes, nom de l'agence** → `js/data.js` (un seul endroit : l'en-tête, le menu,

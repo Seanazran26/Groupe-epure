@@ -745,3 +745,86 @@ body.menu-ouvert { overflow: hidden; }
 .zones-compactes p { color: var(--gris); margin: 0; }
 .zones-compactes .puces-villes { margin-top: 0; }
 @media (max-width: 1020px) { .zones-compactes { grid-template-columns: minmax(0, 1fr); } }
+
+/* 16. Héros scroll : la vidéo « Votre jardin se transforme » pilotée au défilement ---------- */
+.heros-scroll {
+  position: relative; height: 320vh; background: #0c1913;
+  margin-top: calc(-1 * var(--haut-entete));           /* la vidéo passe sous l'en-tête collant (le bandeau d'infos reste visible) */
+}
+.hs-scene { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #0c1913; }
+.hs-affiche, .hs-scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hs-affiche img { width: 100%; height: 100%; object-fit: cover; }
+.hs-scene canvas { display: block; opacity: 0; transition: opacity 0.4s ease; }
+.heros-scroll.pret canvas { opacity: 1; }
+
+/* Overlay de début : titre géant + « Faites défiler pour visiter » */
+.hs-debut {
+  position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  text-align: center; color: #fff; padding: calc(var(--haut-entete) + 10px) var(--gouttiere) calc(clamp(28px, 5vh, 56px) + env(safe-area-inset-bottom, 0px));
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+.hs-debut::before, .hs-debut::after { content: ""; position: absolute; left: 0; right: 0; pointer-events: none; z-index: -1; }
+.hs-debut::before { top: 0; height: 32%; background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.18) 60%, rgba(0, 0, 0, 0) 100%); }
+.hs-debut::after { bottom: 0; height: 62%; background: linear-gradient(0deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.5) 42%, rgba(0, 0, 0, 0) 100%); }
+.hs-debut.cache { opacity: 0; visibility: hidden; }
+.hs-debut h1 { color: #fff; margin: 0; max-width: none; text-wrap: balance; }
+.hs-nom {
+  display: block; font: 380 clamp(44px, 7.4vw, 118px)/0.95 var(--f-titre);
+  font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 144; letter-spacing: -0.045em;
+  text-shadow: 0 6px 50px rgba(0, 0, 0, 0.45);
+}
+.hs-nom em { color: var(--pousse); font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144; }
+.hs-accroche {
+  display: block; max-width: 40em; margin: 18px auto 0; font: 600 clamp(15px, 1.45vw, 20px)/1.45 var(--f-texte);
+  letter-spacing: 0.01em; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+}
+.hs-indice {
+  margin: clamp(22px, 4vh, 40px) 0 0; display: inline-flex; flex-direction: column; align-items: center; gap: 12px;
+  font: 800 clamp(13px, 1.15vw, 16px)/1 var(--f-texte); letter-spacing: 0.22em; text-transform: uppercase; color: #fff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+}
+.hs-fleche {
+  width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.75); display: grid; place-items: center;
+  background: rgba(255, 255, 255, 0.08); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  animation: hs-rebond 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.hs-fleche svg { width: 22px; height: 22px; }
+@keyframes hs-rebond { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+
+/* Overlay de fin : boutons d'action */
+.hs-fin {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; justify-content: center;
+  padding: 0 var(--gouttiere) calc(clamp(36px, 7vh, 72px) + env(safe-area-inset-bottom, 0px));
+  opacity: 0; visibility: hidden; transform: translateY(18px);
+  transition: opacity 0.5s ease, transform 0.6s var(--ease), visibility 0.5s ease;
+}
+.hs-fin::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 75vh; z-index: -1; pointer-events: none;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.42) 45%, rgba(0, 0, 0, 0) 100%);
+}
+.hs-fin.visible { opacity: 1; visibility: visible; transform: none; }
+.hs-fin-carte { max-width: 820px; text-align: center; color: #fff; }
+.hs-fin-titre {
+  margin: 0 0 10px; font: 380 clamp(36px, 5vw, 72px)/1 var(--f-titre); font-variation-settings: "SOFT" 100, "opsz" 144;
+  letter-spacing: -0.035em; text-shadow: 0 4px 34px rgba(0, 0, 0, 0.45);
+}
+.hs-fin-titre em { color: var(--pousse); font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144; }
+.hs-fin-texte { margin: 0 auto 26px; max-width: 36em; font-size: clamp(15px, 1.3vw, 18px); opacity: 0.92; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5); }
+.hs-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.hs-actions .btn--contour-clair { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.08); }
+
+/* Sans JavaScript : une simple image d'accueil */
+.js-off .heros-scroll { height: auto; }
+.js-off .hs-scene { position: relative; }
+.js-off .hs-fin { display: none; }
+
+@media (max-width: 720px) {
+  .hs-nom { font-size: clamp(40px, 12vw, 60px); }
+  .hs-accroche { font-size: 15px; }
+  .hs-actions .btn { flex: 1 1 100%; }
+  .hs-fin { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) { .hs-fleche { animation: none; } }
+/* Pendant la vidéo : pas de flou derrière l'en-tête (il serait recalculé à chaque image → saccades) */
+.sur-heros .entete, .sur-heros .entete.est-defile { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--creme); }
+.sur-heros .barre-mobile { -webkit-backdrop-filter: none; backdrop-filter: none; }
