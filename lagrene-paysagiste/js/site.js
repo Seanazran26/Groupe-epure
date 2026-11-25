@@ -142,8 +142,11 @@
       '<li>' + ico("tel") + '<a href="tel:' + C.telephoneLien + '">' + C.telephone + "</a></li>" +
       '<li>' + ico("mail") + '<a href="mailto:' + C.email + '">' + C.email + "</a></li>" +
       "<li>" + ico("horloge") + "<span>" + C.horaires + "</span></li></ul></div>" +
-      '</div><div class="pied-marque" aria-hidden="true">Lagrene</div>' +
-      '<div class="pied-bas"><span>© ' + annee + " " + C.nom + " · SIREN " + C.siren + "</span>" +
+      "</div></div>" +
+      // Dernier bloc : l'arbre génératif qui pousse derrière le nom
+      '<div class="pied-arbre" data-arbre data-speed="1" data-size="1" data-particles="1" aria-hidden="true">' +
+      '<canvas></canvas><div class="pied-marque">Lagrene</div></div>' +
+      '<div class="wrap"><div class="pied-bas"><span>© ' + annee + " " + C.nom + " · SIREN " + C.siren + "</span>" +
       '<nav aria-label="Liens légaux"><a href="mentions-legales.html">Mentions légales</a><a href="contact.html">Contact</a><a href="realisations.html">Réalisations</a></nav>' +
       '<span>Site réalisé par <a href="' + D.AGENCE.lien + '">' + D.AGENCE.nom + "</a></span></div>" +
       "</div></footer>" +
