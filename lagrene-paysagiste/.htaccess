@@ -1,0 +1,18 @@
+# Lagrene Paysagiste 59 — adresses sans « .html » (comme sur le site actuel)
+# Exemple : /taille-de-haie-59  →  sert le fichier taille-de-haie-59.html
+Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^([^./]+)/?$ $1.html [L]
+
+# Pages d'erreur et mise en cache des images / polices
+ErrorDocument 404 /index.html
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+</IfModule>
