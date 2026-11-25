@@ -214,7 +214,10 @@
     // transparente pendant toute la vidéo ; pleine dès que la vidéo se termine et que la page continue
     if (herosAccueil) {
       var scene = herosAccueil.querySelector(".hs-scene");
-      entete.classList.toggle("transparent", herosAccueil.getBoundingClientRect().bottom >= (scene ? scene.offsetHeight : window.innerHeight) - 2);
+      var surVideo = herosAccueil.getBoundingClientRect().bottom >= (scene ? scene.offsetHeight : window.innerHeight) - 2;
+      entete.classList.toggle("transparent", surVideo);
+      entete.classList.toggle("cache", !surVideo);          // après la vidéo : plus de barre du tout
+      if (!surVideo) doc.querySelectorAll(".has-drop.ouvert").forEach(function (x) { x.classList.remove("ouvert"); });
     }
   }
   window.addEventListener("scroll", surDefilement, { passive: true });

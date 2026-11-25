@@ -968,19 +968,20 @@ body.menu-ouvert { overflow: hidden; }
   .pied-haut > div:nth-child(2) ul, .pied-haut > div:nth-child(3) ul { display: block; }
 }
 
-/* 21. Bandeau défilant sous la vidéo : écriture Cormorant Garamond italique ------------------ */
+/* 21. Bandeau défilant sous la vidéo : capitales fines Cormorant Garamond, très espacées ------ */
 @font-face {
   font-family: "Cormorant Garamond";
-  src: url("../fonts/cormorant-garamond-latin-500-italic.woff2") format("woff2");
-  font-weight: 500; font-style: italic; font-display: swap;
+  src: url("../fonts/cormorant-garamond-latin-400-normal.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
 }
-.defilant { padding: clamp(18px, 2.4vw, 26px) 0; background: var(--foret); }
+.defilant { padding: clamp(14px, 1.4vw, 18px) 0; background: var(--foret); }
 .defilant span {
-  font: italic 500 clamp(30px, 3.4vw, 46px)/1.05 "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
-  font-variation-settings: normal; letter-spacing: 0.01em; color: #f6efe2; padding-inline: clamp(20px, 2.4vw, 34px);
+  font: 400 clamp(13.5px, 1.1vw, 16px)/1 "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  font-style: normal; font-variation-settings: normal; text-transform: uppercase; letter-spacing: 0.32em;
+  color: #f3ebdd; padding-inline: clamp(18px, 1.9vw, 28px);
 }
-.defilant .etoile { display: inline-flex; align-items: center; padding: 0; color: var(--pousse); }
-.defilant .etoile svg { width: clamp(18px, 1.7vw, 24px); height: clamp(18px, 1.7vw, 24px); }
+.defilant .etoile { display: inline-flex; align-items: center; padding: 0; color: var(--pousse); letter-spacing: 0; }
+.defilant .etoile svg { width: 13px; height: 13px; }
 
 /* 22. Accueil : barre de menu transparente posée sur la vidéo --------------------------------- */
 .page-accueil .bandeau-info { display: none; }
@@ -1004,6 +1005,9 @@ body.menu-ouvert { overflow: hidden; }
 .entete.transparent .entete-actions .btn { --bg: var(--pousse); --fg: var(--foret); }
 .entete.transparent .burger { background: rgba(0, 0, 0, 0.18); border-color: rgba(255, 255, 255, 0.45); color: #fff; }
 .entete .logo, .entete .nav-lien, .entete .entete-tel, .entete .burger { transition: color 0.3s, background-color 0.3s, border-color 0.3s; }
+/* Après la vidéo, le menu disparaît complètement (aucune barre) ; il revient en remontant sur la vidéo */
+.page-accueil .entete { transition: transform 0.45s var(--ease), opacity 0.3s ease, border-color 0.3s, background-color 0.3s; }
+.page-accueil .entete.cache { transform: translateY(-110%); opacity: 0; pointer-events: none; }
 
 /* 23. Boutons « shiny » (port du composant ShinyButton) ----------------------------------------
    Un reflet traverse le texte (masque) et le contour (anneau d'1 px), en boucle ; apparition avec
