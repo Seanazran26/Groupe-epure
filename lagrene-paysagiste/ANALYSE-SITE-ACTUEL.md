@@ -51,55 +51,95 @@ Tous les titres et textes ont été repris à l'identique dans le nouveau site (
 | Type | Nombre | Taille d'origine | Remarques |
 | --- | --- | --- | --- |
 | Bandeaux de page | 10 | 1500 × 550 | 3 bandeaux identiques (tronçonneuse) pour Abattage, Réalisations et Mentions légales |
+| Photo d'accueil **sur mobile** | 1 | **360 × 350** | Affichée sur toute la largeur d'un iPhone (1 170 pixels réels) : agrandie plus de 3 fois, donc floue |
 | Vignettes rondes des services | 8 | 150 × 150 | Trop petites pour être réutilisées |
-| Photos des sections | 27 | 570 × 335, 570 × 645, 950 × 695, 330 × 160 | Les 4 petites (330 × 160) sont **étirées** à 350 × 263 sur l'accueil, donc floues |
+| Photos des sections | 27 | 570 × 335, 570 × 645, 950 × 695, 330 × 160 | — |
 | Réalisations | 17 | ≈ 1200 px, JPEG | Ce sont des **captures d'écran de téléphone** (fichiers « screenshot_20231215_… ») |
 | Logo | 1 | 300 × 108, PNG | Flou sur les écrans haute définition (Retina, smartphones) |
 
 Observations :
 
-- La plupart des photos des pages services sont des **photos génériques** (banque d'images : taille-haie de marque, gazon en rouleau…), pas des chantiers de l'entreprise.
+- Beaucoup de photos des pages services **ressemblent à des photos de banque d'images** (taille-haie de marque, gazon en rouleau…). À vérifier en lui posant la question.
 - Les 2 photos **avant / après** sont en très basse définition (images agrandies, pixelisées) ; l'une montre encore le **bouton ✕** de l'écran du téléphone.
 - 2 « réalisations » sont en fait des **affiches** sur la réglementation des haies (taille à l'aplomb, 2 m maximum).
-- Les textes alternatifs des images sont génériques (« elagage-59 » sur presque toutes les photos de l'accueil) ou vides (galerie).
-- **Image manquante** : le bandeau de la page Devis (`devis-59.webp`) renvoie une erreur 404, d'où un grand rectangle vert vide.
+- Les 17 photos de la galerie Réalisations n'ont **aucune description** pour Google.
 
 ---
 
-## 4. Erreurs et points faibles (vos arguments pour le rendez-vous)
+## 4. Erreurs et points faibles — liste vérifiée le 25/11/2026
 
-### Erreurs graves, visibles par les clients
+Chaque point a été contrôlé sur le site en ligne (code des 19 pages + affichage réel sur ordinateur et iPhone).
+Les points marqués *(caché)* ne se voient pas en naviguant normalement.
 
-1. **Page « Devis gratuit » : l'adresse d'une autre entreprise.** On y lit « Adresse : 1767 Chemin Pablo Picasso, **06250 Mougins** », avec une carte de Mougins (Alpes-Maritimes) et une publicité : « Développez votre activité de **couvreur 78** … professionnel de la toiture en Aquitaine ou dans le PACA ». C'est le modèle de l'agence, jamais personnalisé.
-   ⚠️ Cette page n'est reliée à **aucun bouton du site** : le bouton noir « Votre devis ici » fait seulement descendre au formulaire en bas de la page en cours (qui, lui, est correct, avec l'adresse de Lille). On l'atteint en tapant l'adresse `www.lagrene-paysagiste.fr/devis-gratuit`, ou depuis Google : elle figure dans le plan du site (`sitemap.xml`) que le site déclare à Google.
-2. Sur cette même page, le **bouton d'envoi du formulaire est vide** (rectangle noir sans texte), il y a **deux formulaires de devis** l'un sous l'autre, et le bandeau photo est absent.
-3. **« Couverture toiture 06 »** apparaît à la place de « Élagage 59 » dans les vignettes des **7 pages de services** : c'est un reste d'un site de couvreur.
-4. **Textes en double** :
-   - page *Taille de haie* : **chaque paragraphe est répété deux fois** à la suite (intro + 5 sections) ;
-   - pages *villes* : le même titre H2 apparaît **deux fois** (ex. « Pour un jardin soigné et épanoui à Bondues 59910 ») ;
-   - page *Roubaix* : un titre (« Une entreprise qui dépasse le simple rôle de paysagiste ») **sans aucun texte** dessous.
-5. **Fautes** : « Être rappelé immediatement », « Pour des haies magnifique et équilibrée », « Dessouchage de tuya », « Une équipe ouvert à tous projets », « enchanté a Wattrelos », « Prix compétitifs et transparent », « Villeneuve d ascq », « défi.Pourtant », « Contactez nous », H1 qui finit par une virgule (« …à Lille, 59000, »).
-6. **Mentions légales** : « SIRET : 531 041 218 » (c'est un SIREN), rubrique « Conception et réalisation » remplie par une simple image, renvoi à un « point 4 » qui n'existe pas.
+### A. Erreurs visibles par tous les visiteurs
 
-### Version mobile
+1. **« Couverture toiture 06 »** à la place de « Élagage 59 » : première vignette ronde sous le texte d'intro, sur les **7 pages de services**. Même photo et même lien que la vignette « Élagage 59 » de l'accueil : c'est un reste du site d'un couvreur des Alpes-Maritimes (06). *(À présenter comme une question : « Vous faites de la toiture dans le 06 ? »)*
+2. **Phrases répétées** sur la page *Taille de haie* : **17 phrases écrites deux fois**, réparties dans 6 paragraphes (intro et sections).
+3. **Titres en double** sur les **7 pages villes** :
+   - Bondues : « Pour un jardin soigné et épanoui à Bondues 59910 »
+   - Hem : « Des haies sculptées, un jardin d'élégance à Hem 59510 »
+   - Leers : « Haies taillées en mode VIP à Leers 59115 »
+   - Roubaix : « Lagrene Paysagiste 59 : Magnification des jardins sans mettre à mal les finances »
+   - Villeneuve-d'Ascq : « Pour la création d'un paysage éblouissant »
+   - Wattignies : « Paysagiste pas cher à Wattignies »
+   - Wattrelos : « La maîtrise de Lagrene Paysagiste 59 »
+4. **Un titre sans texte** : page Roubaix, « Une entreprise qui dépasse le simple rôle de paysagiste ».
+5. **Fautes d'orthographe et de frappe** :
+   - « Être rappelé **immediatement** » : bouton noir sous la photo, sur **18 pages** ;
+   - « ©copyright 2023 - 2026 - **Tout droit reservé** » (au lieu de « Tous droits réservés ») : pied de page, **19 pages** ;
+   - « Villeneuve **d ascq** » : menu, **19 pages** ;
+   - « Pour des haies **magnifique et équilibrée** visuellement » (Taille de haie) ;
+   - « Dessouchage de **tuya** » et « Vos souches de **tuya** » (Dessouchage) ;
+   - « Une équipe **ouvert** à tous projets » (Hem) ;
+   - « Artisanat paysagiste enchanté **a** Wattrelos » (Wattrelos) ;
+   - « Prix compétitifs et **transparent** » (Wattignies) ;
+   - « Contactez nous » (titre de la page Contact) ;
+   - espaces manquants après un point : « un **défi.Pourtant** » (Accueil), « votre **budget.Chez** » (Taille de haie), « **unique.Votre** » (Villeneuve-d'Ascq) ;
+   - titre principal qui finit par une virgule : « Harmonie végétale avec Lagrene Paysagiste 59 à Lille, 59000**,** ».
+6. **Infobulles erronées** (au survol de la souris, sur ordinateur, 19 pages) : le bouton « Contact » affiche « **ontact** » ; le lien « Contactez-nous » du pied de page affiche « Mentions légales ».
+7. **Pas de page « Élagage »** : la vignette « Élagage 59 » renvoie simplement à l'accueil.
 
-7. Le **formulaire de devis apparaît avant le titre principal** : le visiteur ne sait pas où il est.
-8. Photo d'en-tête écrasée, avec les boutons « Réalisations / Contact » posés dessus.
-9. Des **murs de texte** de 800 à 1 000 caractères par bloc, en petite police.
+### B. Sur téléphone (vérifié sur iPhone)
 
-### Image et confiance
+8. Le **formulaire de devis s'affiche avant le titre principal** sur l'accueil et sur toutes les pages services et villes.
+9. **Photo d'accueil floue** (fichier mobile de 360 pixels de large, agrandi plus de 3 fois), avec les boutons « Réalisations / Contact » posés dessus.
+10. Le **zoom est bloqué** (réglage `maximum-scale=1.0`) : sur Android, un visiteur malvoyant ne peut pas agrandir le texte avec deux doigts.
+11. Des **pavés de texte** de 800 à 1 000 caractères par bloc.
 
-10. **Design daté et générique** (gabarit partagé avec d'autres métiers), sans identité propre : vert olive, gris, polices standard.
-11. **Aucun élément de confiance** : ni avis clients, ni photos de l'équipe, ni réseaux sociaux, ni vrais avant / après mis en valeur.
-12. Les textes, écrits pour Google, sont **répétitifs** (« méticuleux », « minutie », « expertise » à chaque phrase) et passent sans arrêt du « nous » au « ils / leur ».
-13. Le lien « Élagage 59 » renvoie vers l'accueil : il n'existe pas de page dédiée à l'élagage.
+### C. La page cachée *(caché)*
 
-### Référencement (Google) et technique
+12. `www.lagrene-paysagiste.fr/devis-gratuit` : aucun bouton du site n'y mène, mais elle est en ligne et figure dans le plan du site déclaré à Google. On y trouve :
+   - « Adresse : 1767 Chemin Pablo Picasso, **06250 Mougins** » et une carte de Mougins ;
+   - une publicité d'agence pour les **couvreurs** (« Développez votre activité de couvreur 78… Aquitaine ou dans le paca ») avec une **image cassée** ;
+   - un **bouton d'envoi vide**, **deux formulaires** l'un sous l'autre, et le **bandeau photo manquant** (erreur 404) ;
+   - aucun titre principal (H1).
 
-14. Pas de **H1** sur Réalisations, Devis gratuit et Mentions légales.
-15. Pas de **données structurées** « entreprise locale » (adresse, horaires, téléphone lisibles par Google).
-16. Pas de balises **Open Graph** : un lien partagé sur WhatsApp ou Facebook s'affiche sans photo ni description.
-17. Textes alternatifs des images absents ou identiques sur toutes les photos.
+### D. Textes et image
+
+13. **Ton parfois peu sérieux**, typique des textes générés en série. Page Dessouchage : « vos as de l'enlèvement de souches » (titre principal), « c'est un peu le **David Copperfield du dessouchage** à Lille ! », « comme une **troupe de chasseurs de souches** », « la **formule magique** ». Page Leers : « un véritable **événement glamour** pour votre jardin », « Haies taillées en **mode VIP** ». Page Hem : « Votre **odyssée végétale** à prix doux ».
+14. **Positionnement « pas cher »** dans les titres Google : « le paysagiste pas cher à Bondues / Hem / Leers / Roubaix », « le jardinier pas cher à Lille ». *(À lui demander : est-ce l'image qu'il veut donner ?)*
+15. Description Google de la page Jardinier : « à des tarifs **super  mais vraiment abordables** ».
+16. Textes **répétitifs** (« méticuleux », « minutie », « expertise ») qui passent sans arrêt du « nous » au « ils / leur ».
+17. **Aucun avis client, aucun lien vers des réseaux sociaux**, aucune photo de l'équipe.
+18. **Design générique** d'agence (les restes de couvreur prouvent que le même modèle sert à d'autres métiers).
+
+### E. Google et technique *(caché)*
+
+19. **Pas de titre principal (H1)** sur Réalisations, Devis gratuit et Mentions légales.
+20. **Titres d'onglet sans nom ni ville** : « Réalisations », « Contactez-nous », « Devis gratuit », « Mentions légales ».
+21. Les grandes photos du haut de **10 pages** sont décrites pour Google comme « **elagage 06** » (encore le département 06).
+22. **17 photos sans description** (galerie Réalisations) ; ailleurs, descriptions identiques (« elagage-59 » ×4 sur l'accueil).
+23. **Aucune donnée « entreprise locale »** pour Google (adresse, horaires, téléphone balisés) et **aucune balise de partage** (lien WhatsApp / Facebook sans photo ni description).
+24. Champs de formulaire **sans étiquette** (seulement un texte grisé dans la case) : moins accessible.
+25. **Mentions légales** : « SIRET : 531 041 218 » (9 chiffres = SIREN ; un SIRET en a 14) ; « Conception et réalisation » remplie par une simple image ; renvoi au « point 4 » alors que les rubriques ne sont pas numérotées à l'écran.
+
+### Points écartés après vérification (à ne PAS dire)
+
+- La carte en bas de page fonctionne (vérifié sur l'ordinateur du commercial).
+- Le texte n'est pas en petite police sur mobile (16 px, c'est correct).
+- Les 4 petites photos de l'accueil ne sont pas étirées.
+- Un module de cookies est prévu par le site (chargé à la demande) : pas d'argument RGPD.
+- Aucun bouton ne mène à la page de Mougins : ne pas dire que « ses clients tombent dessus ».
 
 ---
 
