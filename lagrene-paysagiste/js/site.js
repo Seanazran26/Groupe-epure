@@ -160,6 +160,41 @@
   doc.querySelectorAll('[data-composant="devis"]').forEach(function (el) { remplacer(el, htmlDevis); });
   remplacer('[data-composant="pied"]', htmlPied);
 
+  /* Boutons « shiny » : le texte est placé dans un <span> (le reflet le traverse) ; l'animation
+     ne tourne que pour les boutons à l'écran, avec un léger rebond la première fois. */
+  doc.querySelectorAll(".btn").forEach(function (b) {
+    if (b.querySelector(":scope > .btn-txt")) return;
+    var t = doc.createElement("span"); t.className = "btn-txt";
+    while (b.firstChild) t.appendChild(b.firstChild);
+    b.appendChild(t);
+  });
+  if ("IntersectionObserver" in window && !mouvementReduit) {
+    // Le reflet est suspendu PENDANT le défilement (il forcerait un redessin à chaque image, au
+    // détriment de la vidéo d'accueil) et reprend dès que le visiteur s'arrête.
+    var visibles = new Set(), enDefilement = false, minuteurBtn = 0;
+    window.addEventListener("scroll", function () {
+      if (!enDefilement) { enDefilement = true; visibles.forEach(function (b) { b.classList.add("shiny-pause"); }); }
+      clearTimeout(minuteurBtn);
+      minuteurBtn = setTimeout(function () {
+        enDefilement = false;
+        doc.querySelectorAll(".btn.shiny-pause").forEach(function (b) { b.classList.remove("shiny-pause"); });
+      }, 220);
+    }, { passive: true });
+    var ioBtn = new IntersectionObserver(function (en) {
+      en.forEach(function (x) {
+        var b = x.target;
+        b.classList.toggle("shiny-actif", x.isIntersecting);
+        if (x.isIntersecting) { visibles.add(b); if (enDefilement) b.classList.add("shiny-pause"); }
+        else visibles.delete(b);
+        if (x.isIntersecting && !b.dataset.pop) {
+          b.dataset.pop = "1"; b.classList.add("shiny-pop");
+          setTimeout(function () { b.classList.remove("shiny-pop"); }, 700);
+        }
+      });
+    });
+    doc.querySelectorAll(".btn").forEach(function (b) { ioBtn.observe(b); });
+  }
+
   /* Petites données injectées dans le texte : <span data-c="telephone"></span> */
   doc.querySelectorAll("[data-c]").forEach(function (el) {
     var k = el.getAttribute("data-c");
@@ -171,7 +206,17 @@
 
   /* 3. Interactions ------------------------------------------------------------ */
   var entete = doc.querySelector(".entete");
-  function surDefilement() { if (entete) entete.classList.toggle("est-defile", window.scrollY > 10); }
+  var herosAccueil = doc.querySelector(".heros-scroll");
+  // Accueil : la barre de menu reste transparente tant qu'elle est posée sur la vidéo
+  function surDefilement() {
+    if (!entete) return;
+    entete.classList.toggle("est-defile", window.scrollY > 10);
+    // transparente pendant toute la vidéo ; pleine dès que la vidéo se termine et que la page continue
+    if (herosAccueil) {
+      var scene = herosAccueil.querySelector(".hs-scene");
+      entete.classList.toggle("transparent", herosAccueil.getBoundingClientRect().bottom >= (scene ? scene.offsetHeight : window.innerHeight) - 2);
+    }
+  }
   window.addEventListener("scroll", surDefilement, { passive: true });
   surDefilement();
 
