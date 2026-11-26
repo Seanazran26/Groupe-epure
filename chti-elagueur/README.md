@@ -25,8 +25,8 @@ Marcq-en-Barœul · Wambrechies · Pérenchies
 
 ## Avant / après
 
-`images/avant-apres/jardin-1-*` (vue complète) et `jardin-2-*` (détail du coin de l’olivier),
-tirés de la paire de photos fournie.
+`images/avant-apres/jardin-1-*` (jardin de ville remis en état) et `jardin-2-*`
+(terrasse et massifs autour du bouleau), tirés des deux paires de photos fournies.
 
 ## À faire avant une mise en ligne
 
