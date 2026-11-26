@@ -1,9 +1,9 @@
 /* ==========================================================================
-   Lagrene Paysagiste 59 — arbre génératif (pied de page)
+   Lagrene Paysagiste 59 — arbre génératif (section « Zones d'intervention »)
    --------------------------------------------------------------------------
    Recréation native du composant « GenerativeTree » (dont le fichier source de
    l'animation n'était pas fourni) : un arbre pousse branche par branche depuis
-   le bas, se tient, s'efface, puis un nouvel arbre (toujours différent)
+   le sol, se tient, s'efface, puis un nouvel arbre (toujours différent)
    repousse. Des particules de pollen flottent autour ; le survol de la souris
    (ou le doigt) fait frémir l'arbre.
 
@@ -13,7 +13,7 @@
    - les branches sont dessinées UNE fois, au fur et à mesure de leur pousse,
      dans une image tampon ; chaque image d'animation ne fait que recopier ce
      tampon et dessiner ~50 particules ;
-   - l'animation s'arrête complètement quand le pied de page n'est pas à
+   - l'animation s'arrête complètement quand la section n'est pas à
      l'écran ou que l'onglet est caché ;
    - « réduire les animations » : un arbre complet, immobile.
    ========================================================================== */
@@ -36,9 +36,9 @@
   // Durées (secondes, à vitesse 1)
   var TENUE = 14, FONDU = 2.4, ATTENTE = 0.9;
 
-  // Couleurs : écorce crème sur fond terre, rameaux et feuillage vert tendre
-  var ECORCE = [233, 220, 198], RAMEAU = [181, 221, 115];
-  var FEUILLES = ["181,221,115", "216,239,174", "243,235,221", "157,200,96"];
+  // Couleurs (fond sable clair) : écorce bois foncé, rameaux vert olive, feuillage olive à vert tendre
+  var ECORCE = [88, 76, 52], RAMEAU = [102, 115, 63];
+  var FEUILLES = ["102,115,63", "128,145,70", "157,182,84", "181,221,115", "255,255,255"];
 
   var tampon = document.createElement("canvas"), tctx = tampon.getContext("2d");
   var W = 0, H = 0, dpr = 1, largeurVue = 0;
@@ -131,15 +131,15 @@
              ph: rnd(0, 6.28), r: rnd(0.7, 1.9), a: rnd(0.25, 0.75) };
   }
   function dessinerParticules(dt) {
-    ctx.globalCompositeOperation = "lighter";
+    ctx.globalCompositeOperation = "source-over";
     for (var k = 0; k < particules.length; k++) {
       var q = particules[k];
       q.y -= q.vy * dt * SPEED; q.ph += q.f * dt * SPEED;
       if (q.y < -10) particules[k] = q = nouvelleParticule(false);
       var x = q.x + Math.sin(q.ph) * q.amp, sc = 0.75 + 0.25 * Math.sin(q.ph * 2.3);
-      ctx.fillStyle = "rgba(200,236,150," + (q.a * 0.22 * sc).toFixed(3) + ")";
+      ctx.fillStyle = "rgba(255,255,255," + (q.a * 0.5 * sc).toFixed(3) + ")";
       ctx.beginPath(); ctx.arc(x, q.y, q.r * 3.2, 0, 6.2832); ctx.fill();
-      ctx.fillStyle = "rgba(226,246,190," + (q.a * sc).toFixed(3) + ")";
+      ctx.fillStyle = "rgba(102,115,63," + (q.a * 0.8 * sc).toFixed(3) + ")";
       ctx.beginPath(); ctx.arc(x, q.y, q.r, 0, 6.2832); ctx.fill();
     }
     ctx.globalCompositeOperation = "source-over";
