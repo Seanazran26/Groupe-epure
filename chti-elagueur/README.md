@@ -18,7 +18,19 @@ au défilement, grille des services, livre des réalisations, arbre génératif)
 Toutes ces données se changent dans `js/data.js` (en-tête, menu, pied de page, bloc devis).
 Si une adresse e-mail ou une rue est ajoutée, elle s’affiche automatiquement.
 
-## Zones d’intervention (une page par ville)
+## Services (d’après la fiche Google du client)
+
+Une page par service, avec des textes rédigés pour lui :
+Élagage d’arbres · Abattage d’arbres (même dangereux) · Taille de haies (à prix modérés) ·
+Taille d’arbres · Dessouchage · Entretien de jardins et d’espaces verts · Évacuation des déchets verts.
+Rien de ce qu’il ne propose pas (création de pelouse, aménagement paysager…).
+Textes modifiables dans `outils/contenu_chti.py`, puis `python3 outils/generer.py` régénère les pages.
+
+Avis Google affiché sur l’accueil : Miguel P., 5/5, « Équipe au top, super sympa, travaille carré. »
+
+## Zones d’intervention
+
+Déplacement dans tout le Nord (59) et le Pas-de-Calais (62). Une page par commune proche :
 
 Lambersart (accueil) · Lille · Lomme · Saint-André-lez-Lille · La Madeleine ·
 Marcq-en-Barœul · Wambrechies · Pérenchies

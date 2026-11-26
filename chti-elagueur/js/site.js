@@ -129,7 +129,7 @@
       '<a class="ligne grand" href="tel:' + C.telephoneLien + '"><span class="rond-icone">' + ico("tel") + "</span><span><small>Téléphone</small><strong>" + C.telephone + "</strong></span></a>" +
       (C.email ? '<a class="ligne" href="mailto:' + C.email + '"><span class="rond-icone">' + ico("mail") + "</span><span><small>E-mail</small><strong>" + C.email + "</strong></span></a>" : "") +
       '<a class="ligne" href="' + C.lienPlan + '" target="_blank" rel="noopener"><span class="rond-icone">' + ico("lieu") + "</span><span><small>" + (C.adresse ? "Adresse" : "Secteur") + "</small><strong>" +
-        (C.adresse ? lieu(true) : lieu() + "<br>et toute la métropole lilloise") + "</strong></span></a>" +
+        (C.adresse ? lieu(true) : lieu() + "<br>" + C.secteur) + "</strong></span></a>" +
       '<div class="ligne"><span class="rond-icone">' + ico("horloge") + "</span><span><small>Disponibilités</small><strong>" + C.horaires + "</strong></span></div>" +
       "</div></div></div></section>";
   }
@@ -138,7 +138,7 @@
     var annee = new Date().getFullYear();
     return '<footer class="pied"><div class="wrap"><div class="pied-haut">' +
       "<div>" + logo() +
-      '<p class="pied-presentation">Élagueur à ' + C.ville + ' et dans la métropole lilloise : élagage, taille de haie, abattage, dessouchage, création de pelouse et entretien de jardin.</p>' +
+      '<p class="pied-presentation">Élagueur à ' + C.ville + ', déplacement dans tout le Nord et le Pas-de-Calais : élagage, abattage d’arbres, taille de haies et d’arbres, dessouchage, entretien de jardins et évacuation des déchets verts.</p>' +
       '<a class="btn btn--pousse btn--petit" href="devis-gratuit.html">Devis gratuit ' + ico("fleche", "icon--fleche") + "</a></div>" +
       "<div><h3>Nos services</h3><ul>" + D.SERVICES.map(function (s) { return '<li><a href="' + s.lien + '">' + s.titre + "</a></li>"; }).join("") + "</ul></div>" +
       "<div><h3>Zones d'intervention</h3><ul><li><a href=\"index.html#zones\">Élagueur à " + C.ville + "</a></li>" +

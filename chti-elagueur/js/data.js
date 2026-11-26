@@ -17,7 +17,7 @@ window.SITE = {
     adresse: "",                     // rue à compléter
     codePostal: "59130",
     ville: "Lambersart",
-    secteur: "Lambersart et la métropole lilloise",
+    secteur: "Déplacement dans tout le Nord (59) et le Pas-de-Calais (62)",
     horaires: "Du lundi au vendredi, de 8 h à 19 h",
     horairesCourt: "Lun – Ven · 8 h – 19 h",
     siret: "",                       // à compléter
@@ -27,24 +27,22 @@ window.SITE = {
   /* Agence qui a réalisé le site (affichée dans le pied de page) */
   AGENCE: { nom: "Groupe Épure", lien: "#" },
 
-  /* Les 8 services */
+  /* Les 7 services (d'après la fiche Google du client) */
   SERVICES: [
-    { titre: "Élagage", lien: "index.html#elagage", photo: "images/photos/elagage-1-600.webp",
-      accroche: "Des arbres sains, sûrs et élégants." },
-    { titre: "Dessouchage arbre et haie", lien: "dessouchage-arbre-et-haie-59.html", photo: "images/photos/dessouchage-arbre-et-haie-1.webp",
-      accroche: "Souches et racines retirées, terrain dégagé." },
-    { titre: "Taille de haie", lien: "taille-de-haie-59.html", photo: "images/photos/taille-de-haie-1.webp",
-      accroche: "Des haies nettes, denses et bien dessinées." },
-    { titre: "Création de pelouse", lien: "creation-de-pelouse-59.html", photo: "images/photos/creation-de-pelouse-1.webp",
-      accroche: "Un gazon dense, de la préparation du sol à la pose." },
-    { titre: "Abattage arbres et haies", lien: "abattage-arbres-et-haies-59.html", photo: "images/photos/abattage-arbres-et-haies-3.webp",
-      accroche: "Abattage d'arbres et de haies, travail soigné." },
-    { titre: "Jardinier", lien: "jardinier-59.html", photo: "images/photos/jardinier-1.webp",
-      accroche: "Entretien de jardin, de la tonte à la plantation." },
-    { titre: "Élagueur", lien: "elagueur-59.html", photo: "images/photos/elagueur-1.webp",
-      accroche: "Élagage de tout type d'arbre." },
-    { titre: "Taille de haie et arbres fruitiers", lien: "taille-de-haie-et-arbres-fruitiers-59.html", photo: "images/photos/taille-de-haie-et-arbres-fruitiers-2.webp",
-      accroche: "Des coupes pensées pour la floraison et la récolte." }
+    { titre: "Élagage d’arbres", lien: "elagage-arbres.html", photo: "images/photos/elagueur-1.webp",
+      accroche: "Des arbres sains, sûrs et bien dessinés." },
+    { titre: "Abattage d’arbres", lien: "abattage-arbres.html", photo: "images/photos/abattage-arbres-et-haies-3.webp",
+      accroche: "Même les arbres dangereux, en toute sécurité." },
+    { titre: "Taille de haies", lien: "taille-de-haies.html", photo: "images/photos/taille-de-haie-1.webp",
+      accroche: "Des haies nettes, à prix modérés." },
+    { titre: "Taille d’arbres", lien: "taille-arbres.html", photo: "images/photos/elagueur-3.webp",
+      accroche: "Arbres d’ornement et fruitiers, taillés avec soin." },
+    { titre: "Dessouchage", lien: "dessouchage.html", photo: "images/photos/dessouchage-arbre-et-haie-1.webp",
+      accroche: "Souches retirées, terrain dégagé." },
+    { titre: "Entretien de jardins", lien: "entretien-jardins.html", photo: "images/photos/taille-de-haie-2.webp",
+      accroche: "Jardins et espaces verts, toute l’année." },
+    { titre: "Évacuation des déchets verts", lien: "evacuation-dechets-verts.html", photo: "images/photos/abattage-arbres-et-haies-2.webp",
+      accroche: "Branches, troncs, feuilles : on emporte tout." }
   ],
 
   /* Zones d'intervention autour de Lambersart (pages « Élagueur à … ») */
