@@ -47,3 +47,9 @@ Marcq-en-Barœul · Wambrechies · Pérenchies
 - Compléter SIRET, responsable de publication, hébergeur ; confirmer les horaires.
 - Choisir le nom de domaine, puis le renseigner dans le générateur (canonical, sitemap).
 - Brancher l’envoi réel des formulaires (aujourd’hui en mode démonstration).
+
+## Mise en ligne sur Netlify
+
+Déployer le contenu de ce dossier **sans** `outils/` ni `README.md` (le zip fourni est déjà prêt).
+Le fichier `_headers` empêche Google d’indexer la maquette : supprimer la ligne `X-Robots-Tag`
+le jour de la vraie mise en ligne.

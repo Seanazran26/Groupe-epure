@@ -1,0 +1,13 @@
+# Réglages Netlify (fichier lu automatiquement au déploiement)
+# Maquette de présentation : Google ne l’indexe pas tant que le client n’a pas validé.
+# Pour la vraie mise en ligne, supprimer la ligne « X-Robots-Tag ».
+/*
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/images/*
+  Cache-Control: public, max-age=604800
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
