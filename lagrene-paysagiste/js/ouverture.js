@@ -6,7 +6,10 @@
      depuis une autre page. Le choix est fait dans le HTML, avant le premier affichage.
    - Un clic, une touche ou un défilement accélèrent l'animation jusqu'au coup de vent.
    - La vidéo n'est dévoilée que lorsque sa première image est prête (attente limitée à 3,5 s).
-   - Tout est dessiné dans un seul canvas ; hasard reproductible (même arbre à chaque visite). */
+   - Tout est dessiné dans un seul canvas ; hasard reproductible (même arbre à chaque visite).
+   - Fluidité : chaque feuille est un petit « lutin » dessiné une fois puis recopié (drawImage),
+     les branches terminées sont tracées par niveau, et le départ attend une page calme
+     et les polices (sans quoi le nom changerait de police en pleine montée). */
 (function () {
   "use strict";
   var intro = document.getElementById("ouverture");
@@ -29,18 +32,31 @@
   function douce(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
 
   var VERTS = ["#b5dd73", "#a3cc61", "#8fb553", "#cfe89a", "#7f9a45", "#e2f2c0"];
-  var branches = [], feuilles = [], vol = [], pollen = [], traits = [];
+  var branches = [], niveaux = [], feuilles = [], vol = [], pollen = [], traits = [];
+
+  // Lutins : une feuille par couleur, dessinée une seule fois
+  var RS = 40, lutins = {};
+  VERTS.forEach(function (c) {
+    var cv = document.createElement("canvas"), x = cv.getContext("2d");
+    cv.width = Math.ceil(RS * 0.8) + 4; cv.height = RS * 2 + 4;
+    x.translate(cv.width / 2, cv.height / 2);
+    x.fillStyle = c; x.beginPath(); x.moveTo(0, -RS); x.quadraticCurveTo(RS * 0.7, -RS * 0.15, 0, RS); x.quadraticCurveTo(-RS * 0.7, -RS * 0.15, 0, -RS); x.fill();
+    x.strokeStyle = "rgba(255,255,255,0.35)"; x.lineWidth = RS * 0.07; x.lineCap = "round";
+    x.beginPath(); x.moveTo(0, -RS * 0.8); x.lineTo(0, RS * 0.92); x.stroke();
+    lutins[c] = cv;
+  });
 
   function construire() {
     R = graine(59);
-    branches = []; feuilles = []; vol = []; pollen = []; traits = [];
+    branches = []; niveaux = []; feuilles = []; vol = []; pollen = []; traits = [];
     var taille = Math.min(W, H);
     echelle = taille / 900;
     cx = W / 2; sol = H * 0.56;
     (function pousse(x, y, ang, len, ep, prof, t0) {
       var dur = prof === 0 ? 0.3 : rnd(0.12, 0.17);
-      var b = { x: x, y: y, x2: x + Math.cos(ang) * len, y2: y + Math.sin(ang) * len, ep: ep, t0: t0, dur: dur };
+      var b = { x: x, y: y, x2: x + Math.cos(ang) * len, y2: y + Math.sin(ang) * len, ep: ep, prof: prof, t0: t0, dur: dur };
       branches.push(b);
+      (niveaux[prof] = niveaux[prof] || []).push(b);
       if (prof < 7 && len > 4) {
         var n = prof === 0 ? 2 : (R() < 0.3 ? 3 : 2), ouv = rnd(0.48, 0.74);
         for (var k = 0; k < n; k++) {
@@ -56,6 +72,8 @@
         }
       }
     })(cx, sol, -Math.PI / 2 + rnd(-0.03, 0.03), taille * 0.11, Math.max(2.5, taille * 0.011), 0, 0.42);
+    // Téléphone : feuilles minuscules, on en garde 3 sur 4, un peu plus grandes (même arbre, moins à dessiner)
+    if (W < 700) feuilles = feuilles.filter(function (f, i) { f.s *= 1.12; return i % 4 !== 3; });
     // Au coup de vent, chaque feuille de l'arbre se détache, de gauche à droite
     var minX = Infinity, maxX = -Infinity;
     feuilles.forEach(function (f) { minX = Math.min(minX, f.x); maxX = Math.max(maxX, f.x); });
@@ -77,21 +95,45 @@
     titre.style.top = (sol + 26 * echelle) + "px";
   }
 
+  // Feuille de taille s (rayon), tournée de ang, retournée selon flip (-1..1) : une seule copie de lutin
   function feuille(x, y, s, ang, flip, col, alpha) {
-    ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.scale(flip, 1); ctx.globalAlpha = alpha;
-    ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(0, -s); ctx.quadraticCurveTo(s * 0.7, -s * 0.15, 0, s); ctx.quadraticCurveTo(-s * 0.7, -s * 0.15, 0, -s); ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = Math.max(0.6, s * 0.07);
-    ctx.beginPath(); ctx.moveTo(0, -s * 0.8); ctx.lineTo(0, s * 0.92); ctx.stroke();
-    ctx.restore();
+    var L = lutins[col], k = s / RS * dpr, c = Math.cos(ang), sn = Math.sin(ang), sx = flip * k;
+    ctx.globalAlpha = alpha;
+    ctx.setTransform(c * sx, sn * sx, -sn * k, c * k, x * dpr, y * dpr);
+    ctx.drawImage(L, -L.width / 2, -L.height / 2);
   }
 
   // Bord organique du coup de vent : position x du bord pour une hauteur y
   function front(t) { return -0.25 * W + douce(borne((t - 2.08) / 1.25)) * 1.5 * W; }
   function bord(fx, y, t) { return fx + Math.sin(y * 0.011 + t * 3.1) * 60 * echelle + Math.sin(y * 0.029 + 1.7) * 34 * echelle + (y / H - 0.5) * W * 0.1; }
-  function balayer(fx, t, decal) {
-    ctx.beginPath(); ctx.moveTo(-10, -10);
-    for (var y = -10; y <= H + 20; y += 14) ctx.lineTo(bord(fx, y, t) + decal, y);
-    ctx.lineTo(-10, H + 20); ctx.closePath(); ctx.fill();
+  // Le bord est échantillonné une fois par image (bx[i] à la hauteur by[i]) puis réutilisé
+  var by = [], bx = [];
+  function echantillonner(fx, t) {
+    by.length = bx.length = 0;
+    for (var y = -14; ; y += 14) { by.push(y); bx.push(bord(fx, y, t)); if (y > H + 14) break; }
+  }
+  // Région du fond encore présente : à droite du bord
+  function cheminDroite() {
+    ctx.beginPath(); ctx.moveTo(bx[0], by[0]);
+    for (var i = 1; i < by.length; i++) ctx.lineTo(bx[i], by[i]);
+    ctx.lineTo(W + 20, by[by.length - 1]); ctx.lineTo(W + 20, by[0]); ctx.closePath();
+  }
+  // Bande entre le bord et le bord décalé de d (pour le fondu)
+  function bande(d) {
+    ctx.beginPath(); ctx.moveTo(bx[0], by[0]);
+    for (var i = 1; i < by.length; i++) ctx.lineTo(bx[i], by[i]);
+    for (var j = by.length - 1; j >= 0; j--) ctx.lineTo(bx[j] + d, by[j]);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // Fond olive préparé une fois (copié pendant le balayage) ; avant, c'est le fond CSS qui s'affiche
+  var fond = document.createElement("canvas"), fondCss = true;
+  function preparerFond() {
+    fond.width = canvas.width; fond.height = canvas.height;
+    var f = fond.getContext("2d"), r = Math.max(W, H) * 0.75 * dpr;
+    var g = f.createRadialGradient(fond.width / 2, fond.height * 0.48, 0, fond.width / 2, fond.height * 0.48, r);
+    g.addColorStop(0, "#808d55"); g.addColorStop(0.5, "#66733f"); g.addColorStop(1, "#4b552e");
+    f.fillStyle = g; f.fillRect(0, 0, fond.width, fond.height);
   }
 
   // La vidéo du héros, dessous : léger recul (1,1 → 1) pendant qu'elle se dévoile
@@ -113,15 +155,16 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
     ctx.clearRect(0, 0, W, H);
-    var fx = front(t);
-    // Une fois le balayage lancé, on ne redessine le fond qu'à droite du bord (moins de pixels à remplir)
-    var gauche = t > 2.08 ? Math.max(0, fx - 0.06 * W - 110 * echelle) : 0;
+    // 1) Fond olive. Avant le coup de vent : le fond CSS (rien à repeindre). Pendant : la copie
+    //    préparée, seulement à droite du bord ; pollen et arbre restent dans cette région.
+    var balaye = t > 2.0;
+    if (balaye === fondCss) { fondCss = !balaye; intro.classList.toggle("balaye", balaye); }
     ctx.save();
-    if (gauche > 0) { ctx.beginPath(); ctx.rect(gauche, 0, W - gauche, H); ctx.clip(); }
-    // 1) Fond olive
-    var g = ctx.createRadialGradient(W / 2, H * 0.48, 0, W / 2, H * 0.48, Math.max(W, H) * 0.75);
-    g.addColorStop(0, "#808d55"); g.addColorStop(0.5, "#66733f"); g.addColorStop(1, "#4b552e");
-    ctx.fillStyle = g; ctx.fillRect(gauche, 0, W - gauche, H);
+    if (balaye) {
+      echantillonner(front(t), t);
+      cheminDroite(); ctx.clip();
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(fond, 0, 0); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
     // 2) Pollen (il continue de flotter même si l'on attend la vidéo)
     ctx.fillStyle = "#e9f5c9";
     for (var i = 0; i < pollen.length; i++) {
@@ -136,47 +179,64 @@
       var largeurSol = sortie(borne((t - 0.08) / 0.5)) * W * 0.2;
       ctx.globalAlpha = 0.6 * (1 - effacement); ctx.strokeStyle = "#f4f1e8"; ctx.lineWidth = 1.2; ctx.lineCap = "round";
       ctx.beginPath(); ctx.moveTo(cx - largeurSol / 2, sol); ctx.lineTo(cx + largeurSol / 2, sol); ctx.stroke();
+      var penche = vent * 0.09 * (1 + 0.35 * Math.sin(t * 9)) + Math.sin(horloge * 1.6) * 0.012;
+      var pc = Math.cos(penche), ps = Math.sin(penche);
       ctx.save();
-      ctx.translate(cx, sol); ctx.rotate(vent * 0.09 * (1 + 0.35 * Math.sin(t * 9)) + Math.sin(horloge * 1.6) * 0.012); ctx.translate(-cx, -sol);
+      ctx.translate(cx, sol); ctx.rotate(penche); ctx.translate(-cx, -sol);
       ctx.globalAlpha = 1 - effacement; ctx.strokeStyle = "#f4ecdb";
-      for (var b = 0; b < branches.length; b++) {
-        var br = branches[b], p = borne((t - br.t0) / br.dur);
-        if (p <= 0) continue;
-        ctx.lineWidth = Math.max(0.7, br.ep * (1 - 0.3 * p));
-        ctx.beginPath(); ctx.moveTo(br.x, br.y); ctx.lineTo(br.x + (br.x2 - br.x) * p, br.y + (br.y2 - br.y) * p); ctx.stroke();
+      // Branches terminées : un seul tracé par niveau ; branches en train de pousser : une par une
+      for (var nv = 0; nv < niveaux.length; nv++) {
+        var lot = niveaux[nv], plein = false;
+        ctx.beginPath();
+        for (var b = 0; b < lot.length; b++) {
+          var br = lot[b], p = borne((t - br.t0) / br.dur);
+          if (p >= 1) { ctx.moveTo(br.x, br.y); ctx.lineTo(br.x2, br.y2); plein = true; }
+        }
+        if (plein) { ctx.lineWidth = Math.max(0.7, lot[0].ep * 0.7); ctx.stroke(); }
+        for (var b2 = 0; b2 < lot.length; b2++) {
+          var bg = lot[b2], pg = borne((t - bg.t0) / bg.dur);
+          if (pg <= 0 || pg >= 1) continue;
+          ctx.lineWidth = Math.max(0.7, bg.ep * (1 - 0.3 * pg));
+          ctx.beginPath(); ctx.moveTo(bg.x, bg.y); ctx.lineTo(bg.x + (bg.x2 - bg.x) * pg, bg.y + (bg.y2 - bg.y) * pg); ctx.stroke();
+        }
       }
-      ctx.globalAlpha = 1;
+      ctx.restore();
+      // Feuilles encore accrochées : même inclinaison que l'arbre (calculée à la main)
       for (var f = 0; f < feuilles.length; f++) {
         var fe = feuilles[f];
         if (t < fe.t0 || t >= fe.td) continue;
-        feuille(fe.x, fe.y, fe.s * rebond(borne((t - fe.t0) / 0.35)), fe.a + Math.sin(t * 6 + fe.ph) * 0.15 * vent, 1, fe.c, 1);
+        var rx = fe.x - cx, ry = fe.y - sol;
+        feuille(cx + rx * pc - ry * ps, sol + rx * ps + ry * pc, fe.s * rebond(borne((t - fe.t0) / 0.35)),
+          fe.a + penche + Math.sin(t * 6 + fe.ph) * 0.15 * vent, 1, fe.c, 1);
       }
-      ctx.restore();
-    }
-    // 4) Le vent balaie le fond et dévoile la vidéo. Bord fondu en rampe linéaire :
-    //    la passe n (de l'extérieur vers l'intérieur) retire 1/(N-n) de ce qui reste.
-    if (t > 2.08) {
-      ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "#000";
-      var N = W < 700 ? 10 : 14, pas = (W < 700 ? 9 : 6.5) * echelle;
-      for (var n = 0; n < N; n++) { ctx.globalAlpha = 1 / (N - n); balayer(fx, t, (N - 1 - n) * pas); }
-      ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.globalAlpha = 1;
     }
     ctx.restore();
+    // 4) Bord fondu en rampe linéaire : la passe n (de l'extérieur vers l'intérieur) retire 1/(N-n)
+    //    de ce qui reste, sur une bande qui part du bord ; à gauche du bord, rien n'a été dessiné.
+    if (balaye) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "#000";
+      var N = W < 700 ? 10 : 14, pas = (W < 700 ? 9 : 6.5) * echelle;
+      for (var n = 0; n < N - 1; n++) { ctx.globalAlpha = 1 / (N - n); bande((N - 1 - n) * pas); }
+      ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+    }
     // 5) Feuilles emportées et lignes de vent, par-dessus la vidéo dévoilée
     for (var k = 0; k < feuilles.length; k++) {
       var fl = feuilles[k], d = t - fl.td;
       if (d < 0) continue;
       var x = fl.x + fl.vx * d * d * 0.85 + 90 * d, y = fl.y + fl.vy * d + 110 * d * d * echelle + Math.sin(d * fl.fr + fl.ph) * fl.amp;
-      if (x > W + 40) continue;
+      if (x > W + 40 || y < -40 || y > H + 40) continue;
       feuille(x, y, fl.s, fl.a + fl.rot * d, Math.cos(d * 9 + fl.ph), fl.c, 1);
     }
     for (var v = 0; v < vol.length; v++) {
       var o = vol[v], dt = t - o.t0;
       if (dt < 0) continue;
       var ox = o.x + o.vx * dt, oy = o.y + o.vy * dt + Math.sin(dt * o.f + o.ph) * o.amp;
-      if (ox > W + 40) continue;
+      if (ox > W + 40 || oy < -40 || oy > H + 40) continue;
       feuille(ox, oy, o.s, o.a + o.rot * dt, Math.cos(dt * 8 + o.ph), o.c, 0.95);
     }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.globalAlpha = 1;
     ctx.lineCap = "round";
     for (var tr = 0; tr < traits.length; tr++) {
       var o2 = traits[tr], dt2 = t - o2.t0;
@@ -210,6 +270,7 @@
     W = window.innerWidth; H = window.innerHeight;
     dpr = Math.min(window.devicePixelRatio || 1, W < 700 ? 1.5 : 1.75);
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    preparerFond();
     construire();
   }
   dimensionner();
@@ -217,6 +278,9 @@
 
   // Horloge : l'animation avance seule ; une interaction l'accélère jusqu'au coup de vent
   var t = 0, horloge = 0, vitesse = 1, presse = false, attente = 0, avant = performance.now(), fini = false;
+  var lance = false, calmes = 0, patience = 0, polices = !(document.fonts && document.fonts.load);
+  if (!polices) Promise.all([document.fonts.load('380 100px "Fraunces"'), document.fonts.load('700 15px "Manrope"')])
+    .then(function () { polices = true; }, function () { polices = true; });
   function presser() {
     if (presse) return;
     presse = true;
@@ -238,6 +302,12 @@
     var dt = Math.min(0.05, Math.max(0, (maintenant - avant) / 1000)); // pas de saut après un onglet en arrière-plan
     avant = maintenant;
     horloge += dt;
+    // Départ quand la page est calme (3 images régulières) et les polices prêtes ; 1,2 s au plus
+    if (!lance) {
+      patience += dt; calmes = dt < 0.022 ? calmes + 1 : 0;
+      if ((calmes >= 3 && polices) || patience > 1.2 || presse) lance = true;
+      else { rendu(0, horloge); requestAnimationFrame(boucle); return; }
+    }
     vitesse = presse ? (t < T_VENT ? 4 : 1.6) : 1;
     var suivant = t + dt * vitesse;
     // Avant le coup de vent, on attend que la vidéo soit prête (3,5 s au plus)
